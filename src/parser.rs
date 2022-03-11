@@ -342,18 +342,20 @@ impl ArgumentParser {
 
             let names = movable.get_names();
 
-            let (double, start) = if names[0].len() == 2 {
+            let (start, extra) = if names[0].len() == 2 {
                 print!("{}", names[0]);
                 if names.len() > 1 {
-                    print!(", ");
-                    (false, 1)
+                    print!(",");
+                    (1, false)
                 } else {
-                    (true, 1)
+                    (1, true)
                 }
             } else {
-                print!("    ");
-                (false, 0)
+                print!("   ");
+                (0, true)
             };
+
+            print!(" ");
 
             let mut printed_length = 0;
             for i in start..names.len() {
@@ -367,16 +369,15 @@ impl ArgumentParser {
 
             if movable.has_hint() {
                 let hint = movable.generate_hint();
-                print!(" {}", hint);
-                printed_length += hint.len() + 1;
-            }
-
-            if double {
-                print!("  ");
-                printed_length += 2;
+                print!("{}", hint);
+                printed_length += hint.len();
             }
 
             for _ in printed_length..longest_line {
+                print!(" ");
+            }
+
+            if extra {
                 print!(" ");
             }
 
