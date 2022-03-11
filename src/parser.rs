@@ -13,7 +13,9 @@ pub struct ArgumentParser {
     usage: Option<String>,
     help: bool,
     movable_arguments: Vec<MovableArgument>,
+    movable_header: Option<String>,
     positional_arguments: Vec<PositionalArgument>,
+    positional_header: Option<String>,
 }
 
 impl ArgumentParser {
@@ -26,7 +28,9 @@ impl ArgumentParser {
             usage: None,
             help: true,
             movable_arguments: Vec::new(),
+            movable_header: None,
             positional_arguments: Vec::new(),
+            positional_header: None,
         }
     }
 
@@ -57,6 +61,16 @@ impl ArgumentParser {
 
     pub fn help(&mut self, enable: bool) -> &mut Self {
         self.help = enable;
+        self
+    }
+
+    pub fn movable_header<S: AsRef<str>>(&mut self, header: S) -> &mut Self {
+        self.movable_header = Some(header.as_ref().to_owned());
+        self
+    }
+
+    pub fn positional_header<S: AsRef<str>>(&mut self, header: S) -> &mut Self {
+        self.positional_header = Some(header.as_ref().to_owned());
         self
     }
 
@@ -290,7 +304,13 @@ impl ArgumentParser {
             }
         }
 
-        println!("\nPOSITIONAL ARGUMENTS:");
+        println!(
+            "\n{}",
+            match &self.positional_header {
+                Some(header) => header,
+                None => "POSITIONAL ARGUMENTS:",
+            }
+        );
         for positional in &self.positional_arguments {
             let len = positional_length - positional.get_name().len();
 
@@ -336,7 +356,13 @@ impl ArgumentParser {
             }
         }
 
-        println!("\nMOVABLE ARGUMENTS:");
+        println!(
+            "\n{}",
+            match &self.movable_header {
+                Some(header) => header,
+                None => "MOVABLE ARGUMENTS:",
+            }
+        );
         for movable in &self.movable_arguments {
             print!("  ");
 
