@@ -212,6 +212,20 @@ impl ArgumentParser {
             }
         }
 
+        // Verify required movables
+        for movable in &self.movable_arguments {
+            if movable.is_required() {
+                match variables.get(movable.get_variable_name()) {
+                    Some(_) => {}
+                    None => {
+                        return Err(ArgumentParseError::MissingRequiredArgument(
+                            movable.get_names()[0].to_owned(),
+                        ))
+                    }
+                }
+            }
+        }
+
         Ok(crate::arguments::new(variables))
     }
 

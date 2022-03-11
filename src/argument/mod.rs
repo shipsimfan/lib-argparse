@@ -106,10 +106,7 @@ impl<'a> Argument<'a> {
 
     pub fn required(&mut self, required: bool) -> &mut Self {
         match self {
-            Argument::Movable(_) => match required {
-                true => {}
-                false => panic!("Cannot set an movable argument to be not required"),
-            },
+            Argument::Movable(movable) => movable.required(required),
             Argument::Positional(positional) => positional.required(required),
         }
 

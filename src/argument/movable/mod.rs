@@ -9,6 +9,7 @@ pub struct MovableArgument {
     hint: Option<String>,
     help: Option<String>,
     class: Class,
+    required: bool,
 }
 
 impl MovableArgument {
@@ -19,6 +20,7 @@ impl MovableArgument {
             hint: None,
             help: None,
             class: Class::Boolean,
+            required: false,
         }
     }
 
@@ -51,6 +53,10 @@ impl MovableArgument {
 
     pub fn count(&mut self, new_count: usize) {
         self.class.update_count(new_count);
+    }
+
+    pub fn required(&mut self, required: bool) {
+        self.required = required;
     }
 
     pub fn sort_names(&mut self) {
@@ -94,8 +100,16 @@ impl MovableArgument {
         }
     }
 
+    pub fn is_required(&self) -> bool {
+        self.required
+    }
+
     pub fn get_names(&self) -> &[String] {
         self.names.as_slice()
+    }
+
+    pub fn get_variable_name(&self) -> &str {
+        &self.variable
     }
 
     pub fn get_help(&self) -> &str {
