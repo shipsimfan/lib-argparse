@@ -10,6 +10,7 @@ pub struct MovableArgument {
     help: Option<String>,
     class: Class,
     required: bool,
+    multiple: bool,
 }
 
 impl MovableArgument {
@@ -21,6 +22,7 @@ impl MovableArgument {
             help: None,
             class: Class::Boolean,
             required: false,
+            multiple: false,
         }
     }
 
@@ -57,6 +59,13 @@ impl MovableArgument {
 
     pub fn required(&mut self, required: bool) {
         self.required = required;
+    }
+
+    pub fn multiple(&mut self, multiple: bool) {
+        match &self.class {
+            Class::Boolean => panic!("Cannot have multiple booleans"),
+            _ => self.multiple = multiple,
+        }
     }
 
     pub fn sort_names(&mut self) {
@@ -102,6 +111,10 @@ impl MovableArgument {
 
     pub fn is_required(&self) -> bool {
         self.required
+    }
+
+    pub fn is_multiple(&self) -> bool {
+        self.multiple
     }
 
     pub fn get_names(&self) -> &[String] {

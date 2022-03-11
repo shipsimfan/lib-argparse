@@ -33,6 +33,24 @@ impl ArgumentClass {
             ArgumentClass::String(vec) => vec.len(),
         }
     }
+
+    pub fn extend(&mut self, other: ArgumentClass) {
+        match self {
+            ArgumentClass::Boolean => panic!("Cannot have multiple booleans"),
+            ArgumentClass::String(vec) => match other {
+                ArgumentClass::String(vec2) => vec.extend(vec2.into_iter()),
+                _ => panic!("Type mismatch"),
+            },
+            ArgumentClass::Integer(vec) => match other {
+                ArgumentClass::Integer(vec2) => vec.extend(vec2.into_iter()),
+                _ => panic!("Type mismatch"),
+            },
+            ArgumentClass::Float(vec) => match other {
+                ArgumentClass::Float(vec2) => vec.extend(vec2.into_iter()),
+                _ => panic!("Type mismatch"),
+            },
+        }
+    }
 }
 
 impl std::fmt::Display for ArgumentClass {

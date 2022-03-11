@@ -1,5 +1,6 @@
 use crate::{
     argument::{MovableArgument, PositionalArgument},
+    argument_class::ArgumentClass,
     Argument, ArgumentParseError, Arguments,
 };
 use std::collections::HashMap;
@@ -94,7 +95,7 @@ impl ArgumentParser {
         };
 
         // Parse the arguments
-        let mut variables = HashMap::new();
+        let mut variables: HashMap<String, ArgumentClass> = HashMap::new();
         let mut positional_index = 0;
         let mut current_positional =
             self.positional_arguments
@@ -128,9 +129,24 @@ impl ArgumentParser {
                     if argument.name_match(&arg) {
                         let (name, output) = argument.parse(&arg, args)?;
 
-                        match variables.insert(name, output) {
-                            Some(_) => return Err(ArgumentParseError::MultipleDefinition(arg)),
-                            None => continue 'main,
+                        if argument.is_multiple() {
+                            match variables.get_mut(&name) {
+                                Some(variable) => {
+                                    variable.extend(output);
+
+                                    continue 'main;
+                                }
+                                None => {}
+                            }
+
+                            variables.insert(name, output);
+
+                            continue 'main;
+                        } else {
+                            match variables.insert(name, output) {
+                                Some(_) => return Err(ArgumentParseError::MultipleDefinition(arg)),
+                                None => continue 'main,
+                            }
                         }
                     }
                 }

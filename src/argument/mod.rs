@@ -112,4 +112,16 @@ impl<'a> Argument<'a> {
 
         self
     }
+
+    pub fn multiple(&mut self, multiple: bool) -> &mut Self {
+        match self {
+            Argument::Movable(movable) => movable.multiple(multiple),
+            Argument::Positional(_) => match multiple {
+                true => panic!("Cannot have multiple of one positional argument!"),
+                false => {}
+            },
+        }
+
+        self
+    }
 }
