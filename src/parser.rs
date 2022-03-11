@@ -246,7 +246,7 @@ impl ArgumentParser {
     }
 
     fn generate_usage(&self) -> String {
-        let mut string = format!("USAGE:\n\t%(prog) ");
+        let mut string = format!("%(prog) ");
 
         for movable in &self.movable_arguments {
             string.push_str(&format!("[{}] ", movable.generate_usage()));
@@ -405,7 +405,7 @@ impl ArgumentParser {
         }
 
         println!(
-            "{}",
+            "USAGE:\n\t{}",
             match &self.usage {
                 Some(usage) => usage.to_owned(),
                 None => self.generate_usage(),
