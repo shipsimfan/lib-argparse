@@ -3,7 +3,7 @@ use class::Class;
 
 mod class;
 
-pub struct OptionalArgument {
+pub struct MovableArgument {
     names: Vec<String>,
     variable: String,
     hint: Option<String>,
@@ -11,9 +11,9 @@ pub struct OptionalArgument {
     class: Class,
 }
 
-impl OptionalArgument {
+impl MovableArgument {
     pub fn new<S: AsRef<str>>(name: S) -> Self {
-        OptionalArgument {
+        MovableArgument {
             names: vec![name.as_ref().to_owned()],
             variable: name.as_ref().to_owned(),
             hint: None,

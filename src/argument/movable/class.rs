@@ -20,7 +20,7 @@ impl Class {
 
     pub fn update_count(&mut self, new_count: usize) {
         if new_count == 0 {
-            panic!("Zero count is not valid for optional arguments");
+            panic!("Zero count is not valid for movable arguments");
         }
 
         match self {

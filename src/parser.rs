@@ -1,5 +1,5 @@
 use crate::{
-    argument::{OptionalArgument, PositionalArgument},
+    argument::{MovableArgument, PositionalArgument},
     Argument, ArgumentParseError, Arguments,
 };
 use std::collections::HashMap;
@@ -11,7 +11,7 @@ pub struct ArgumentParser {
     epilogue: Option<String>,
     usage: Option<String>,
     help: bool,
-    optional_arguments: Vec<OptionalArgument>,
+    movable_arguments: Vec<MovableArgument>,
     positional_arguments: Vec<PositionalArgument>,
 }
 
@@ -24,7 +24,7 @@ impl ArgumentParser {
             epilogue: None,
             usage: None,
             help: true,
-            optional_arguments: Vec::new(),
+            movable_arguments: Vec::new(),
             positional_arguments: Vec::new(),
         }
     }
@@ -61,9 +61,9 @@ impl ArgumentParser {
 
     pub fn add_argument<S: AsRef<str>>(&mut self, name: S) -> Argument {
         if name.as_ref().starts_with('-') {
-            let index = self.optional_arguments.len();
-            self.optional_arguments.push(OptionalArgument::new(name));
-            Argument::Optional(self.optional_arguments.get_mut(index).unwrap())
+            let index = self.movable_arguments.len();
+            self.movable_arguments.push(MovableArgument::new(name));
+            Argument::Movable(self.movable_arguments.get_mut(index).unwrap())
         } else {
             let index = self.positional_arguments.len();
             self.positional_arguments
@@ -124,7 +124,7 @@ impl ArgumentParser {
                     }
                 }
 
-                for argument in &self.optional_arguments {
+                for argument in &self.movable_arguments {
                     if argument.name_match(&arg) {
                         let (name, output) = argument.parse(&arg, args)?;
 
@@ -218,8 +218,8 @@ impl ArgumentParser {
     fn generate_usage(&self) -> String {
         let mut string = format!("USAGE:\n\t%(prog) ");
 
-        for optional in &self.optional_arguments {
-            string.push_str(&format!("[{}] ", optional.generate_usage()));
+        for movable in &self.movable_arguments {
+            string.push_str(&format!("[{}] ", movable.generate_usage()));
         }
 
         for positional in &self.positional_arguments {
@@ -276,15 +276,15 @@ impl ArgumentParser {
         }
     }
 
-    fn display_help_optionals(&self, program_name: &str) {
-        if self.optional_arguments.len() == 0 {
+    fn display_help_movables(&self, program_name: &str) {
+        if self.movable_arguments.len() == 0 {
             return;
         }
 
         let mut longest_line = if self.version.is_some() { 9 } else { 6 };
 
-        for optional in &self.optional_arguments {
-            let names = optional.get_names();
+        for movable in &self.movable_arguments {
+            let names = movable.get_names();
 
             let offset = if names[0].len() == 2 { 1 } else { 0 };
 
@@ -297,8 +297,8 @@ impl ArgumentParser {
                 len -= 2;
             }
 
-            if optional.has_hint() {
-                len += optional.generate_hint().len() + 1;
+            if movable.has_hint() {
+                len += movable.generate_hint().len() + 1;
             }
 
             if longest_line < len {
@@ -306,11 +306,11 @@ impl ArgumentParser {
             }
         }
 
-        println!("\nOPTIONAL ARGUMENTS:");
-        for optional in &self.optional_arguments {
+        println!("\nMOVABLE ARGUMENTS:");
+        for movable in &self.movable_arguments {
             print!("  ");
 
-            let names = optional.get_names();
+            let names = movable.get_names();
 
             let (double, start) = if names[0].len() == 2 {
                 print!("{}", names[0]);
@@ -335,8 +335,8 @@ impl ArgumentParser {
                 }
             }
 
-            if optional.has_hint() {
-                let hint = optional.generate_hint();
+            if movable.has_hint() {
+                let hint = movable.generate_hint();
                 print!(" {}", hint);
                 printed_length += hint.len() + 1;
             }
@@ -350,10 +350,7 @@ impl ArgumentParser {
                 print!(" ");
             }
 
-            println!(
-                "\t {}",
-                optional.get_help().replace("%(prog)", program_name)
-            );
+            println!("\t {}", movable.get_help().replace("%(prog)", program_name));
         }
 
         print!("  -h, --help");
@@ -387,7 +384,7 @@ impl ArgumentParser {
         );
 
         self.display_help_positionals(program_name);
-        self.display_help_optionals(program_name);
+        self.display_help_movables(program_name);
 
         std::process::exit(0);
     }
