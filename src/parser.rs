@@ -299,7 +299,7 @@ impl ArgumentParser {
             }
 
             println!(
-                "{}\t {}",
+                "{}    {}",
                 positional.get_name(),
                 positional.get_help().replace("%(prog)", program_name)
             );
@@ -380,21 +380,24 @@ impl ArgumentParser {
                 print!(" ");
             }
 
-            println!("\t {}", movable.get_help().replace("%(prog)", program_name));
+            println!(
+                "    {}",
+                movable.get_help().replace("%(prog)", program_name)
+            );
         }
 
         print!("  -h, --help");
         for _ in 0..longest_line - 6 {
             print!(" ");
         }
-        println!("\t Display this help message");
+        println!("    Display this help message");
 
         if self.version.is_some() {
             print!("      --version");
             for _ in 0..longest_line - 9 {
                 print!(" ");
             }
-            println!("\t Display the version");
+            println!("    Display the version");
         }
     }
 
@@ -405,7 +408,7 @@ impl ArgumentParser {
         }
 
         println!(
-            "USAGE:\n\t{}",
+            "USAGE:\n    {}",
             match &self.usage {
                 Some(usage) => usage.to_owned(),
                 None => self.generate_usage(),
