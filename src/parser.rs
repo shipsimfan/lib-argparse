@@ -420,6 +420,11 @@ impl ArgumentParser {
         self.display_help_positionals(program_name);
         self.display_help_movables(program_name);
 
+        match &self.epilogue {
+            Some(epilogue) => println!("\n{}", epilogue.replace("%(prog)", program_name)),
+            None => {}
+        }
+
         std::process::exit(0);
     }
 }
