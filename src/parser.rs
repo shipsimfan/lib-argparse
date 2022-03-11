@@ -331,19 +331,19 @@ impl ArgumentParser {
             return;
         }
 
-        let mut longest_line = if self.version.is_some() { 9 } else { 6 };
+        let mut longest_line = if self.version.is_some() { 13 } else { 10 };
 
         for movable in &self.movable_arguments {
             let names = movable.get_names();
 
             let offset = if names[0].len() == 2 { 1 } else { 0 };
 
-            let mut len = 0;
+            let mut len = 4;
             for i in offset..names.len() {
                 len += names[i].len() + 2;
             }
 
-            if len > 0 {
+            if len > 4 {
                 len -= 2;
             }
 
@@ -368,42 +368,36 @@ impl ArgumentParser {
 
             let names = movable.get_names();
 
-            let (start, extra) = if names[0].len() == 2 {
+            let (start, mut printed_length) = if names[0].len() == 2 {
                 print!("{}", names[0]);
                 if names.len() > 1 {
-                    print!(",");
-                    (1, false)
+                    print!(", ");
+                    (1, 4)
                 } else {
-                    (1, true)
+                    (1, 2)
                 }
             } else {
-                print!("   ");
-                (0, true)
+                print!("    ");
+                (0, 4)
             };
 
-            print!(" ");
-
-            let mut printed_length = 0;
             for i in start..names.len() {
                 print!("{}", names[i]);
                 printed_length += names[i].len();
 
                 if i < names.len() - 1 {
                     print!(", ");
+                    printed_length += 2;
                 }
             }
 
             if movable.has_hint() {
                 let hint = movable.generate_hint();
-                print!("{}", hint);
-                printed_length += hint.len();
+                print!(" {}", hint);
+                printed_length += hint.len() + 1;
             }
 
             for _ in printed_length..longest_line {
-                print!(" ");
-            }
-
-            if extra {
                 print!(" ");
             }
 
@@ -414,14 +408,14 @@ impl ArgumentParser {
         }
 
         print!("  -h, --help");
-        for _ in 0..longest_line - 6 {
+        for _ in 0..longest_line - 10 {
             print!(" ");
         }
         println!("    Display this help message");
 
         if self.version.is_some() {
             print!("      --version");
-            for _ in 0..longest_line - 9 {
+            for _ in 0..longest_line - 13 {
                 print!(" ");
             }
             println!("    Display the version");
