@@ -2,6 +2,14 @@ use crate::{
     argument::{MovableArgument, PositionalArgument},
     ActionType, Argument, ArgumentParseError,
 };
+
+pub enum DashAction<T> {
+    Reject,
+    Ignore,
+    Accept(ActionType<T>),
+    Collect(ActionType<T>),
+}
+
 pub struct ArgumentParser<T = ()> {
     program_name: Option<String>,
     version: Option<String>,
@@ -13,6 +21,8 @@ pub struct ArgumentParser<T = ()> {
     movable_header: Option<String>,
     positional_arguments: Vec<PositionalArgument<T>>,
     positional_header: Option<String>,
+    dash_action: DashAction<T>,
+    dash_dash_action: DashAction<T>,
 }
 
 impl<T> ArgumentParser<T> {
@@ -28,6 +38,8 @@ impl<T> ArgumentParser<T> {
             movable_header: None,
             positional_arguments: Vec::new(),
             positional_header: None,
+            dash_action: DashAction::Reject,
+            dash_dash_action: DashAction::Reject,
         }
     }
 
@@ -85,6 +97,14 @@ impl<T> ArgumentParser<T> {
         }
     }
 
+    pub fn dash_action(&mut self, action: DashAction<T>) {
+        self.dash_action = action;
+    }
+
+    pub fn dash_dash_action(&mut self, action: DashAction<T>) {
+        self.dash_dash_action = action;
+    }
+
     pub fn parse_args_env(&self, options: T) -> Result<T, ArgumentParseError> {
         let mut args = std::env::args();
         self.parse_args(&mut args, options)
@@ -122,8 +142,48 @@ impl<T> ArgumentParser<T> {
             }
         }
 
-        while let Some(arg) = args.next() {
+        'main: while let Some(arg) = args.next() {
             if arg.starts_with('-') {
+                if arg == "-" {
+                    match self.dash_action {
+                        DashAction::Reject => return Err(ArgumentParseError::UnknownArgument(arg)),
+                        DashAction::Ignore => {}
+                        DashAction::Accept(action) => (action)(&[], &mut options)?,
+                        DashAction::Collect(action) => {
+                            let mut values = Vec::new();
+                            while let Some(arg) = args.next() {
+                                values.push(arg);
+                            }
+
+                            (action)(values.as_slice(), &mut options)?
+                        }
+                    }
+
+                    continue 'main;
+                }
+
+                if arg == "--" {
+                    if arg == "-" {
+                        match self.dash_dash_action {
+                            DashAction::Reject => {
+                                return Err(ArgumentParseError::UnknownArgument(arg))
+                            }
+                            DashAction::Ignore => {}
+                            DashAction::Accept(action) => (action)(&[], &mut options)?,
+                            DashAction::Collect(action) => {
+                                let mut values = Vec::new();
+                                while let Some(arg) = args.next() {
+                                    values.push(arg);
+                                }
+
+                                (action)(values.as_slice(), &mut options)?
+                            }
+                        }
+
+                        continue 'main;
+                    }
+                }
+
                 if arg == "--version" {
                     match &self.version {
                         Some(version) => print_version(&program_name, version),
@@ -140,7 +200,8 @@ impl<T> ArgumentParser<T> {
 
                 for argument in &self.movable_arguments {
                     if argument.name_match(&arg) {
-                        argument.parse(args, &mut options)?
+                        argument.parse(args, &mut options)?;
+                        continue 'main;
                     }
                 }
 
