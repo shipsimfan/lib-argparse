@@ -1,28 +1,23 @@
-use crate::{argument_class::ArgumentClass, ArgumentParseError};
-use class::Class;
+use crate::{ActionType, ArgumentParseError};
 
-mod class;
-
-pub struct MovableArgument {
+pub struct MovableArgument<T> {
     names: Vec<String>,
-    variable: String,
     hint: Option<String>,
     help: Option<String>,
-    class: Class,
     required: bool,
-    multiple: bool,
+    count: usize,
+    action: ActionType<T>,
 }
 
-impl MovableArgument {
-    pub fn new<S: AsRef<str>>(name: S) -> Self {
+impl<T> MovableArgument<T> {
+    pub fn new<S: AsRef<str>>(name: S, action: ActionType<T>) -> Self {
         MovableArgument {
             names: vec![name.as_ref().to_owned()],
-            variable: name.as_ref().to_owned(),
             hint: None,
             help: None,
-            class: Class::Boolean,
             required: false,
-            multiple: false,
+            count: 0,
+            action,
         }
     }
 
@@ -37,10 +32,6 @@ impl MovableArgument {
         self.sort_names();
     }
 
-    pub fn variable_name<S: AsRef<str>>(&mut self, name: S) {
-        self.variable = name.as_ref().to_owned();
-    }
-
     pub fn hint<S: AsRef<str>>(&mut self, hint: S) {
         self.hint = Some(hint.as_ref().to_owned());
     }
@@ -49,23 +40,12 @@ impl MovableArgument {
         self.help = Some(message.as_ref().to_owned());
     }
 
-    pub fn class<S: AsRef<str>>(&mut self, class: S) {
-        self.class = Class::new(class);
-    }
-
     pub fn count(&mut self, new_count: usize) {
-        self.class.update_count(new_count);
+        self.count = new_count;
     }
 
     pub fn required(&mut self, required: bool) {
         self.required = required;
-    }
-
-    pub fn multiple(&mut self, multiple: bool) {
-        match &self.class {
-            Class::Boolean => panic!("Cannot have multiple booleans"),
-            _ => self.multiple = multiple,
-        }
     }
 
     pub fn sort_names(&mut self) {
@@ -79,9 +59,8 @@ impl MovableArgument {
     pub fn generate_usage(&self) -> String {
         let mut string = format!("{}", self.names[0]);
 
-        match self.class {
-            Class::Boolean => return string,
-            _ => {}
+        if self.count == 0 {
+            return string;
         }
 
         string.push(' ');
@@ -91,38 +70,29 @@ impl MovableArgument {
     }
 
     pub fn generate_hint(&self) -> String {
-        match self.class {
-            Class::Boolean => return String::new(),
-            _ => {}
-        }
-
-        match &self.hint {
-            Some(hint) => hint.to_owned(),
-            None => format!("{}", self.class),
+        if self.count == 0 {
+            String::new()
+        } else {
+            match &self.hint {
+                Some(hint) => hint.to_owned(),
+                None => match self.count > 1 {
+                    true => format!("{} VALUES", self.count),
+                    false => format!("VALUE"),
+                },
+            }
         }
     }
 
     pub fn has_hint(&self) -> bool {
-        match self.class {
-            Class::Boolean => false,
-            _ => self.hint.is_some(),
-        }
+        self.count > 0
     }
 
     pub fn is_required(&self) -> bool {
         self.required
     }
 
-    pub fn is_multiple(&self) -> bool {
-        self.multiple
-    }
-
     pub fn get_names(&self) -> &[String] {
         self.names.as_slice()
-    }
-
-    pub fn get_variable_name(&self) -> &str {
-        &self.variable
     }
 
     pub fn get_help(&self) -> &str {
@@ -144,9 +114,24 @@ impl MovableArgument {
 
     pub fn parse<I: Iterator<Item = String>>(
         &self,
-        name: &str,
         iter: &mut I,
-    ) -> Result<(String, ArgumentClass), ArgumentParseError> {
-        Ok((self.variable.clone(), self.class.parse(name, iter)?))
+        options: &mut T,
+    ) -> Result<(), ArgumentParseError> {
+        let mut values = Vec::with_capacity(self.count);
+
+        for i in 0..self.count {
+            match iter.next() {
+                Some(value) => values.push(value),
+                None => {
+                    return Err(ArgumentParseError::TooFewArguments(
+                        self.names[0].clone(),
+                        self.count,
+                        i,
+                    ))
+                }
+            }
+        }
+
+        Ok((self.action)(values.as_slice(), options)?)
     }
 }

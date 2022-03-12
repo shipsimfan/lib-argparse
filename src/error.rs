@@ -6,8 +6,7 @@ pub enum ArgumentParseError {
     InvalidNumber(String, usize, usize),
     TooFewArguments(String, usize, usize),
     MissingRequiredArgument(String),
-    InvalidInteger(String),
-    InvalidFloat(String),
+    UserArgumentError(Box<dyn std::error::Error>),
 }
 
 impl std::error::Error for ArgumentParseError {}
@@ -53,8 +52,13 @@ impl std::fmt::Display for ArgumentParseError {
             ArgumentParseError::MissingRequiredArgument(arg) => {
                 write!(f, "Missing argument for {}", arg)
             }
-            ArgumentParseError::InvalidInteger(int) => write!(f, "{} is an invalid integer", int),
-            ArgumentParseError::InvalidFloat(val) => write!(f, "{} is an invalid number", val),
+            ArgumentParseError::UserArgumentError(error) => write!(f, "{}", error),
         }
+    }
+}
+
+impl From<Box<dyn std::error::Error>> for ArgumentParseError {
+    fn from(error: Box<dyn std::error::Error>) -> Self {
+        ArgumentParseError::UserArgumentError(error)
     }
 }

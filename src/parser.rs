@@ -1,24 +1,21 @@
 use crate::{
     argument::{MovableArgument, PositionalArgument},
-    argument_class::ArgumentClass,
-    Argument, ArgumentParseError, Arguments,
+    ActionType, Argument, ArgumentParseError,
 };
-use std::collections::HashMap;
-
-pub struct ArgumentParser {
+pub struct ArgumentParser<T = ()> {
     program_name: Option<String>,
     version: Option<String>,
     description: Option<String>,
     epilogue: Option<String>,
     usage: Option<String>,
     help: bool,
-    movable_arguments: Vec<MovableArgument>,
+    movable_arguments: Vec<MovableArgument<T>>,
     movable_header: Option<String>,
-    positional_arguments: Vec<PositionalArgument>,
+    positional_arguments: Vec<PositionalArgument<T>>,
     positional_header: Option<String>,
 }
 
-impl ArgumentParser {
+impl<T> ArgumentParser<T> {
     pub fn new() -> Self {
         ArgumentParser {
             program_name: None,
@@ -74,28 +71,30 @@ impl ArgumentParser {
         self
     }
 
-    pub fn add_argument<S: AsRef<str>>(&mut self, name: S) -> Argument {
+    pub fn add_argument<S: AsRef<str>>(&mut self, name: S, action: ActionType<T>) -> Argument<T> {
         if name.as_ref().starts_with('-') {
             let index = self.movable_arguments.len();
-            self.movable_arguments.push(MovableArgument::new(name));
+            self.movable_arguments
+                .push(MovableArgument::new(name, action));
             Argument::Movable(self.movable_arguments.get_mut(index).unwrap())
         } else {
             let index = self.positional_arguments.len();
             self.positional_arguments
-                .push(PositionalArgument::new(name));
+                .push(PositionalArgument::new(name, action));
             Argument::Positional(self.positional_arguments.get_mut(index).unwrap())
         }
     }
 
-    pub fn parse_args_env(&self) -> Result<Arguments, ArgumentParseError> {
+    pub fn parse_args_env(&self, options: T) -> Result<T, ArgumentParseError> {
         let mut args = std::env::args();
-        self.parse_args(&mut args)
+        self.parse_args(&mut args, options)
     }
 
     pub fn parse_args<I: Iterator<Item = String>>(
         &self,
         args: &mut I,
-    ) -> Result<Arguments, ArgumentParseError> {
+        mut options: T,
+    ) -> Result<T, ArgumentParseError> {
         // Skip the first argument and get the program name if nescessary
         let program_name = match &self.program_name {
             Some(name) => {
@@ -109,21 +108,21 @@ impl ArgumentParser {
         };
 
         // Parse the arguments
-        let mut variables: HashMap<String, ArgumentClass> = HashMap::new();
         let mut positional_index = 0;
-        let mut current_positional =
-            self.positional_arguments
-                .get(positional_index)
-                .map(|positional| {
-                    (
-                        positional.generate_instance(),
-                        positional.get_maximum(),
-                        positional.get_variable_name(),
-                    )
-                });
-        let mut count = 0;
+        let mut positional_counts = vec![0];
+        let mut current_maximum = self
+            .positional_arguments
+            .get(positional_index)
+            .map(|positional| positional.get_maximum());
 
-        'main: while let Some(arg) = args.next() {
+        let mut required_movables = Vec::new();
+        for argument in &self.movable_arguments {
+            if argument.is_required() {
+                required_movables.push(argument);
+            }
+        }
+
+        while let Some(arg) = args.next() {
             if arg.starts_with('-') {
                 if arg == "--version" {
                     match &self.version {
@@ -141,63 +140,25 @@ impl ArgumentParser {
 
                 for argument in &self.movable_arguments {
                     if argument.name_match(&arg) {
-                        let (name, output) = argument.parse(&arg, args)?;
-
-                        if argument.is_multiple() {
-                            match variables.get_mut(&name) {
-                                Some(variable) => {
-                                    variable.extend(output);
-
-                                    continue 'main;
-                                }
-                                None => {}
-                            }
-
-                            variables.insert(name, output);
-
-                            continue 'main;
-                        } else {
-                            match variables.insert(name, output) {
-                                Some(_) => return Err(ArgumentParseError::MultipleDefinition(arg)),
-                                None => continue 'main,
-                            }
-                        }
+                        argument.parse(args, &mut options)?
                     }
                 }
 
                 return Err(ArgumentParseError::UnknownArgument(arg));
             } else {
-                current_positional = match current_positional {
-                    Some((mut positional, max, variable_name)) => {
-                        positional.insert(arg)?;
-                        if max != 0 {
-                            count += 1;
+                current_maximum = match current_maximum {
+                    Some(maximum) => {
+                        self.positional_arguments[positional_index].parse(arg, &mut options)?;
+                        positional_counts[positional_index] += 1;
+                        if maximum != 0 && positional_counts[positional_index] >= maximum {
+                            positional_counts.push(0);
+                            positional_index += 1;
 
-                            if count >= max {
-                                positional_index += 1;
-                                match variables.insert(variable_name.to_owned(), positional) {
-                                    Some(_) => {
-                                        return Err(ArgumentParseError::MultipleDefinition(
-                                            variable_name.to_owned(),
-                                        ))
-                                    }
-                                    None => {}
-                                }
-
-                                self.positional_arguments
-                                    .get(positional_index)
-                                    .map(|positional| {
-                                        (
-                                            positional.generate_instance(),
-                                            positional.get_maximum(),
-                                            positional.get_variable_name(),
-                                        )
-                                    })
-                            } else {
-                                Some((positional, max, variable_name))
-                            }
+                            self.positional_arguments
+                                .get(positional_index)
+                                .map(|positional| (positional.get_maximum()))
                         } else {
-                            Some((positional, max, variable_name))
+                            Some(maximum)
                         }
                     }
                     None => return Err(ArgumentParseError::UnexpectedArgument(arg)),
@@ -205,58 +166,32 @@ impl ArgumentParser {
             }
         }
 
-        match current_positional {
-            Some((positional, _, variable_name)) => {
-                match variables.insert(variable_name.to_owned(), positional) {
-                    Some(_) => {
-                        return Err(ArgumentParseError::MultipleDefinition(
-                            variable_name.to_owned(),
-                        ))
-                    }
-                    None => {}
-                }
-            }
-            None => {}
-        }
-
         // Verify positional minimums
-        for argument in &self.positional_arguments {
+        for i in 0..self.positional_arguments.len() {
+            let argument = &self.positional_arguments[i];
             let minimum = argument.get_minimum();
-            if minimum != 0 {
-                match variables.get(argument.get_variable_name()) {
-                    Some(variable) => {
-                        if variable.len() < minimum {
-                            return Err(ArgumentParseError::TooFewArguments(
-                                argument.get_name().to_owned(),
-                                minimum,
-                                variable.len(),
-                            ));
-                        }
-                    }
-                    None => {
-                        return Err(ArgumentParseError::MissingRequiredArgument(
-                            argument.get_name().to_owned(),
-                        ))
-                    }
+            if positional_counts[i] < minimum {
+                if positional_counts[i] > 0 {
+                    return Err(ArgumentParseError::TooFewArguments(
+                        argument.get_name().to_owned(),
+                        minimum,
+                        positional_counts[i],
+                    ));
+                } else {
+                    return Err(ArgumentParseError::MissingRequiredArgument(
+                        argument.get_name().to_owned(),
+                    ));
                 }
             }
         }
 
         // Verify required movables
-        for movable in &self.movable_arguments {
-            if movable.is_required() {
-                match variables.get(movable.get_variable_name()) {
-                    Some(_) => {}
-                    None => {
-                        return Err(ArgumentParseError::MissingRequiredArgument(
-                            movable.get_names()[0].to_owned(),
-                        ))
-                    }
-                }
-            }
+        match required_movables.pop() {
+            Some(movable) => Err(ArgumentParseError::MissingRequiredArgument(
+                movable.get_names()[0].to_owned(),
+            )),
+            None => Ok(options),
         }
-
-        Ok(crate::arguments::new(variables))
     }
 
     fn generate_usage(&self) -> String {
