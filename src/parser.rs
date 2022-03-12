@@ -164,67 +164,65 @@ impl<T> ArgumentParser<T> {
                     }
                 }
             } else if arg == "--" {
-                if arg == "-" {
-                    match self.dash_dash_action {
-                        DashAction::Reject => return Err(ArgumentParseError::UnknownArgument(arg)),
-                        DashAction::Ignore => continue 'main,
-                        DashAction::Positional => {}
-                        DashAction::Accept(action) => {
-                            (action)(&[], &mut options)?;
-                            continue 'main;
-                        }
-                        DashAction::Collect(action) => {
-                            let mut values = Vec::new();
-                            while let Some(arg) = args.next() {
-                                values.push(arg);
-                            }
-
-                            (action)(values.as_slice(), &mut options)?;
-                            continue 'main;
-                        }
+                match self.dash_dash_action {
+                    DashAction::Reject => return Err(ArgumentParseError::UnknownArgument(arg)),
+                    DashAction::Ignore => continue 'main,
+                    DashAction::Positional => {}
+                    DashAction::Accept(action) => {
+                        (action)(&[], &mut options)?;
+                        continue 'main;
                     }
-                } else if arg.starts_with('-') {
-                    if arg == "--version" {
-                        match &self.version {
-                            Some(version) => print_version(&program_name, version),
-                            None => {}
+                    DashAction::Collect(action) => {
+                        let mut values = Vec::new();
+                        while let Some(arg) = args.next() {
+                            values.push(arg);
                         }
-                    }
 
-                    if arg == "-h" || arg == "--help" {
-                        match self.help {
-                            true => self.print_help(&program_name),
-                            false => {}
-                        }
+                        (action)(values.as_slice(), &mut options)?;
+                        continue 'main;
                     }
-
-                    for argument in &self.movable_arguments {
-                        if argument.name_match(&arg) {
-                            argument.parse(args, &mut options)?;
-                            continue 'main;
-                        }
+                }
+            } else if arg.starts_with('-') {
+                if arg == "--version" {
+                    match &self.version {
+                        Some(version) => print_version(&program_name, version),
+                        None => {}
                     }
-
-                    return Err(ArgumentParseError::UnknownArgument(arg));
                 }
 
-                current_maximum = match current_maximum {
-                    Some(maximum) => {
-                        self.positional_arguments[positional_index].parse(arg, &mut options)?;
-                        positional_counts[positional_index] += 1;
-                        if maximum != 0 && positional_counts[positional_index] >= maximum {
-                            positional_counts.push(0);
-                            positional_index += 1;
-
-                            self.positional_arguments
-                                .get(positional_index)
-                                .map(|positional| (positional.get_maximum()))
-                        } else {
-                            Some(maximum)
-                        }
+                if arg == "-h" || arg == "--help" {
+                    match self.help {
+                        true => self.print_help(&program_name),
+                        false => {}
                     }
-                    None => return Err(ArgumentParseError::UnexpectedArgument(arg)),
                 }
+
+                for argument in &self.movable_arguments {
+                    if argument.name_match(&arg) {
+                        argument.parse(args, &mut options)?;
+                        continue 'main;
+                    }
+                }
+
+                return Err(ArgumentParseError::UnknownArgument(arg));
+            }
+
+            current_maximum = match current_maximum {
+                Some(maximum) => {
+                    self.positional_arguments[positional_index].parse(arg, &mut options)?;
+                    positional_counts[positional_index] += 1;
+                    if maximum != 0 && positional_counts[positional_index] >= maximum {
+                        positional_counts.push(0);
+                        positional_index += 1;
+
+                        self.positional_arguments
+                            .get(positional_index)
+                            .map(|positional| (positional.get_maximum()))
+                    } else {
+                        Some(maximum)
+                    }
+                }
+                None => return Err(ArgumentParseError::UnexpectedArgument(arg)),
             }
         }
 
