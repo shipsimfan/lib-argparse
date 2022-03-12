@@ -6,6 +6,7 @@ use crate::{
 pub enum DashAction<T> {
     Reject,
     Ignore,
+    Positional,
     Accept(ActionType<T>),
     Collect(ActionType<T>),
 }
@@ -143,70 +144,70 @@ impl<T> ArgumentParser<T> {
         }
 
         'main: while let Some(arg) = args.next() {
-            if arg.starts_with('-') {
+            if arg == "-" {
+                match self.dash_action {
+                    DashAction::Reject => return Err(ArgumentParseError::UnknownArgument(arg)),
+                    DashAction::Ignore => continue 'main,
+                    DashAction::Positional => {}
+                    DashAction::Accept(action) => {
+                        (action)(&[], &mut options)?;
+                        continue 'main;
+                    }
+                    DashAction::Collect(action) => {
+                        let mut values = Vec::new();
+                        while let Some(arg) = args.next() {
+                            values.push(arg);
+                        }
+
+                        (action)(values.as_slice(), &mut options)?;
+                        continue 'main;
+                    }
+                }
+            } else if arg == "--" {
                 if arg == "-" {
-                    match self.dash_action {
+                    match self.dash_dash_action {
                         DashAction::Reject => return Err(ArgumentParseError::UnknownArgument(arg)),
-                        DashAction::Ignore => {}
-                        DashAction::Accept(action) => (action)(&[], &mut options)?,
+                        DashAction::Ignore => continue 'main,
+                        DashAction::Positional => {}
+                        DashAction::Accept(action) => {
+                            (action)(&[], &mut options)?;
+                            continue 'main;
+                        }
                         DashAction::Collect(action) => {
                             let mut values = Vec::new();
                             while let Some(arg) = args.next() {
                                 values.push(arg);
                             }
 
-                            (action)(values.as_slice(), &mut options)?
+                            (action)(values.as_slice(), &mut options)?;
+                            continue 'main;
+                        }
+                    }
+                } else if arg.starts_with('-') {
+                    if arg == "--version" {
+                        match &self.version {
+                            Some(version) => print_version(&program_name, version),
+                            None => {}
                         }
                     }
 
-                    continue 'main;
-                }
-
-                if arg == "--" {
-                    if arg == "-" {
-                        match self.dash_dash_action {
-                            DashAction::Reject => {
-                                return Err(ArgumentParseError::UnknownArgument(arg))
-                            }
-                            DashAction::Ignore => {}
-                            DashAction::Accept(action) => (action)(&[], &mut options)?,
-                            DashAction::Collect(action) => {
-                                let mut values = Vec::new();
-                                while let Some(arg) = args.next() {
-                                    values.push(arg);
-                                }
-
-                                (action)(values.as_slice(), &mut options)?
-                            }
+                    if arg == "-h" || arg == "--help" {
+                        match self.help {
+                            true => self.print_help(&program_name),
+                            false => {}
                         }
-
-                        continue 'main;
                     }
+
+                    for argument in &self.movable_arguments {
+                        if argument.name_match(&arg) {
+                            argument.parse(args, &mut options)?;
+                            continue 'main;
+                        }
+                    }
+
+                    return Err(ArgumentParseError::UnknownArgument(arg));
                 }
 
-                if arg == "--version" {
-                    match &self.version {
-                        Some(version) => print_version(&program_name, version),
-                        None => {}
-                    }
-                }
-
-                if arg == "-h" || arg == "--help" {
-                    match self.help {
-                        true => self.print_help(&program_name),
-                        false => {}
-                    }
-                }
-
-                for argument in &self.movable_arguments {
-                    if argument.name_match(&arg) {
-                        argument.parse(args, &mut options)?;
-                        continue 'main;
-                    }
-                }
-
-                return Err(ArgumentParseError::UnknownArgument(arg));
-            } else {
                 current_maximum = match current_maximum {
                     Some(maximum) => {
                         self.positional_arguments[positional_index].parse(arg, &mut options)?;
