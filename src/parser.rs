@@ -130,7 +130,7 @@ impl<T> ArgumentParser<T> {
 
         // Parse the arguments
         let mut positional_index = 0;
-        let mut positional_counts = vec![0];
+        let mut positional_arguments = vec![Vec::new()];
         let mut current_maximum = self
             .positional_arguments
             .get(positional_index)
@@ -209,10 +209,9 @@ impl<T> ArgumentParser<T> {
 
             current_maximum = match current_maximum {
                 Some(maximum) => {
-                    self.positional_arguments[positional_index].parse(arg, &mut options)?;
-                    positional_counts[positional_index] += 1;
-                    if maximum != 0 && positional_counts[positional_index] >= maximum {
-                        positional_counts.push(0);
+                    positional_arguments[positional_index].push(arg);
+                    if maximum != 0 && positional_arguments[positional_index].len() >= maximum {
+                        positional_arguments.push(Vec::new());
                         positional_index += 1;
 
                         self.positional_arguments
@@ -227,15 +226,15 @@ impl<T> ArgumentParser<T> {
         }
 
         // Verify positional minimums
-        for i in 0..self.positional_arguments.len() {
+        for (i, args) in positional_arguments.into_iter().enumerate() {
             let argument = &self.positional_arguments[i];
             let minimum = argument.get_minimum();
-            if positional_counts[i] < minimum {
-                if positional_counts[i] > 0 {
+            if args.len() < minimum {
+                if args.len() > 0 {
                     return Err(ArgumentParseError::TooFewArguments(
                         argument.get_name().to_owned(),
                         minimum,
-                        positional_counts[i],
+                        args.len(),
                     ));
                 } else {
                     return Err(ArgumentParseError::MissingRequiredArgument(
@@ -243,6 +242,8 @@ impl<T> ArgumentParser<T> {
                     ));
                 }
             }
+
+            argument.parse(args, &mut options)?;
         }
 
         // Verify required movables

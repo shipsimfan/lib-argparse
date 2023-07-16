@@ -83,7 +83,7 @@ impl<T> PositionalArgument<T> {
         self.minimum
     }
 
-    pub fn parse(&self, arg: String, options: &mut T) -> Result<(), ArgumentParseError> {
-        Ok((self.action)(vec![arg], options)?)
+    pub fn parse(&self, args: Vec<String>, options: &mut T) -> Result<(), ArgumentParseError> {
+        Ok((self.action)(args, options)?)
     }
 }
