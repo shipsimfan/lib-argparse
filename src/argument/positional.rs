@@ -84,6 +84,6 @@ impl<T> PositionalArgument<T> {
     }
 
     pub fn parse(&self, arg: String, options: &mut T) -> Result<(), ArgumentParseError> {
-        Ok((self.action)(&[arg], options)?)
+        Ok((self.action)(vec![arg], options)?)
     }
 }

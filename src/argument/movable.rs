@@ -132,6 +132,6 @@ impl<T> MovableArgument<T> {
             }
         }
 
-        Ok((self.action)(values.as_slice(), options)?)
+        Ok((self.action)(values, options)?)
     }
 }

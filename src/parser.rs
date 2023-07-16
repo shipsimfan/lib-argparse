@@ -150,7 +150,7 @@ impl<T> ArgumentParser<T> {
                     DashAction::Ignore => continue 'main,
                     DashAction::Positional => {}
                     DashAction::Accept(action) => {
-                        (action)(&[], &mut options)?;
+                        (action)(Vec::new(), &mut options)?;
                         continue 'main;
                     }
                     DashAction::Collect(action) => {
@@ -159,7 +159,7 @@ impl<T> ArgumentParser<T> {
                             values.push(arg);
                         }
 
-                        (action)(values.as_slice(), &mut options)?;
+                        (action)(values, &mut options)?;
                         continue 'main;
                     }
                 }
@@ -169,7 +169,7 @@ impl<T> ArgumentParser<T> {
                     DashAction::Ignore => continue 'main,
                     DashAction::Positional => {}
                     DashAction::Accept(action) => {
-                        (action)(&[], &mut options)?;
+                        (action)(Vec::new(), &mut options)?;
                         continue 'main;
                     }
                     DashAction::Collect(action) => {
@@ -178,7 +178,7 @@ impl<T> ArgumentParser<T> {
                             values.push(arg);
                         }
 
-                        (action)(values.as_slice(), &mut options)?;
+                        (action)(values, &mut options)?;
                         continue 'main;
                     }
                 }

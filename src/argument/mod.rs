@@ -5,7 +5,7 @@ pub use movable::MovableArgument;
 pub use positional::PositionalArgument;
 
 pub type ActionType<T> =
-    fn(args: &[String], options: &mut T) -> Result<(), Box<dyn std::error::Error>>;
+    fn(args: Vec<String>, options: &mut T) -> Result<(), Box<dyn std::error::Error>>;
 
 pub enum Argument<'a, T> {
     Movable(&'a mut MovableArgument<T>),
