@@ -226,6 +226,18 @@ impl<T> ArgumentParser<T> {
         }
 
         // Verify positional minimums
+        if positional_arguments.len() < self.positional_arguments.len() {
+            return Err(ArgumentParseError::MissingRequiredArgument(
+                self.positional_arguments[positional_arguments.len()]
+                    .get_name()
+                    .to_owned(),
+            ));
+        } else if positional_arguments.len() == self.positional_arguments.len() + 1
+            && positional_arguments.last().unwrap().len() == 0
+        {
+            positional_arguments.pop();
+        }
+
         for (i, args) in positional_arguments.into_iter().enumerate() {
             let argument = &self.positional_arguments[i];
             let minimum = argument.get_minimum();
