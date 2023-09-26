@@ -1,5 +1,7 @@
 use crate::{ArgStream, FlagArgument, FlagKind};
 
+// TODO: Create `SimpleValueParser` that can parse any type implementing `std::str::FromStr`
+
 pub trait ValueParser: 'static {
     type Error;
     type Value;
