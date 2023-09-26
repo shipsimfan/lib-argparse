@@ -7,7 +7,7 @@
 //! Argument parsing is performed in a tree. Each node of the tree is a `Parser`.
 //! `Parser`s can have any number of `FlagArgument`s and one `TerminalArgument`.
 //!
-//! ### Named Arguments
+//! ### Flag Arguments
 //!
 //! `FlagArgument`s are arguments that start with '-' or '--'
 //! A `FlagArgument` can be one of the following:
@@ -51,3 +51,9 @@
 //! #### Positionals
 //! `Positionals` form the leaves of the tree.
 //! `Positionals` are made from an ordered list of `PositionalParser`s.
+
+mod flag;
+mod parser;
+
+pub use flag::{ActionFlag, FlagArgument, FlagKind};
+pub use parser::Parser;
