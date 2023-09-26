@@ -5,11 +5,36 @@
 //! ## Concept
 //!
 //! Argument parsing is performed in a tree. Each node of the tree is a `Parser`.
-//! `Parser`s can have any number of `NamedArgument`s and one `TerminalArgument`.
+//! `Parser`s can have any number of `FlagArgument`s and one `TerminalArgument`.
 //!
 //! ### Named Arguments
 //!
-//! `NamedArgument`s are arguments that start with '-' or '--'
+//! `FlagArgument`s are arguments that start with '-' or '--'
+//! A `FlagArgument` can be one of the following:
+//!  - `HelpFlag`
+//!  - `ActionFlag`
+//!  - `ValueFlag`
+//!
+//! #### Help Flag
+//! A `HelpFlag` generates and displays a help for the current parser and exits the program when matched.
+//!
+//! #### Action Flag
+//! An `ActionFlag` runs a function on matching.
+//!
+//! The function can take one of the following as parameters:
+//!  - `()`
+//!  - `(&str)`
+//!  - `(String)`
+//!  - `(Vec<String>)`
+//!
+//! The function can return one of the following:
+//!  - `()`
+//!  - `Result<(), E>` where `E` is any type
+//!
+//! #### Value Flag
+//! A `ValueFlag` will construct a value using a `ValueParser` and pass it to a function.
+//! The `ValueParser` is given access to the argument stream so it can be variable length.
+//! The function can return the same types as an action parser.
 //!
 //! ### Terminal Arguments
 //! `TerminalArgument`s are how the tree of `Parser`s is formed.
