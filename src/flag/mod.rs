@@ -1,19 +1,22 @@
 use std::{borrow::Cow, ops::Deref};
 
 mod action;
+mod value;
 
 pub use action::ActionFlag;
+pub use value::{Value, ValueParser};
 
 pub enum FlagKind<T, E> {
     Help,
     Action(ActionFlag<T, E>),
-    Value,
+    Value(Value<T, E>),
 }
 
 pub struct FlagArgument<T, E> {
     short_name: Option<Cow<'static, str>>,
     long_name: Option<Cow<'static, str>>,
     required: bool,
+    repeatable: bool,
     kind: FlagKind<T, E>,
 }
 
@@ -23,6 +26,7 @@ impl<T, E> FlagArgument<T, E> {
             short_name: None,
             long_name: None,
             required: false,
+            repeatable: false,
             kind,
         }
     }
@@ -39,6 +43,10 @@ impl<T, E> FlagArgument<T, E> {
 
     pub fn required(&self) -> bool {
         self.required
+    }
+
+    pub fn repeatable(&self) -> bool {
+        self.repeatable
     }
 
     pub fn kind(&self) -> &FlagKind<T, E> {
@@ -59,6 +67,14 @@ impl<T, E> FlagArgument<T, E> {
 
     pub fn set_not_required(&mut self) {
         self.required = false;
+    }
+
+    pub fn set_repeatable(&mut self) {
+        self.repeatable = true;
+    }
+
+    pub fn set_not_repeatable(&mut self) {
+        self.repeatable = false;
     }
 
     pub fn set_kind(&mut self, kind: FlagKind<T, E>) {

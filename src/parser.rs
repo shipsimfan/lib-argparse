@@ -1,4 +1,4 @@
-use crate::FlagArgument;
+use crate::{ArgStream, FlagArgument};
 use std::{borrow::Cow, ops::Deref};
 
 pub struct Parser<T, E = ()> {
@@ -42,5 +42,11 @@ impl<T, E> Parser<T, E> {
 
     pub fn add_flag_argument(&mut self, flag_argument: FlagArgument<T, E>) {
         self.flag_arguments.push(flag_argument);
+    }
+
+    pub fn parse(&mut self, options: T) -> Result<T, E> {
+        let mut args = ArgStream::new();
+
+        todo!()
     }
 }

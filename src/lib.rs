@@ -52,8 +52,12 @@
 //! `Positionals` form the leaves of the tree.
 //! `Positionals` are made from an ordered list of `PositionalParser`s.
 
+#![feature(associated_type_bounds)]
+
 mod flag;
 mod parser;
+mod stream;
 
-pub use flag::{ActionFlag, FlagArgument, FlagKind};
+pub use flag::{ActionFlag, FlagArgument, FlagKind, Value, ValueParser};
 pub use parser::Parser;
+pub use stream::{ArgStream, InvalidUTF8};
