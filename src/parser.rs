@@ -1,11 +1,11 @@
-use crate::{ArgStream, FlagArgument, TerminalArgument};
+use crate::{ArgStream, FlagArgument, FlagSet, TerminalArgument};
 use std::{borrow::Cow, ops::Deref};
 
 pub struct Parser<T, E = ()> {
     program_name: Option<Cow<'static, str>>,
     description: Option<Cow<'static, str>>,
 
-    flag_arguments: Vec<FlagArgument<T, E>>,
+    flag_arguments: FlagSet<T, E>,
     terminal_argument: TerminalArgument,
 }
 
@@ -15,7 +15,7 @@ impl<T, E> Parser<T, E> {
             program_name: None,
             description: None,
 
-            flag_arguments: Vec::new(),
+            flag_arguments: FlagSet::new(),
             terminal_argument: TerminalArgument::None,
         }
     }
@@ -46,8 +46,11 @@ impl<T, E> Parser<T, E> {
         self.description = Some(description.into());
     }
 
-    pub fn add_flag_argument(&mut self, flag_argument: FlagArgument<T, E>) {
-        self.flag_arguments.push(flag_argument);
+    pub fn add_flag_argument(
+        &mut self,
+        flag_argument: FlagArgument<T, E>,
+    ) -> (Option<FlagArgument<T, E>>, Option<FlagArgument<T, E>>) {
+        self.flag_arguments.push(flag_argument)
     }
 
     pub fn set_terminal_argument(&mut self, terminal_argument: TerminalArgument) {

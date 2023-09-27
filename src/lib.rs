@@ -65,3 +65,5 @@ pub use flag::{ActionFlag, FlagArgument, FlagKind, SimpleValueParser, Value, Val
 pub use parser::Parser;
 pub use stream::{ArgStream, InvalidUTF8};
 pub use terminal::TerminalArgument;
+
+pub(crate) use flag::FlagSet;

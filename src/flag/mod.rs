@@ -1,7 +1,10 @@
 use std::{borrow::Cow, ops::Deref};
 
 mod action;
+mod set;
 mod value;
+
+pub(crate) use set::FlagSet;
 
 pub use action::ActionFlag;
 pub use value::{SimpleValueParser, Value, ValueParser};
