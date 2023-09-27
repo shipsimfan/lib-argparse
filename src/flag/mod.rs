@@ -4,7 +4,7 @@ mod action;
 mod value;
 
 pub use action::ActionFlag;
-pub use value::{Value, ValueParser};
+pub use value::{SimpleValueParser, Value, ValueParser};
 
 pub enum FlagKind<T, E> {
     Help,

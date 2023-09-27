@@ -54,10 +54,12 @@
 
 #![feature(associated_type_bounds)]
 
+mod error;
 mod flag;
 mod parser;
 mod stream;
 
-pub use flag::{ActionFlag, FlagArgument, FlagKind, Value, ValueParser};
+pub use error::Error;
+pub use flag::{ActionFlag, FlagArgument, FlagKind, SimpleValueParser, Value, ValueParser};
 pub use parser::Parser;
 pub use stream::{ArgStream, InvalidUTF8};
