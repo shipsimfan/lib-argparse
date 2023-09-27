@@ -1,4 +1,4 @@
-use crate::{ArgStream, FlagArgument, FlagSet, TerminalArgument};
+use crate::{ArgStream, Command, FlagArgument, FlagSet, Positionals, TerminalArgument};
 use std::{borrow::Cow, ops::Deref};
 
 pub struct Parser<T, E = ()> {
@@ -6,7 +6,7 @@ pub struct Parser<T, E = ()> {
     description: Option<Cow<'static, str>>,
 
     flag_arguments: FlagSet<T, E>,
-    terminal_argument: TerminalArgument,
+    terminal_argument: TerminalArgument<T, E>,
 }
 
 impl<T, E> Parser<T, E> {
@@ -34,7 +34,7 @@ impl<T, E> Parser<T, E> {
         &self.flag_arguments
     }
 
-    pub fn terminal_argument(&self) -> &TerminalArgument {
+    pub fn terminal_argument(&self) -> &TerminalArgument<T, E> {
         &self.terminal_argument
     }
 
@@ -53,8 +53,20 @@ impl<T, E> Parser<T, E> {
         self.flag_arguments.push(flag_argument)
     }
 
-    pub fn set_terminal_argument(&mut self, terminal_argument: TerminalArgument) {
+    pub fn set_terminal_argument(&mut self, terminal_argument: TerminalArgument<T, E>) {
         self.terminal_argument = terminal_argument;
+    }
+
+    pub fn set_terminal_command(&mut self, command: Command<T, E>) {
+        self.terminal_argument = TerminalArgument::Command(command);
+    }
+
+    pub fn set_terminal_positionals(&mut self, positionals: Positionals<T, E>) {
+        self.terminal_argument = TerminalArgument::Positionals(positionals);
+    }
+
+    pub fn clear_terminal_argument(&mut self) {
+        self.terminal_argument = TerminalArgument::None;
     }
 
     pub fn parse(&mut self, options: T) -> Result<T, E> {
