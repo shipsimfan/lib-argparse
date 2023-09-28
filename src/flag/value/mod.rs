@@ -4,31 +4,46 @@ mod simple;
 
 pub use simple::SimpleValueParser;
 
+/// Parses a value for a `ValueFlag`
 pub trait ValueParser: 'static {
+    /// An error returned by the parser
     type Error;
+
+    /// The type of object returned by this parser
     type Value;
 
-    fn parse(&mut self, args: &mut ArgStream) -> Result<Self::Value, Self::Error>;
+    /// Parse a value from the argument stream
+    fn parse(&mut self, args: &mut ArgStream) -> Result<Self::Value, crate::Error<Self::Error>>;
 }
 
-pub struct ValueFlag<T, E> {
-    parser: Box<dyn FnMut(&mut T, &mut ArgStream) -> Result<(), E>>,
+/// Flag which parses a specific type as it's value
+pub struct ValueFlag<T, E: 'static> {
+    parser: Box<dyn FnMut(&mut T, &mut ArgStream) -> Result<(), crate::Error<E>>>,
 }
 
 impl<T, E> ValueFlag<T, E> {
-    pub fn new<V: ValueParser<Error: Into<E>>>(
+    /// Creates a new `ValueFlag`
+    ///
+    ///  - `parser` is the `ValueParser` which will parse the value
+    ///  - `action` is called after the parser to update the options
+    pub fn new<V: ValueParser<Error = E>>(
         mut parser: V,
-        action: impl Fn(&mut T, V::Value) -> Result<(), E> + 'static,
+        action: impl Fn(&mut T, V::Value) -> Result<(), crate::Error<E>> + 'static,
     ) -> FlagArgument<T, E> {
         FlagArgument::new(FlagKind::Value(ValueFlag {
             parser: Box::new(move |options, args| {
-                let value = parser.parse(args).map_err(|error| error.into())?;
+                let value = parser.parse(args)?;
                 action(options, value)
             }),
         }))
     }
 
-    pub(crate) fn parse(&mut self, options: &mut T, args: &mut ArgStream) -> Result<(), E> {
+    /// Parses an object from `args` and updates `options`
+    pub(crate) fn parse(
+        &mut self,
+        options: &mut T,
+        args: &mut ArgStream,
+    ) -> Result<(), crate::Error<E>> {
         (self.parser)(options, args)
     }
 }

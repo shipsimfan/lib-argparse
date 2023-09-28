@@ -3,7 +3,9 @@ use std::{borrow::Cow, marker::PhantomData, str::FromStr};
 
 /// Parses values using the `std::str::FromStr` trait
 pub struct SimpleValueParser<T: FromStr + 'static> {
+    /// Error message if the value is missing
     missing_message: Cow<'static, str>,
+
     phantom: PhantomData<T>,
 }
 
@@ -21,9 +23,9 @@ impl<T: FromStr> SimpleValueParser<T> {
 
 impl<T: FromStr> ValueParser for SimpleValueParser<T> {
     type Value = T;
-    type Error = Error<T::Err>;
+    type Error = T::Err;
 
-    fn parse(&mut self, args: &mut crate::ArgStream) -> Result<Self::Value, Self::Error> {
+    fn parse(&mut self, args: &mut crate::ArgStream) -> Result<Self::Value, Error<Self::Error>> {
         T::from_str(
             &args
                 .next()?

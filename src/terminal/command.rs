@@ -1,13 +1,18 @@
 use crate::Parser;
 use std::{borrow::Cow, ops::Deref};
 
-pub struct Command<T, E>(Vec<(Cow<'static, str>, Parser<T, E>)>);
+/// An unorded set of commands
+pub struct Command<T, E: 'static>(Vec<(Cow<'static, str>, Parser<T, E>)>);
 
 impl<T, E> Command<T, E> {
+    /// Creates a new empty `Command` list
     pub fn new() -> Self {
         Command(Vec::new())
     }
 
+    /// Adds a new command into the set
+    ///
+    /// Returns the old command if there is a name conflict
     pub fn add_command<S: Into<Cow<'static, str>>>(
         &mut self,
         command: S,
@@ -19,6 +24,7 @@ impl<T, E> Command<T, E> {
         ret
     }
 
+    /// Removes a command with the name `command`
     fn remove(&mut self, command: &str) -> Option<(Cow<'static, str>, Parser<T, E>)> {
         for i in 0..self.0.len() {
             if command == self.0[i].0 {

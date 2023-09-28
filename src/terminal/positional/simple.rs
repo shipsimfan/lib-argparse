@@ -6,9 +6,14 @@ pub struct SimplePositionalParser<T: FromStr + 'static, O, F>
 where
     F: Fn(&mut O, T),
 {
+    /// Function called when parsing is complete
     callback: F,
+    /// Determines if this positional is required
+    ///
+    /// The contained string holds the error message if no value is provided
     required: Option<Cow<'static, str>>,
 
+    /// Variable for storing if a value was parsed
     recieved_value: bool,
 
     phantom_type: PhantomData<T>,
@@ -34,10 +39,14 @@ where
         }
     }
 
+    /// Sets this flag to be required
+    ///
+    /// `message` is the error message used if no value is provided
     pub fn set_required<S: Into<Cow<'static, str>>>(&mut self, message: S) {
         self.required = Some(message.into());
     }
 
+    /// Sets this flag to be not required
     pub fn set_not_required(&mut self) {
         self.required = None;
     }
@@ -48,13 +57,13 @@ where
     F: Fn(&mut O, T),
 {
     type Options = O;
-    type Error = Error<T::Err>;
+    type Error = T::Err;
 
     fn parse(
         &mut self,
         options: &mut Self::Options,
         arg: std::ffi::OsString,
-    ) -> Result<bool, Self::Error> {
+    ) -> Result<bool, Error<T::Err>> {
         self.recieved_value = true;
         let value = T::from_str(&arg.into_string().map_err(|_| Error::InvalidUTF8)?)
             .map_err(|error| Error::Other(error))?;
@@ -62,7 +71,7 @@ where
         Ok(false)
     }
 
-    fn finish(&mut self, _: &mut Self::Options) -> Result<(), Self::Error> {
+    fn finish(&mut self, _: &mut Self::Options) -> Result<(), Error<T::Err>> {
         match (&self.required, self.recieved_value) {
             (Some(message), false) => return Err(Error::MissingParameter(message.clone())),
             _ => {}

@@ -1,13 +1,22 @@
 use crate::FlagArgument;
 use std::ops::Deref;
 
-pub(crate) struct FlagSet<T, E>(Vec<FlagArgument<T, E>>);
+/// Represents a set of flag arguments
+///
+/// No two flags in this structure can share either a short or long name
+pub(crate) struct FlagSet<T, E: 'static>(Vec<FlagArgument<T, E>>);
 
 impl<T, E> FlagSet<T, E> {
+    /// Creates a new empty `FlagSet`
     pub(crate) fn new() -> Self {
         FlagSet(Vec::new())
     }
 
+    /// Pushes a new flag into the set
+    ///
+    /// Returns any arguments which have conflicting names
+    ///
+    /// If there is only one conflict, the conflicting argument will always be the first value of the returned tuple
     pub(crate) fn push(
         &mut self,
         flag_argument: FlagArgument<T, E>,
@@ -22,6 +31,7 @@ impl<T, E> FlagSet<T, E> {
         ret
     }
 
+    /// Removes any arguments that have the same long or short name as `long_name` or `short_name` respectively
     fn remove(
         &mut self,
         short_name: Option<&str>,

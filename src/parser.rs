@@ -1,7 +1,7 @@
 use crate::{ArgStream, Command, FlagArgument, FlagSet, Positionals, TerminalArgument};
 use std::{borrow::Cow, ops::Deref};
 
-pub struct Parser<T, E = ()> {
+pub struct Parser<T, E: 'static = ()> {
     program_name: Option<Cow<'static, str>>,
     description: Option<Cow<'static, str>>,
 

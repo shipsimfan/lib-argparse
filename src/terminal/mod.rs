@@ -7,7 +7,7 @@ pub use positional::{
     SimplePositionalParser,
 };
 
-pub enum TerminalArgument<T, E> {
+pub enum TerminalArgument<T, E: 'static> {
     None,
     Command(Command<T, E>),
     Positionals(Positionals<T, E>),
