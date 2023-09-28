@@ -64,6 +64,9 @@ pub use error::Error;
 pub use flag::{ActionFlag, FlagArgument, FlagKind, SimpleValueParser, Value, ValueParser};
 pub use parser::Parser;
 pub use stream::{ArgStream, InvalidUTF8};
-pub use terminal::{Command, PositionalParser, Positionals, TerminalArgument};
+pub use terminal::{
+    CollectOsPositionalParser, CollectPositionalParser, Command, PositionalParser, Positionals,
+    SimplePositionalParser, TerminalArgument,
+};
 
 pub(crate) use flag::FlagSet;

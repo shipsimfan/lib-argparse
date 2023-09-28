@@ -7,12 +7,13 @@ pub trait PositionalParser {
     /// Parses the positional arguments
     ///
     /// Returning `true` means this parser will take the next positional
+    ///
     /// Returning `false` means this parser is done
     fn parse(&mut self, options: &mut Self::Options, arg: OsString) -> Result<bool, Self::Error>;
 
     /// Called at the end of argument parsing
     ///
-    /// Example usage: A parser to returning an error if not enough arguments were passed
+    /// Example usage: A parser returning an error if not enough arguments were passed
     #[allow(unused_variables)]
     fn finish(&mut self, options: &mut Self::Options) -> Result<(), Self::Error> {
         Ok(())

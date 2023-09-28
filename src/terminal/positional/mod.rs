@@ -1,8 +1,12 @@
 use std::ops::Deref;
 
+mod collect;
 mod parser;
+mod simple;
 
+pub use collect::{CollectOsPositionalParser, CollectPositionalParser};
 pub use parser::PositionalParser;
+pub use simple::SimplePositionalParser;
 
 pub struct Positionals<T, E>(Vec<Box<dyn PositionalParser<Options = T, Error = E>>>);
 
