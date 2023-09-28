@@ -1,6 +1,7 @@
 use crate::InvalidUTF8;
 use std::borrow::Cow;
 
+/// Argument parsing errors
 pub enum Error<E: 'static> {
     InvalidUTF8,
     MissingParameter(Cow<'static, str>),

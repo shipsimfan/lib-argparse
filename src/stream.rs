@@ -6,17 +6,20 @@ use std::{
 
 pub struct InvalidUTF8(OsString);
 
+/// A stream of arguments
 pub struct ArgStream {
     args: Peekable<ArgsOs>,
 }
 
 impl ArgStream {
+    /// Creates a new stream from OS arguments
     pub(crate) fn new() -> Self {
         let args = args_os().peekable();
 
         ArgStream { args }
     }
 
+    /// Returns the next `str` in the stream without advancing the stream
     pub fn peek(&mut self) -> Result<Option<&str>, InvalidUTF8> {
         match self.peek_os() {
             Some(arg) => arg
@@ -27,10 +30,12 @@ impl ArgStream {
         }
     }
 
+    /// Returns the next `OsStr` in the stream without advancing the stream
     pub fn peek_os(&mut self) -> Option<&OsStr> {
         self.args.peek().map(|string| string.as_os_str())
     }
 
+    /// Returns the next `String` in the stream and advances the stream
     pub fn next(&mut self) -> Result<Option<String>, InvalidUTF8> {
         match self.next_os() {
             Some(arg) => arg
@@ -41,6 +46,7 @@ impl ArgStream {
         }
     }
 
+    /// Returns the next `OsString` in the stream and advances the stream
     pub fn next_os(&mut self) -> Option<OsString> {
         self.args.next()
     }

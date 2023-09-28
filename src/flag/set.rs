@@ -12,7 +12,7 @@ impl<T, E> FlagSet<T, E> {
         FlagSet(Vec::new())
     }
 
-    /// Pushes a new flag into the set
+    /// Pushes `flag_argument` into the set
     ///
     /// Returns any arguments which have conflicting names
     ///
