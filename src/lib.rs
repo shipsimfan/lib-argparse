@@ -61,7 +61,7 @@ mod stream;
 mod terminal;
 
 pub use error::Error;
-pub use flag::{ActionFlag, FlagArgument, FlagKind, SimpleValueParser, Value, ValueParser};
+pub use flag::{ActionFlag, FlagArgument, FlagKind, SimpleValueParser, ValueFlag, ValueParser};
 pub use parser::Parser;
 pub use stream::{ArgStream, InvalidUTF8};
 pub use terminal::{

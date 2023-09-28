@@ -7,12 +7,12 @@ mod value;
 pub(crate) use set::FlagSet;
 
 pub use action::ActionFlag;
-pub use value::{SimpleValueParser, Value, ValueParser};
+pub use value::{SimpleValueParser, ValueFlag, ValueParser};
 
 pub enum FlagKind<T, E> {
     Help,
     Action(ActionFlag<T, E>),
-    Value(Value<T, E>),
+    Value(ValueFlag<T, E>),
 }
 
 pub struct FlagArgument<T, E> {

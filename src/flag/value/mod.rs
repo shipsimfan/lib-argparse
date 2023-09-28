@@ -11,16 +11,16 @@ pub trait ValueParser: 'static {
     fn parse(&mut self, args: &mut ArgStream) -> Result<Self::Value, Self::Error>;
 }
 
-pub struct Value<T, E> {
+pub struct ValueFlag<T, E> {
     parser: Box<dyn FnMut(&mut T, &mut ArgStream) -> Result<(), E>>,
 }
 
-impl<T, E> Value<T, E> {
+impl<T, E> ValueFlag<T, E> {
     pub fn new<V: ValueParser<Error: Into<E>>>(
         mut parser: V,
         action: impl Fn(&mut T, V::Value) -> Result<(), E> + 'static,
     ) -> FlagArgument<T, E> {
-        FlagArgument::new(FlagKind::Value(Value {
+        FlagArgument::new(FlagKind::Value(ValueFlag {
             parser: Box::new(move |options, args| {
                 let value = parser.parse(args).map_err(|error| error.into())?;
                 action(options, value)
