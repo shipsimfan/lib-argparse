@@ -1,5 +1,5 @@
-use crate::{ArgStream, Command, FlagArgument, FlagSet, Positionals, TerminalArgument};
-use std::{borrow::Cow, ops::Deref};
+use crate::{ArgStream, Command, Error, FlagArgument, FlagSet, Positionals, TerminalArgument};
+use std::{borrow::Cow, ffi::OsStr, ops::Deref};
 
 /// Argument Parser
 pub struct Parser<T, E: 'static = ()> {
@@ -8,9 +8,21 @@ pub struct Parser<T, E: 'static = ()> {
     /// Program description for help
     description: Option<Cow<'static, str>>,
 
+    /// Prefixes for flag arguments
+    short_prefix: Cow<'static, str>,
+    long_prefix: Cow<'static, str>,
+
     /// Arguments
     flag_arguments: FlagSet<T, E>,
     terminal_argument: TerminalArgument<T, E>,
+}
+
+fn starts_with(arg: &OsStr, prefix: &str) -> bool {
+    if arg.len() < prefix.len() {
+        return false;
+    }
+
+    &arg.as_encoded_bytes()[..prefix.len()] == prefix.as_bytes()
 }
 
 impl<T, E> Parser<T, E> {
@@ -19,6 +31,9 @@ impl<T, E> Parser<T, E> {
         Parser {
             program_name: None,
             description: None,
+
+            short_prefix: "-".into(),
+            long_prefix: "--".into(),
 
             flag_arguments: FlagSet::new(),
             terminal_argument: TerminalArgument::None,
@@ -45,6 +60,16 @@ impl<T, E> Parser<T, E> {
     /// Returns the terminal argument
     pub fn terminal_argument(&self) -> &TerminalArgument<T, E> {
         &self.terminal_argument
+    }
+
+    /// Returns the prefix for short names
+    pub fn short_prefix(&self) -> &str {
+        &self.short_prefix
+    }
+
+    /// Returns the prefix for long names
+    pub fn long_prefix(&self) -> &str {
+        &self.long_prefix
     }
 
     /// Sets the program name to `program_name`
@@ -89,10 +114,58 @@ impl<T, E> Parser<T, E> {
         self.terminal_argument = TerminalArgument::None;
     }
 
+    /// Sets the prefix for short names
+    pub fn set_short_prefix<S: Into<Cow<'static, str>>>(&mut self, short_prefix: S) {
+        let short_prefix = short_prefix.into();
+        assert_ne!(
+            self.long_prefix, short_prefix,
+            "Short prefix and long prefix cannot be the same"
+        );
+        self.short_prefix = short_prefix;
+    }
+
+    /// Sets the prefix for long names
+    pub fn set_long_prefix<S: Into<Cow<'static, str>>>(&mut self, long_prefix: S) {
+        let long_prefix = long_prefix.into();
+        assert_ne!(
+            self.short_prefix, long_prefix,
+            "Short prefix and long prefix cannot be the same"
+        );
+        self.long_prefix = long_prefix;
+    }
+
     /// Parses arguments from `argv` into `options`
-    pub fn parse(&mut self, options: T) -> Result<T, E> {
+    pub fn parse(&mut self, mut options: T) -> Result<T, Error<E>> {
         let mut args = ArgStream::new();
 
-        todo!()
+        let mut parser = self;
+        while let Some(new_parser) = parser.do_parse(&mut options, &mut args)? {
+            parser = new_parser;
+        }
+
+        Ok(options)
+    }
+
+    fn do_parse(
+        &mut self,
+        options: &mut T,
+        args: &mut ArgStream,
+    ) -> Result<Option<&mut Parser<T, E>>, Error<E>> {
+        while let Some(arg) = args.next_os() {
+            if starts_with(&arg, &self.long_prefix) {
+                todo!("Long prefixed argument")
+            } else if starts_with(&arg, &self.short_prefix) {
+                todo!("Short prefixed argument")
+            } else {
+                todo!("Terminal argument")
+            }
+        }
+
+        todo!("Final checks")
+        /*
+         * - Check for required arguments
+         * - Call final on the current positional if needed
+         * - Error if the terminal is a command
+         */
     }
 }
