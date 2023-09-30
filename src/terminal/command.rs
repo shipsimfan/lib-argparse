@@ -1,13 +1,49 @@
-use crate::Parser;
-use std::{borrow::Cow, ops::Deref};
+use crate::{Error, Parser};
+use std::{borrow::Cow, ffi::OsString, ops::Deref};
 
 /// An unorded set of commands
-pub struct Command<T, E: 'static>(Vec<(Cow<'static, str>, Parser<T, E>)>);
+pub struct Command<T, E: 'static> {
+    /// The list of positionals
+    ///
+    /// The first member of the tuple is the name of the command.
+    /// The second member is the new parser if the command is reached.
+    commands: Vec<(Cow<'static, str>, Parser<T, E>)>,
+
+    /// The name of the command
+    ///
+    /// Placed at the "$" in the unknown command error string "unknown $"
+    command_name: Cow<'static, str>,
+
+    /// Determines if this command is required
+    ///
+    /// The string contained is the error message displayed if this command is missing
+    required: Option<Cow<'static, str>>,
+
+    /// The command index found during parsing.
+    command_index: Option<usize>,
+}
 
 impl<T, E> Command<T, E> {
     /// Creates a new empty `Command` list
-    pub fn new() -> Self {
-        Command(Vec::new())
+    pub fn new<S: Into<Cow<'static, str>>>(command_name: S) -> Self {
+        Command {
+            commands: Vec::new(),
+            command_name: command_name.into(),
+            required: None,
+            command_index: None,
+        }
+    }
+
+    /// Sets this command to be required
+    ///
+    /// `missing_error_message` is the error message displayed if this command is missing
+    pub fn set_required<S: Into<Cow<'static, str>>>(&mut self, missing_error_message: S) {
+        self.required = Some(missing_error_message.into());
+    }
+
+    /// Sets this command to be not required
+    pub fn set_not_required(&mut self) {
+        self.required = None;
     }
 
     /// Adds a new command into the set
@@ -20,15 +56,44 @@ impl<T, E> Command<T, E> {
     ) -> Option<(Cow<'static, str>, Parser<T, E>)> {
         let command = command.into();
         let ret = self.remove(&command);
-        self.0.push((command, parser));
+        self.commands.push((command, parser));
         ret
+    }
+
+    pub(crate) fn parse(&mut self, argument: OsString) -> Result<(), Error<E>> {
+        assert!(self.command_index.is_none());
+
+        let argument = argument
+            .into_string()
+            .map_err(|string| Error::UnknownCommandOS(string, self.command_name.clone()))?;
+
+        for i in 0..self.commands.len() {
+            if self.commands[i].0.as_ref() == argument.as_str() {
+                self.command_index = Some(i);
+                return Ok(());
+            }
+        }
+
+        Err(Error::UnknownCommand(argument, self.command_name.clone()))
+    }
+
+    pub(crate) fn finalize(&mut self) -> Result<Option<&mut Parser<T, E>>, Error<E>> {
+        let command_index = match self.command_index.take() {
+            Some(command_index) => command_index,
+            None => match &self.required {
+                Some(error_message) => return Err(Error::MissingCommand(error_message.clone())),
+                None => return Ok(None),
+            },
+        };
+
+        Ok(Some(&mut self.commands[command_index].1))
     }
 
     /// Removes a command with the name `command`
     fn remove(&mut self, command: &str) -> Option<(Cow<'static, str>, Parser<T, E>)> {
-        for i in 0..self.0.len() {
-            if command == self.0[i].0 {
-                return Some(self.0.swap_remove(i));
+        for i in 0..self.commands.len() {
+            if command == self.commands[i].0 {
+                return Some(self.commands.swap_remove(i));
             }
         }
 
@@ -40,6 +105,6 @@ impl<T, E> Deref for Command<T, E> {
     type Target = [(Cow<'static, str>, Parser<T, E>)];
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.commands
     }
 }

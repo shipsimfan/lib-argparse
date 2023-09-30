@@ -17,12 +17,12 @@ pub struct Parser<T, E: 'static = ()> {
     terminal_argument: TerminalArgument<T, E>,
 }
 
-fn starts_with(arg: &OsStr, prefix: &str) -> bool {
-    if arg.len() < prefix.len() {
+fn starts_with(argument: &OsStr, prefix: &str) -> bool {
+    if argument.len() < prefix.len() {
         return false;
     }
 
-    &arg.as_encoded_bytes()[..prefix.len()] == prefix.as_bytes()
+    &argument.as_encoded_bytes()[..prefix.len()] == prefix.as_bytes()
 }
 
 impl<T, E> Parser<T, E> {
@@ -146,30 +146,36 @@ impl<T, E> Parser<T, E> {
         Ok(options)
     }
 
-    fn do_parse(
-        &mut self,
+    fn do_parse<'a>(
+        &'a mut self,
         options: &mut T,
         args: &mut ArgStream,
-    ) -> Result<Option<&mut Parser<T, E>>, Error<E>> {
-        while let Some(arg) = args.next_os() {
-            let argument = if starts_with(&arg, &self.long_prefix) {
-                let arg_name = arg
+    ) -> Result<Option<&'a mut Parser<T, E>>, Error<E>> {
+        let (flags, terminal, short_prefix, long_prefix) = self.as_mut();
+
+        while let Some(argument) = args.next_os() {
+            let argument = if starts_with(&argument, long_prefix) {
+                let arg_name = argument
                     .into_string()
                     .map_err(|string| Error::UnknowArgumentOS(string))?;
 
-                self.flag_arguments
-                    .get_long(&arg_name[self.long_prefix.len()..])
+                flags
+                    .get_long(&arg_name[long_prefix.len()..])
                     .ok_or(Error::UnknowArgument(arg_name))
-            } else if starts_with(&arg, &self.short_prefix) {
-                let arg_name = arg
+            } else if starts_with(&argument, short_prefix) {
+                let arg_name = argument
                     .into_string()
                     .map_err(|string| Error::UnknowArgumentOS(string))?;
 
-                self.flag_arguments
-                    .get_short(&arg_name[self.short_prefix.len()..])
+                flags
+                    .get_short(&arg_name[short_prefix.len()..])
                     .ok_or(Error::UnknowArgument(arg_name))
             } else {
-                todo!("Terminal argument")
+                if terminal.parse(argument)? {
+                    break;
+                }
+
+                continue;
             }?;
 
             if argument.parse(options, args)? {
@@ -177,26 +183,23 @@ impl<T, E> Parser<T, E> {
             }
         }
 
-        self.finalize_parse()?;
-        Ok(None)
+        flags.finalize()?;
+        terminal.finalize()
     }
 
-    fn finalize_parse(&mut self) -> Result<(), Error<E>> {
-        self.finalize_flag_arguments()?;
-
-        todo!("Finalize parse")
-        /*
-         * - Check for required positionals
-         * - Call final on the current positional if needed
-         * - Error if the terminal is a command
-         */
-    }
-
-    fn finalize_flag_arguments(&mut self) -> Result<(), Error<E>> {
-        for flag_argument in &mut self.flag_arguments {
-            flag_argument.finalize()?;
-        }
-
-        Ok(())
+    fn as_mut<'a>(
+        &'a mut self,
+    ) -> (
+        &'a mut FlagSet<T, E>,
+        &'a mut TerminalArgument<T, E>,
+        &str,
+        &str,
+    ) {
+        (
+            &mut self.flag_arguments,
+            &mut self.terminal_argument,
+            self.short_prefix.as_ref(),
+            self.long_prefix.as_ref(),
+        )
     }
 }

@@ -4,7 +4,7 @@ use std::{
     iter::Peekable,
 };
 
-pub struct InvalidUTF8(OsString);
+use crate::Error;
 
 /// A stream of arguments
 pub struct ArgStream {
@@ -20,12 +20,12 @@ impl ArgStream {
     }
 
     /// Returns the next `str` in the stream without advancing the stream
-    pub fn peek(&mut self) -> Result<Option<&str>, InvalidUTF8> {
+    pub fn peek<E>(&mut self) -> Result<Option<&str>, Error<E>> {
         match self.peek_os() {
             Some(arg) => arg
                 .to_str()
                 .map(|str| Some(str))
-                .ok_or_else(|| InvalidUTF8(arg.to_owned())),
+                .ok_or_else(|| Error::InvalidUTF8(arg.to_owned())),
             None => Ok(None),
         }
     }
@@ -36,12 +36,12 @@ impl ArgStream {
     }
 
     /// Returns the next `String` in the stream and advances the stream
-    pub fn next(&mut self) -> Result<Option<String>, InvalidUTF8> {
+    pub fn next<E>(&mut self) -> Result<Option<String>, Error<E>> {
         match self.next_os() {
             Some(arg) => arg
                 .into_string()
                 .map(|string| Some(string))
-                .map_err(|os_string| InvalidUTF8(os_string)),
+                .map_err(|os_string| Error::InvalidUTF8(os_string)),
             None => Ok(None),
         }
     }
@@ -49,29 +49,5 @@ impl ArgStream {
     /// Returns the next `OsString` in the stream and advances the stream
     pub fn next_os(&mut self) -> Option<OsString> {
         self.args.next()
-    }
-}
-
-impl InvalidUTF8 {
-    pub fn os_str(&self) -> &OsStr {
-        &self.0
-    }
-
-    pub fn unwrap(self) -> OsString {
-        self.0
-    }
-}
-
-impl std::error::Error for InvalidUTF8 {}
-
-impl std::fmt::Display for InvalidUTF8 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "invalid UTF-8 {:?}", self.0)
-    }
-}
-
-impl std::fmt::Debug for InvalidUTF8 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self, f)
     }
 }

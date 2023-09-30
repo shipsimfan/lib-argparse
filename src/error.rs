@@ -1,26 +1,38 @@
-use crate::InvalidUTF8;
 use std::{borrow::Cow, ffi::OsString};
 
 /// Argument parsing errors
 pub enum Error<E: 'static> {
-    InvalidUTF8,
+    InvalidUTF8(OsString),
     MissingParameter(Cow<'static, str>),
     UnknowArgumentOS(OsString),
     UnknowArgument(String),
     RepeatedArgument(Cow<'static, str>),
     MissingArgument(Cow<'static, str>),
+    UnexpectedArgument(OsString),
+    UnknownCommandOS(OsString, Cow<'static, str>),
+    UnknownCommand(String, Cow<'static, str>),
+    MissingCommand(Cow<'static, str>),
     Other(E),
 }
 
 impl<E> Error<E> {
     pub fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Error::InvalidUTF8 => write!(f, "invalid utf-8"),
-            Error::MissingParameter(message) => write!(f, "{}", message),
+            Error::InvalidUTF8(string) => write!(f, "invalid utf-8 {:?}", string),
             Error::UnknowArgumentOS(argument) => write!(f, "unknown argument {:?}", argument),
             Error::UnknowArgument(argument) => write!(f, "unknown argument \"{}\"", argument),
-            Error::RepeatedArgument(message) => write!(f, "{}", message),
-            Error::MissingArgument(message) => write!(f, "{}", message),
+            Error::UnexpectedArgument(argument) => write!(f, "unexpected argument {:?}", argument),
+            Error::UnknownCommandOS(command, command_name) => {
+                write!(f, "unknown {} {:?}", command_name, command)
+            }
+            Error::UnknownCommand(command, command_name) => {
+                write!(f, "unknown {} \"{}\"", command_name, command)
+            }
+
+            Error::MissingParameter(message)
+            | Error::RepeatedArgument(message)
+            | Error::MissingArgument(message)
+            | Error::MissingCommand(message) => write!(f, "{}", message),
 
             Error::Other(_) => write!(f, "other"),
         }
@@ -32,12 +44,16 @@ impl<E: std::error::Error> std::error::Error for Error<E> {
         match self {
             Error::Other(error) => Some(error),
 
-            Error::InvalidUTF8
+            Error::InvalidUTF8(_)
             | Error::MissingParameter(_)
             | Error::UnknowArgumentOS(_)
             | Error::UnknowArgument(_)
             | Error::RepeatedArgument(_)
-            | Error::MissingArgument(_) => None,
+            | Error::MissingArgument(_)
+            | Error::UnexpectedArgument(_)
+            | Error::UnknownCommandOS(_, _)
+            | Error::UnknownCommand(_, _)
+            | Error::MissingCommand(_) => None,
         }
     }
 }
@@ -59,11 +75,5 @@ impl<E: std::fmt::Debug> std::fmt::Debug for Error<E> {
 
             _ => Self::fmt(self, f),
         }
-    }
-}
-
-impl<E> From<InvalidUTF8> for Error<E> {
-    fn from(_: InvalidUTF8) -> Self {
-        Error::InvalidUTF8
     }
 }

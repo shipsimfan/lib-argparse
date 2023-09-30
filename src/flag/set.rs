@@ -1,4 +1,4 @@
-use crate::FlagArgument;
+use crate::{Error, FlagArgument};
 use std::ops::Deref;
 
 /// Represents a set of flag arguments
@@ -62,6 +62,14 @@ impl<T, E> FlagSet<T, E> {
         let ret = self.remove(flag_argument.short_name(), flag_argument.long_name());
         self.0.push(flag_argument);
         ret
+    }
+
+    pub(crate) fn finalize(&mut self) -> Result<(), Error<E>> {
+        for flag_argument in self {
+            flag_argument.finalize()?;
+        }
+
+        Ok(())
     }
 
     /// Removes any arguments that have the same long or short name as `long_name` or `short_name` respectively

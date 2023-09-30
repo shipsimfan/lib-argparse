@@ -63,7 +63,7 @@ mod terminal;
 pub use error::Error;
 pub use flag::{ActionFlag, FlagArgument, FlagKind, SimpleValueParser, ValueFlag, ValueParser};
 pub use parser::Parser;
-pub use stream::{ArgStream, InvalidUTF8};
+pub use stream::ArgStream;
 pub use terminal::{
     CollectOsPositionalParser, CollectPositionalParser, Command, PositionalParser, Positionals,
     SimplePositionalParser, TerminalArgument,

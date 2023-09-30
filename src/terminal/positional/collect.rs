@@ -136,8 +136,10 @@ where
     type Error = E;
 
     fn parse(&mut self, _: &mut Self::Options, arg: OsString) -> Result<bool, Error<E>> {
-        self.list
-            .push(arg.into_string().map_err(|_| Error::InvalidUTF8)?);
+        self.list.push(
+            arg.into_string()
+                .map_err(|string| Error::InvalidUTF8(string))?,
+        );
         Ok(true)
     }
 

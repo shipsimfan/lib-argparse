@@ -65,8 +65,11 @@ where
         arg: std::ffi::OsString,
     ) -> Result<bool, Error<T::Err>> {
         self.recieved_value = true;
-        let value = T::from_str(&arg.into_string().map_err(|_| Error::InvalidUTF8)?)
-            .map_err(|error| Error::Other(error))?;
+        let value = T::from_str(
+            &arg.into_string()
+                .map_err(|string| Error::InvalidUTF8(string))?,
+        )
+        .map_err(|error| Error::Other(error))?;
         (self.callback)(options, value);
         Ok(false)
     }
