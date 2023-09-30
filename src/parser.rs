@@ -152,20 +152,51 @@ impl<T, E> Parser<T, E> {
         args: &mut ArgStream,
     ) -> Result<Option<&mut Parser<T, E>>, Error<E>> {
         while let Some(arg) = args.next_os() {
-            if starts_with(&arg, &self.long_prefix) {
-                todo!("Long prefixed argument")
+            let argument = if starts_with(&arg, &self.long_prefix) {
+                let arg_name = arg
+                    .into_string()
+                    .map_err(|string| Error::UnknowArgumentOS(string))?;
+
+                self.flag_arguments
+                    .get_long(&arg_name[self.long_prefix.len()..])
+                    .ok_or(Error::UnknowArgument(arg_name))
             } else if starts_with(&arg, &self.short_prefix) {
-                todo!("Short prefixed argument")
+                let arg_name = arg
+                    .into_string()
+                    .map_err(|string| Error::UnknowArgumentOS(string))?;
+
+                self.flag_arguments
+                    .get_short(&arg_name[self.short_prefix.len()..])
+                    .ok_or(Error::UnknowArgument(arg_name))
             } else {
                 todo!("Terminal argument")
+            }?;
+
+            if argument.parse(options, args)? {
+                todo!("Generate help")
             }
         }
 
-        todo!("Final checks")
+        self.finalize_parse()?;
+        Ok(None)
+    }
+
+    fn finalize_parse(&mut self) -> Result<(), Error<E>> {
+        self.finalize_flag_arguments()?;
+
+        todo!("Finalize parse")
         /*
-         * - Check for required arguments
+         * - Check for required positionals
          * - Call final on the current positional if needed
          * - Error if the terminal is a command
          */
+    }
+
+    fn finalize_flag_arguments(&mut self) -> Result<(), Error<E>> {
+        for flag_argument in &mut self.flag_arguments {
+            flag_argument.finalize()?;
+        }
+
+        Ok(())
     }
 }

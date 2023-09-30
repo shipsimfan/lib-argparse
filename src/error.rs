@@ -1,10 +1,14 @@
 use crate::InvalidUTF8;
-use std::borrow::Cow;
+use std::{borrow::Cow, ffi::OsString};
 
 /// Argument parsing errors
 pub enum Error<E: 'static> {
     InvalidUTF8,
     MissingParameter(Cow<'static, str>),
+    UnknowArgumentOS(OsString),
+    UnknowArgument(String),
+    RepeatedArgument(Cow<'static, str>),
+    MissingArgument(Cow<'static, str>),
     Other(E),
 }
 
@@ -13,6 +17,10 @@ impl<E> Error<E> {
         match self {
             Error::InvalidUTF8 => write!(f, "invalid utf-8"),
             Error::MissingParameter(message) => write!(f, "{}", message),
+            Error::UnknowArgumentOS(argument) => write!(f, "unknown argument {:?}", argument),
+            Error::UnknowArgument(argument) => write!(f, "unknown argument \"{}\"", argument),
+            Error::RepeatedArgument(message) => write!(f, "{}", message),
+            Error::MissingArgument(message) => write!(f, "{}", message),
 
             Error::Other(_) => write!(f, "other"),
         }
@@ -24,7 +32,12 @@ impl<E: std::error::Error> std::error::Error for Error<E> {
         match self {
             Error::Other(error) => Some(error),
 
-            Error::InvalidUTF8 | Error::MissingParameter(_) => None,
+            Error::InvalidUTF8
+            | Error::MissingParameter(_)
+            | Error::UnknowArgumentOS(_)
+            | Error::UnknowArgument(_)
+            | Error::RepeatedArgument(_)
+            | Error::MissingArgument(_) => None,
         }
     }
 }

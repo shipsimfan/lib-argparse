@@ -12,6 +12,39 @@ impl<T, E> FlagSet<T, E> {
         FlagSet(Vec::new())
     }
 
+    /// Returns an iterator that allows modifying each value.
+    ///
+    /// The iterator yields all items from start to end.
+    pub(crate) fn iter_mut(&mut self) -> std::slice::IterMut<FlagArgument<T, E>> {
+        self.0.iter_mut()
+    }
+
+    /// Gets an argument based on its short name
+    pub(crate) fn get_short(&mut self, short_name: &str) -> Option<&mut FlagArgument<T, E>> {
+        for flag in &mut self.0 {
+            if let Some(f_short_name) = flag.short_name() {
+                if f_short_name == short_name {
+                    return Some(flag);
+                }
+            }
+        }
+
+        None
+    }
+
+    /// Gets an argument based on its long name
+    pub(crate) fn get_long(&mut self, long_name: &str) -> Option<&mut FlagArgument<T, E>> {
+        for flag in &mut self.0 {
+            if let Some(f_long_name) = flag.long_name() {
+                if f_long_name == long_name {
+                    return Some(flag);
+                }
+            }
+        }
+
+        None
+    }
+
     /// Pushes `flag_argument` into the set
     ///
     /// Returns any arguments which have conflicting names
@@ -84,5 +117,14 @@ impl<T, E> Deref for FlagSet<T, E> {
 
     fn deref(&self) -> &Self::Target {
         self.0.deref()
+    }
+}
+
+impl<'a, T, E> IntoIterator for &'a mut FlagSet<T, E> {
+    type Item = &'a mut FlagArgument<T, E>;
+    type IntoIter = std::slice::IterMut<'a, FlagArgument<T, E>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
     }
 }
