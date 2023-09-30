@@ -74,7 +74,7 @@ where
         Ok(false)
     }
 
-    fn finish(&mut self, _: &mut Self::Options) -> Result<(), Error<T::Err>> {
+    fn finalize(&mut self, _: &mut Self::Options) -> Result<(), Error<T::Err>> {
         match (&self.required, self.recieved_value) {
             (Some(message), false) => return Err(Error::MissingParameter(message.clone())),
             _ => {}

@@ -171,7 +171,7 @@ impl<T, E> Parser<T, E> {
                     .get_short(&arg_name[short_prefix.len()..])
                     .ok_or(Error::UnknowArgument(arg_name))
             } else {
-                if terminal.parse(argument)? {
+                if terminal.parse(options, argument)? {
                     break;
                 }
 
@@ -184,7 +184,7 @@ impl<T, E> Parser<T, E> {
         }
 
         flags.finalize()?;
-        terminal.finalize()
+        terminal.finalize(options)
     }
 
     fn as_mut<'a>(

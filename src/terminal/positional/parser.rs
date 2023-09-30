@@ -23,7 +23,7 @@ pub trait PositionalParser {
     ///
     /// Example usage: A parser returning an error if not enough arguments were passed
     #[allow(unused_variables)]
-    fn finish(&mut self, options: &mut Self::Options) -> Result<(), crate::Error<Self::Error>> {
+    fn finalize(&mut self, options: &mut Self::Options) -> Result<(), crate::Error<Self::Error>> {
         Ok(())
     }
 }

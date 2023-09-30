@@ -84,7 +84,7 @@ where
         Ok(true)
     }
 
-    fn finish(&mut self, options: &mut Self::Options) -> Result<(), Error<E>> {
+    fn finalize(&mut self, options: &mut Self::Options) -> Result<(), Error<E>> {
         let mut strings = Vec::new();
         std::mem::swap(&mut self.list, &mut strings);
 
@@ -143,7 +143,7 @@ where
         Ok(true)
     }
 
-    fn finish(&mut self, options: &mut Self::Options) -> Result<(), Error<E>> {
+    fn finalize(&mut self, options: &mut Self::Options) -> Result<(), Error<E>> {
         let mut strings = Vec::new();
         std::mem::swap(&mut self.list, &mut strings);
 

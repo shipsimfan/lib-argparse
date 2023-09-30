@@ -1,5 +1,5 @@
 use crate::Error;
-use std::ops::Deref;
+use std::{ffi::OsString, ops::Deref};
 
 mod collect;
 mod parser;
@@ -11,7 +11,11 @@ pub use simple::SimplePositionalParser;
 
 /// An ordered list of positional arguments
 pub struct Positionals<T, E> {
+    /// List of positional parsers
     positionals: Vec<Box<dyn PositionalParser<Options = T, Error = E>>>,
+
+    /// Current positional for parsing
+    current_positional: usize,
 }
 
 impl<T, E> Positionals<T, E> {
@@ -19,6 +23,7 @@ impl<T, E> Positionals<T, E> {
     pub fn new() -> Self {
         Positionals {
             positionals: Vec::new(),
+            current_positional: 0,
         }
     }
 
@@ -27,12 +32,26 @@ impl<T, E> Positionals<T, E> {
         self.positionals.push(Box::new(positional))
     }
 
-    pub(super) fn parse(&mut self) -> Result<(), Error<E>> {
-        todo!("Parse positional")
+    pub(super) fn parse(&mut self, options: &mut T, argument: OsString) -> Result<(), Error<E>> {
+        if self.current_positional >= self.positionals.len() {
+            return Err(Error::UnexpectedArgument(argument));
+        }
+
+        if !self.positionals[self.current_positional].parse(options, argument)? {
+            self.current_positional += 1;
+        }
+
+        Ok(())
     }
 
-    pub(super) fn finalize(&mut self) -> Result<(), Error<E>> {
-        todo!("Finalize positional");
+    pub(super) fn finalize(&mut self, options: &mut T) -> Result<(), Error<E>> {
+        self.current_positional = 0;
+
+        for positional in &mut self.positionals {
+            positional.finalize(options)?;
+        }
+
+        Ok(())
     }
 }
 
