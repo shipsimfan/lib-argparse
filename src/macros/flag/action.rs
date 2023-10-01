@@ -2,7 +2,6 @@
 use crate::FlagArgument;
 
 #[macro_export]
-#[doc(hidden)]
 /// Creates a [`FlagArgument`]
 ///
 /// Every selection can start with one of the following:
