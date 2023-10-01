@@ -64,7 +64,10 @@ mod terminal;
 pub mod macros;
 
 pub use error::Error;
-pub use flag::{ActionFlag, FlagArgument, FlagKind, SimpleValueParser, ValueFlag, ValueParser};
+pub use flag::{
+    ActionFlag, FlagArgument, FlagKind, SimpleValueParser, SimpleValueParserOS,
+    SimpleValueParserTry, ValueFlag, ValueParser,
+};
 pub use parser::Parser;
 pub use stream::ArgStream;
 pub use terminal::{

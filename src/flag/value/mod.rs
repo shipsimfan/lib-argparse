@@ -3,8 +3,12 @@ use std::borrow::Cow;
 use crate::{ArgStream, FlagArgument, FlagKind};
 
 mod simple;
+mod simple_os;
+mod simple_try;
 
 pub use simple::SimpleValueParser;
+pub use simple_os::SimpleValueParserOS;
+pub use simple_try::SimpleValueParserTry;
 
 /// Parses a value for a [`ValueFlag`]
 pub trait ValueParser: 'static {

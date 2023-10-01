@@ -7,7 +7,9 @@ mod value;
 pub(crate) use set::FlagSet;
 
 pub use action::ActionFlag;
-pub use value::{SimpleValueParser, ValueFlag, ValueParser};
+pub use value::{
+    SimpleValueParser, SimpleValueParserOS, SimpleValueParserTry, ValueFlag, ValueParser,
+};
 
 use crate::{ArgStream, Error};
 
