@@ -16,7 +16,7 @@ pub struct ActionFlag<T, E> {
 impl<T, E> ActionFlag<T, E> {
     /// Creates and `ActionFlag` with `action`
     ///
-    /// `action` is in the form `fn(&mut T)`
+    ///  - `action` is in the form `fn(&mut T)`
     pub fn simple(action: impl Fn(&mut T) + 'static) -> FlagArgument<T, E> {
         FlagArgument::new(FlagKind::Action(ActionFlag {
             action: Box::new(move |options, _| Ok(action(options))),
@@ -27,7 +27,7 @@ impl<T, E> ActionFlag<T, E> {
 
     /// Creates and `ActionFlag` with `action`
     ///
-    /// `action` is in the form `fn(&mut T) -> Result<(), E>`
+    ///  - `action` is in the form `fn(&mut T) -> Result<(), E>`
     pub fn simple_res(action: impl Fn(&mut T) -> Result<(), E> + 'static) -> FlagArgument<T, E> {
         FlagArgument::new(FlagKind::Action(ActionFlag {
             action: Box::new(move |options, _| action(options)),
@@ -38,8 +38,8 @@ impl<T, E> ActionFlag<T, E> {
 
     /// Creates and `ActionFlag` with `action`
     ///
-    /// `action` is in the form `fn(&mut T, &str)`
-    /// `missing_parameter_message` is the message for if the parameter is missing during the parse
+    ///  - `action` is in the form `fn(&mut T, &str)`
+    ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
     pub fn str<S: Into<Cow<'static, str>>>(
         action: impl Fn(&mut T, &str) + 'static,
         missing_parameter_message: S,
@@ -53,8 +53,8 @@ impl<T, E> ActionFlag<T, E> {
 
     /// Creates and `ActionFlag` with `action`
     ///
-    /// `action` is in the form `fn(&mut T, &str) -> Result<(), E>`
-    /// `missing_parameter_message` is the message for if the parameter is missing during the parse
+    ///  - `action` is in the form `fn(&mut T, &str) -> Result<(), E>`
+    ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
     pub fn str_res<S: Into<Cow<'static, str>>>(
         action: impl Fn(&mut T, &str) -> Result<(), E> + 'static,
         missing_parameter_message: S,
@@ -68,7 +68,8 @@ impl<T, E> ActionFlag<T, E> {
 
     /// Creates and `ActionFlag` with `action`
     ///
-    /// `action` is in the form `fn(&mut T, String)`
+    ///  - `action` is in the form `fn(&mut T, String)`
+    ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
     pub fn string<S: Into<Cow<'static, str>>>(
         action: impl Fn(&mut T, String) + 'static,
         missing_parameter_message: S,
@@ -84,7 +85,8 @@ impl<T, E> ActionFlag<T, E> {
 
     /// Creates and `ActionFlag` with `action`
     ///
-    /// `action` is in the form `fn(&mut T, String) -> Result<(), E>`
+    ///  - `action` is in the form `fn(&mut T, String) -> Result<(), E>`
+    ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
     pub fn string_res<S: Into<Cow<'static, str>>>(
         action: impl Fn(&mut T, String) -> Result<(), E> + 'static,
         missing_parameter_message: S,
@@ -98,7 +100,9 @@ impl<T, E> ActionFlag<T, E> {
 
     /// Creates and `ActionFlag` with `action`
     ///
-    /// `action` is in the form `fn(&mut T, Vec<String>)`
+    ///  - `count` is the number of arguments to pull from the stream
+    ///  - `action` is in the form `fn(&mut T, Vec<String>)`
+    ///  - `missing_parameter_message` is the message for if a parameter is missing during the parse
     pub fn vec_string<S: Into<Cow<'static, str>>>(
         count: usize,
         action: impl Fn(&mut T, Vec<String>) + 'static,
@@ -113,7 +117,9 @@ impl<T, E> ActionFlag<T, E> {
 
     /// Creates and `ActionFlag` with `action`
     ///
-    /// `action` is in the form `fn(&mut T, Vec<String>) -> Result<(), E>`
+    ///  - `count` is the number of parameters to pull from the stream
+    ///  - `action` is in the form `fn(&mut T, Vec<String>) -> Result<(), E>`
+    ///  - `missing_parameter_message` is the message for if a parameter is missing during the parse
     pub fn vec_string_res<S: Into<Cow<'static, str>>>(
         count: usize,
         action: impl Fn(&mut T, Vec<String>) -> Result<(), E> + 'static,
@@ -126,12 +132,19 @@ impl<T, E> ActionFlag<T, E> {
         }))
     }
 
+    /// Parses this flag from the stream
+    ///
+    ///  - `options` is the developer defined options
+    ///  - `args` is the argument stream
     pub(super) fn parse(&mut self, options: &mut T, args: &mut ArgStream) -> Result<(), Error<E>> {
         let parameters = self.collect_parameters(args)?;
 
         (self.action)(options, parameters).map_err(|error| Error::Other(error))
     }
 
+    /// Collects `self.count` parameters from the argument stream
+    ///
+    ///  - `args` is the argument stream
     fn collect_parameters(&mut self, args: &mut ArgStream) -> Result<Vec<String>, Error<E>> {
         let mut parameters = Vec::with_capacity(self.count);
 

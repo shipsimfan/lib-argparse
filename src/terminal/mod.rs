@@ -19,7 +19,12 @@ pub enum TerminalArgument<T, E: 'static> {
 impl<T, E> TerminalArgument<T, E> {
     /// Parses a terminal argument
     ///
-    /// Returned `usize` is the index of the selected command
+    /// Returns if a command was parsed
+    ///  - `true` if a command was parsed
+    ///  - `false` if a command was not parsed
+    ///
+    ///  - `options` is the developer provided options to be updated
+    ///  - `argument` is the argument to be parsed
     pub(crate) fn parse(&mut self, options: &mut T, argument: OsString) -> Result<bool, Error<E>> {
         match self {
             TerminalArgument::None => Err(Error::UnexpectedArgument(argument)),
@@ -32,7 +37,7 @@ impl<T, E> TerminalArgument<T, E> {
 
     /// Finalizes a terminal argument
     ///
-    /// `command_index` si the index returned from `parse()`
+    ///  - `options` is the developer provided options to be updated
     pub(crate) fn finalize(
         &mut self,
         options: &mut T,

@@ -17,6 +17,10 @@ pub struct Parser<T, E: 'static = ()> {
     terminal_argument: TerminalArgument<T, E>,
 }
 
+/// Determines if an argument starts with a prefix
+///
+///  - `argument` is the argument to be checked
+///  - `prefix` is the value to be checked against
 fn starts_with(argument: &OsStr, prefix: &str) -> bool {
     if argument.len() < prefix.len() {
         return false;
@@ -72,21 +76,26 @@ impl<T, E> Parser<T, E> {
         &self.long_prefix
     }
 
-    /// Sets the program name to `program_name`
+    /// Sets the program name
+    ///
+    ///  - `program_name` is the string the program name will be set to
     pub fn set_program_name<S: Into<Cow<'static, str>>>(&mut self, program_name: S) {
         self.program_name = Some(program_name.into());
     }
 
-    /// Sets the program description to `description`
+    /// Sets the program description
+    ///
+    ///  - `description` is the string the program description will be set to
     pub fn set_description<S: Into<Cow<'static, str>>>(&mut self, description: S) {
         self.description = Some(description.into());
     }
 
-    /// Pushes `flag_argument` into the list of flag arguments
+    /// Pushes an argument into the list of flag arguments
     ///
-    /// Returns any arguments which have conflicting names
+    /// Returns any arguments which have conflicting names.
+    /// If there is only one conflict, the conflicting argument will always be the first value of the returned tuple.
     ///
-    /// If there is only one conflict, the conflicting argument will always be the first value of the returned tuple
+    ///  - `flag_argument` is the argument to pushed into the list
     pub fn add_flag_argument(
         &mut self,
         flag_argument: FlagArgument<T, E>,
@@ -94,17 +103,23 @@ impl<T, E> Parser<T, E> {
         self.flag_arguments.push(flag_argument)
     }
 
-    /// Sets the terminal argument to `terminal_argument`
+    /// Sets the terminal argument
+    ///
+    ///  - `terminal_argument` is the terminal argument the terminal argument will be set to
     pub fn set_terminal_argument(&mut self, terminal_argument: TerminalArgument<T, E>) {
         self.terminal_argument = terminal_argument;
     }
 
-    /// Sets the terminal argument to `command`
+    /// Sets the terminal argument to a `Command`
+    ///
+    ///  - `command` is the `Command` the terminal argument will be set to
     pub fn set_terminal_command(&mut self, command: Command<T, E>) {
         self.terminal_argument = TerminalArgument::Command(command);
     }
 
-    /// Sets the terminal arugment to `positionals`
+    /// Sets the terminal arugment to a `Positionals`
+    ///
+    ///  - `positionals` is the `Positionals` the terminal argument will be set to
     pub fn set_terminal_positionals(&mut self, positionals: Positionals<T, E>) {
         self.terminal_argument = TerminalArgument::Positionals(positionals);
     }
@@ -115,6 +130,8 @@ impl<T, E> Parser<T, E> {
     }
 
     /// Sets the prefix for short names
+    ///
+    ///  - `short_prefix` is the string the short prefix will be set to
     pub fn set_short_prefix<S: Into<Cow<'static, str>>>(&mut self, short_prefix: S) {
         let short_prefix = short_prefix.into();
         assert_ne!(
@@ -125,6 +142,8 @@ impl<T, E> Parser<T, E> {
     }
 
     /// Sets the prefix for long names
+    ///
+    ///  - `long_prefix` is the string the long prefix will be set to
     pub fn set_long_prefix<S: Into<Cow<'static, str>>>(&mut self, long_prefix: S) {
         let long_prefix = long_prefix.into();
         assert_ne!(
@@ -134,7 +153,9 @@ impl<T, E> Parser<T, E> {
         self.long_prefix = long_prefix;
     }
 
-    /// Parses arguments from `argv` into `options`
+    /// Parses arguments from the environment
+    ///
+    ///  - `options` is the developer provided options to be updated
     pub fn parse(&mut self, mut options: T) -> Result<T, Error<E>> {
         let mut args = ArgStream::new();
 
@@ -146,6 +167,10 @@ impl<T, E> Parser<T, E> {
         Ok(options)
     }
 
+    /// Performs a parse run of a single parser
+    ///
+    ///  - `options` is the developer provided options to be updated
+    ///  - `args` is the argument stream to be parsed from
     fn do_parse<'a>(
         &'a mut self,
         options: &mut T,

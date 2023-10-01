@@ -10,9 +10,9 @@ pub struct SimpleValueParser<T: FromStr + 'static> {
 }
 
 impl<T: FromStr> SimpleValueParser<T> {
-    /// Creates a new SimpleValueParser
+    /// Creates a new `SimpleValueParser`
     ///
-    /// `missing_message` is the error message if the parameter is missing
+    ///  - `missing_message` is the error message if the parameter is missing
     pub fn new<S: Into<Cow<'static, str>>>(missing_message: S) -> Self {
         SimpleValueParser {
             missing_message: missing_message.into(),

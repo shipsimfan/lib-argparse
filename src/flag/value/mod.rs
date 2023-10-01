@@ -13,6 +13,8 @@ pub trait ValueParser: 'static {
     type Value;
 
     /// Parse a value from the argument stream
+    ///
+    ///  - `args` is the argument stream
     fn parse(&mut self, args: &mut ArgStream) -> Result<Self::Value, crate::Error<Self::Error>>;
 }
 
@@ -38,7 +40,10 @@ impl<T, E> ValueFlag<T, E> {
         }))
     }
 
-    /// Parses an object from `args` and updates `options`
+    /// Parses an object
+    ///
+    ///  - `options` is the developer provided options to be updates
+    ///  - `args` is the argument stream parsed from
     pub(crate) fn parse(
         &mut self,
         options: &mut T,

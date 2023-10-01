@@ -27,11 +27,17 @@ impl<T, E> Positionals<T, E> {
         }
     }
 
-    /// Pushes `positional` to the end of the list
+    /// Pushes a positional parser to the end of the list
+    ///
+    ///  - `positional` is the positional parser to be pushed onto the list
     pub fn push(&mut self, positional: impl PositionalParser<Options = T, Error = E> + 'static) {
         self.positionals.push(Box::new(positional))
     }
 
+    /// Parses a positional argument
+    ///
+    ///  - `options` is the developer provided options to be updated
+    ///  - `argument` is the argument is the positional argument from the stream
     pub(super) fn parse(&mut self, options: &mut T, argument: OsString) -> Result<(), Error<E>> {
         if self.current_positional >= self.positionals.len() {
             return Err(Error::UnexpectedArgument(argument));
@@ -44,6 +50,9 @@ impl<T, E> Positionals<T, E> {
         Ok(())
     }
 
+    /// Finalizes all the positional arguments in the list
+    /// 
+    ///  - `options` is the developer provided options to be updated
     pub(super) fn finalize(&mut self, options: &mut T) -> Result<(), Error<E>> {
         self.current_positional = 0;
 

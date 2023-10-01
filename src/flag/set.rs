@@ -20,6 +20,8 @@ impl<T, E> FlagSet<T, E> {
     }
 
     /// Gets an argument based on its short name
+    ///
+    ///  - `short_name` is the short name that will be searched for
     pub(crate) fn get_short(&mut self, short_name: &str) -> Option<&mut FlagArgument<T, E>> {
         for flag in &mut self.0 {
             if let Some(f_short_name) = flag.short_name() {
@@ -33,6 +35,8 @@ impl<T, E> FlagSet<T, E> {
     }
 
     /// Gets an argument based on its long name
+    ///
+    ///  - `long_name` is the long name that will be searched for
     pub(crate) fn get_long(&mut self, long_name: &str) -> Option<&mut FlagArgument<T, E>> {
         for flag in &mut self.0 {
             if let Some(f_long_name) = flag.long_name() {
@@ -45,11 +49,12 @@ impl<T, E> FlagSet<T, E> {
         None
     }
 
-    /// Pushes `flag_argument` into the set
+    /// Pushes an argument into the set
     ///
-    /// Returns any arguments which have conflicting names
+    /// Returns any arguments which have conflicting names.
+    /// If there is only one conflict, the conflicting argument will always be the first value of the returned tuple.
     ///
-    /// If there is only one conflict, the conflicting argument will always be the first value of the returned tuple
+    ///  - `flag_argument` is the argument to be pushed into the set
     pub(crate) fn push(
         &mut self,
         flag_argument: FlagArgument<T, E>,
@@ -64,6 +69,7 @@ impl<T, E> FlagSet<T, E> {
         ret
     }
 
+    /// Finalizes all the arguments in this set
     pub(crate) fn finalize(&mut self) -> Result<(), Error<E>> {
         for flag_argument in self {
             flag_argument.finalize()?;
@@ -72,7 +78,14 @@ impl<T, E> FlagSet<T, E> {
         Ok(())
     }
 
-    /// Removes any arguments that have the same long or short name as `long_name` or `short_name` respectively
+    /// Removes arguments based on their long or short names
+    ///
+    /// Returns any arguments which have conflicting names.
+    /// If there is only one conflict, the conflicting argument will always be the first value of the returned tuple.
+    ///
+    ///  - `short_name` is the short name searched for
+    ///  - `long_name` is the long name searched for
+    /// At least one of the parameters is required to be `Some`
     fn remove(
         &mut self,
         short_name: Option<&str>,

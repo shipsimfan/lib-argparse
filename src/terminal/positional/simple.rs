@@ -24,9 +24,9 @@ impl<T: FromStr, O, F> SimplePositionalParser<T, O, F>
 where
     F: Fn(&mut O, T),
 {
-    /// Creates a new SimpleValueParser
+    /// Creates a new `SimplePositionalParser`
     ///
-    /// `callback` is the function called to store the parsed value
+    ///  - `callback` is the function called to store the parsed value
     pub fn new(callback: F) -> Self {
         SimplePositionalParser {
             callback,
@@ -41,7 +41,7 @@ where
 
     /// Sets this flag to be required
     ///
-    /// `message` is the error message used if no value is provided
+    ///  - `message` is the error message used if no value is provided
     pub fn set_required<S: Into<Cow<'static, str>>>(&mut self, message: S) {
         self.required = Some(message.into());
     }
@@ -62,11 +62,12 @@ where
     fn parse(
         &mut self,
         options: &mut Self::Options,
-        arg: std::ffi::OsString,
+        argument: std::ffi::OsString,
     ) -> Result<bool, Error<T::Err>> {
         self.recieved_value = true;
         let value = T::from_str(
-            &arg.into_string()
+            &argument
+                .into_string()
                 .map_err(|string| Error::InvalidUTF8(string))?,
         )
         .map_err(|error| Error::Other(error))?;

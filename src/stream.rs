@@ -12,7 +12,7 @@ pub struct ArgStream {
 }
 
 impl ArgStream {
-    /// Creates a new stream from OS arguments
+    /// Creates a new `ArgStream` from OS arguments
     pub(crate) fn new() -> Self {
         let args = args_os().peekable();
 

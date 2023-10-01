@@ -47,7 +47,7 @@ where
 {
     /// Creates a new `CollectOsPositionalParser`
     ///
-    /// `callback` is called upon completion of parsing to update the options
+    ///  - `callback` is called upon completion of parsing to update the options
     pub fn new(callback: F) -> Self {
         CollectOsPositionalParser {
             required: None,
@@ -61,7 +61,7 @@ where
 
     /// Sets this positional argument to require at least one value
     ///
-    /// If no value is provided, `error_message` is the error message used
+    /// - `error_message` is the error message used if there are no values
     pub fn set_required<S: Into<Cow<'static, str>>>(&mut self, error_message: S) {
         self.required = Some(error_message.into());
     }
@@ -79,8 +79,8 @@ where
     type Options = T;
     type Error = E;
 
-    fn parse(&mut self, _: &mut Self::Options, arg: OsString) -> Result<bool, Error<E>> {
-        self.list.push(arg);
+    fn parse(&mut self, _: &mut Self::Options, argument: OsString) -> Result<bool, Error<E>> {
+        self.list.push(argument);
         Ok(true)
     }
 
@@ -103,7 +103,7 @@ where
 {
     /// Creates a new `CollectPositionalParser`
     ///
-    /// `callback` is called upon completion of parsing to update the options
+    ///  - `callback` is called upon completion of parsing to update the options
     pub fn new(callback: F) -> Self {
         CollectPositionalParser {
             required: None,
@@ -117,7 +117,7 @@ where
 
     /// Sets this positional argument to require at least one value
     ///
-    /// If no value is provided, `error_message` is the error message used
+    /// - `error_message` is the error message used if there are no values
     pub fn set_required<S: Into<Cow<'static, str>>>(&mut self, error_message: S) {
         self.required = Some(error_message.into());
     }
@@ -135,9 +135,10 @@ where
     type Options = T;
     type Error = E;
 
-    fn parse(&mut self, _: &mut Self::Options, arg: OsString) -> Result<bool, Error<E>> {
+    fn parse(&mut self, _: &mut Self::Options, argument: OsString) -> Result<bool, Error<E>> {
         self.list.push(
-            arg.into_string()
+            argument
+                .into_string()
                 .map_err(|string| Error::InvalidUTF8(string))?,
         );
         Ok(true)

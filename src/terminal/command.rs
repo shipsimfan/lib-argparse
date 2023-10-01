@@ -24,7 +24,9 @@ pub struct Command<T, E: 'static> {
 }
 
 impl<T, E> Command<T, E> {
-    /// Creates a new empty `Command` list
+    /// Creates a new empty `Command` set
+    ///
+    ///  - `command_name` is the name of the command placed at the "$" in the unknown error string "unknown $"
     pub fn new<S: Into<Cow<'static, str>>>(command_name: S) -> Self {
         Command {
             commands: Vec::new(),
@@ -36,7 +38,7 @@ impl<T, E> Command<T, E> {
 
     /// Sets this command to be required
     ///
-    /// `missing_error_message` is the error message displayed if this command is missing
+    ///  - `missing_error_message` is the error message displayed if this command is missing
     pub fn set_required<S: Into<Cow<'static, str>>>(&mut self, missing_error_message: S) {
         self.required = Some(missing_error_message.into());
     }
@@ -49,6 +51,9 @@ impl<T, E> Command<T, E> {
     /// Adds a new command into the set
     ///
     /// Returns the old command if there is a name conflict
+    ///
+    ///  - `command` is the name of the command to be matched against
+    ///  - `parser` is the parser returned if the command is matched
     pub fn add_command<S: Into<Cow<'static, str>>>(
         &mut self,
         command: S,
@@ -60,6 +65,9 @@ impl<T, E> Command<T, E> {
         ret
     }
 
+    /// Parses a command from the argument stream
+    ///
+    ///  - `argument` is the argument to be parsed
     pub(crate) fn parse(&mut self, argument: OsString) -> Result<(), Error<E>> {
         assert!(self.command_index.is_none());
 
@@ -77,6 +85,7 @@ impl<T, E> Command<T, E> {
         Err(Error::UnknownCommand(argument, self.command_name.clone()))
     }
 
+    /// Verifies if this command is required that it was parsed
     pub(crate) fn finalize(&mut self) -> Result<Option<&mut Parser<T, E>>, Error<E>> {
         let command_index = match self.command_index.take() {
             Some(command_index) => command_index,
@@ -89,7 +98,9 @@ impl<T, E> Command<T, E> {
         Ok(Some(&mut self.commands[command_index].1))
     }
 
-    /// Removes a command with the name `command`
+    /// Removes a command based on its name
+    ///
+    ///  - `command` is the name of the command to be removed
     fn remove(&mut self, command: &str) -> Option<(Cow<'static, str>, Parser<T, E>)> {
         for i in 0..self.commands.len() {
             if command == self.commands[i].0 {

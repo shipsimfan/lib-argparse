@@ -44,7 +44,9 @@ pub struct FlagArgument<T, E: 'static> {
 }
 
 impl<T, E> FlagArgument<T, E> {
-    /// Creates a new unnamed `FlagArgument` of the specified kind
+    /// Creates a new unnamed `FlagArgument`
+    ///
+    ///  - `kind` is the kind of flag being created
     pub fn new(kind: FlagKind<T, E>) -> Self {
         FlagArgument {
             short_name: None,
@@ -88,19 +90,23 @@ impl<T, E> FlagArgument<T, E> {
         &self.kind
     }
 
-    /// Sets the name which follows the short prefix to `short_name`
+    /// Sets the name which follows the short prefix
+    ///
+    ///  - `short_name` is the name which the short name is set to
     pub fn set_short_name<S: Into<Cow<'static, str>>>(&mut self, short_name: S) {
         self.short_name = Some(short_name.into())
     }
 
-    /// Sets the name which follows the long prefix to `long_name`
+    /// Sets the name which follows the long prefix
+    ///
+    ///  - `long_name` is the name which the long name is set to
     pub fn set_long_name<S: Into<Cow<'static, str>>>(&mut self, long_name: S) {
         self.long_name = Some(long_name.into())
     }
 
     /// Sets this flag to be required
     ///
-    /// `missing_error_message` is the error message if this argument is missing in the parse
+    ///  - `missing_error_message` is the error message if this argument is missing in the parse
     pub fn set_required<S: Into<Cow<'static, str>>>(&mut self, missing_error_message: S) {
         self.required = Some(missing_error_message.into());
     }
@@ -112,7 +118,7 @@ impl<T, E> FlagArgument<T, E> {
 
     /// Allows this flag to appear more than once
     ///
-    /// `repeated_error_message` is the error message if this argument is repeated in the parse
+    ///  - `repeated_error_message` is the error message if this argument is repeated in the parse
     pub fn set_repeatable<S: Into<Cow<'static, str>>>(&mut self, repeated_error_message: S) {
         self.repeatable = Some(repeated_error_message.into());
     }
@@ -122,7 +128,9 @@ impl<T, E> FlagArgument<T, E> {
         self.repeatable = None;
     }
 
-    /// Sets the type of this flag to `kind`
+    /// Sets the kind of this flag
+    ///
+    ///  - `kind` is the kind this flag is set to
     pub fn set_kind(&mut self, kind: FlagKind<T, E>) {
         self.kind = kind;
     }
@@ -130,6 +138,9 @@ impl<T, E> FlagArgument<T, E> {
     /// Parses the flag argument
     ///
     /// Returns `true` if the flag is a help flag
+    ///
+    ///  - `options` is the developer provided options to be updated
+    ///  - `args` is the argument stream to be parsed from
     pub(crate) fn parse(
         &mut self,
         options: &mut T,
@@ -151,7 +162,7 @@ impl<T, E> FlagArgument<T, E> {
         .map(|_| false)
     }
 
-    /// Resets this arguments count before a parse
+    /// Resets this argument's count before a parse and verifies that it is required
     pub(crate) fn finalize(&mut self) -> Result<(), Error<E>> {
         if let Some(error_message) = &self.required {
             if self.count == 0 {

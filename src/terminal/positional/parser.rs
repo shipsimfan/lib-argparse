@@ -10,16 +10,21 @@ pub trait PositionalParser {
 
     /// Parses the positional arguments
     ///
-    /// Returning `true` means this parser will take the next positional
+    /// The return value determines if this parser will take the next positional:
+    ///  - `true` means this parser will take the next positional
+    ///  - `false` means this parser is done
     ///
-    /// Returning `false` means this parser is done
+    ///  - `options` is the developer provided options to update
+    ///  - `argument` is the argument to be parsed from the stream
     fn parse(
         &mut self,
         options: &mut Self::Options,
-        arg: OsString,
+        argument: OsString,
     ) -> Result<bool, crate::Error<Self::Error>>;
 
     /// Called at the end of argument parsing
+    ///
+    ///  - `options` is the developer provided options which can be updated
     ///
     /// Example usage: A parser returning an error if not enough arguments were passed
     #[allow(unused_variables)]
