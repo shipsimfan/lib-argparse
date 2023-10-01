@@ -2,7 +2,11 @@ use crate::{Parser, TerminalArgument};
 use header::__parser_header;
 use std::borrow::Cow;
 
+mod command;
 mod header;
+
+#[doc(hidden)]
+pub use command::__command;
 
 #[macro_export]
 /// Creates a [`Parser`]
@@ -12,19 +16,21 @@ mod header;
 ///  - `terminal` is the terminal argument
 macro_rules! parser {
     {} => {
-        $crate::macros::__parser_inner! {
+        $crate::macros::__parser(
             ::std::option::Option::None,
             ::std::option::Option::None,
-        }
+            $crate::TerminalArgument::None,
+        )
     };
 
     {
         $program_name: literal
     } => {
-        $crate::macros::__parser_inner! {
-            ::std::option::Option::Some($program_name),
+        $crate::macros::__parser(
+            ::std::option::Option::Some($program_name.into()),
             ::std::option::Option::None,
-        }
+            $crate::TerminalArgument::None,
+        )
     };
 
 
@@ -32,29 +38,32 @@ macro_rules! parser {
         $program_name: literal
         $description: literal
     } => {
-        $crate::macros::__parser_inner! {
-            ::std::option::Option::Some($program_name),
-            ::std::option::Option::Some($description),
-        }
+        $crate::macros::__parser(
+            ::std::option::Option::Some($program_name.into()),
+            ::std::option::Option::Some($description.into()),
+            $crate::TerminalArgument::None,
+        )
     };
 
     {
         terminal: expr
     } => {
-        $crate::macros::__parser_inner! {
+        $crate::macros::__parser(
             ::std::option::Option::None,
             ::std::option::Option::None,
-        }
+            $terminal,
+        )
     };
 
     {
         $program_name: literal
         $terminal: expr
     } => {
-        $crate::macros::__parser_inner! {
-            ::std::option::Option::Some($program_name),
+        $crate::macros::__parser(
+            ::std::option::Option::Some($program_name.into()),
             ::std::option::Option::None,
-        }
+            $terminal,
+        )
     };
 
 
@@ -63,10 +72,11 @@ macro_rules! parser {
         $description: literal
         $terminal: expr
     } => {
-        $crate::macros::__parser_inner! {
-            ::std::option::Option::Some($program_name),
-            ::std::option::Option::Some($description),
-        }
+        $crate::macros::__parser(
+            ::std::option::Option::Some($program_name.into()),
+            ::std::option::Option::Some($description.into()),
+            $terminal,
+        )
     };
 }
 
