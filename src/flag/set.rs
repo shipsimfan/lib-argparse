@@ -29,33 +29,25 @@ impl<T, E> FlagSet<T, E> {
         writeln!(f, "OPTIONS:")?;
 
         let mut longest_short_name = 0;
-        let mut longest_total = 0;
+        let mut longest_long_name = 0;
         for argument in self {
-            let mut total_length = 0;
             if let Some(short_name) = argument.short_name() {
-                let mut short_name_len = short_name.len() + short_prefix.len();
-                if argument.long_name().is_some() {
-                    short_name_len += 2;
-                }
-
+                let short_name_len = short_name.len() + short_prefix.len();
                 if short_name_len > longest_short_name {
                     longest_short_name = short_name_len;
                 }
-
-                total_length += short_name_len;
             }
 
             if let Some(long_name) = argument.long_name() {
-                total_length += long_name.len() + long_prefix.len();
-            }
-
-            if total_length > longest_total {
-                longest_total = total_length;
+                let long_name_len = long_name.len() + long_prefix.len();
+                if long_name_len > longest_long_name {
+                    longest_long_name = long_name_len;
+                }
             }
         }
 
-        let short_padding = longest_short_name;
-        let total_padding = longest_total + 2;
+        let short_padding = longest_short_name + 2;
+        let long_padding = longest_long_name + 2;
 
         /*
          * -s, --long HINT  Description
@@ -63,34 +55,41 @@ impl<T, E> FlagSet<T, E> {
         for argument in self {
             write!(f, "  ")?;
 
-            let mut length = 0;
-            match argument.short_name() {
+            let start = match argument.short_name() {
                 Some(short_name) => {
+                    let mut length = 0;
+
                     write!(f, "{}{}", short_prefix, short_name)?;
-                    length += short_prefix.len() + short_name.len();
-                }
-                None => {
-                    for _ in 0..short_padding {
-                        write!(f, " ")?;
+                    if argument.long_name().is_some() {
+                        write!(f, ", ")?;
+                        length += 2;
                     }
-                    length += short_padding;
+
+                    length + short_prefix.len() + short_name.len()
                 }
+                None => 0,
+            };
+
+            for _ in start..short_padding {
+                write!(f, " ")?;
             }
 
-            match argument.long_name() {
+            let start = match argument.long_name() {
                 Some(long_name) => {
+                    let mut length = 0;
+
                     if argument.short_name().is_some() {
                         write!(f, ", ")?;
                         length += 2;
                     }
 
                     write!(f, "{}{}", long_prefix, long_name)?;
-                    length += long_prefix.len() + long_name.len();
+                    length + long_prefix.len() + long_name.len()
                 }
-                None => {}
-            }
+                None => 0,
+            };
 
-            for _ in 0..total_padding - length {
+            for _ in start..long_padding {
                 write!(f, " ")?;
             }
 
