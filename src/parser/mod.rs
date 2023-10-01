@@ -81,6 +81,8 @@ impl<T, E> Parser<T, E> {
 
     /// Sets the program name
     ///
+    /// If this parser is in a `Command`, then the program name used will be inherited instead of the one set here.
+    ///
     ///  - `program_name` is the string the program name will be set to
     pub fn set_program_name<S: Into<Cow<'static, str>>>(mut self, program_name: S) -> Self {
         self.program_name = Some(program_name.into());
@@ -88,6 +90,8 @@ impl<T, E> Parser<T, E> {
     }
 
     /// Sets the program description
+    ///
+    /// If this parser is in a `Command`, then the program description used will be inherited instead of the one set here.
     ///
     ///  - `description` is the string the program description will be set to
     pub fn set_description<S: Into<Cow<'static, str>>>(mut self, description: S) -> Self {
@@ -172,11 +176,19 @@ impl<T, E> Parser<T, E> {
 
         let first_argument = args.next()?.unwrap();
 
+        let program_name = self.program_name().map(|string| string.to_owned());
+        let description = self.description().map(|string| string.to_owned());
+
         let mut parser = self;
         let mut command_chain = Vec::new();
-        while let Some((new_parser, command)) =
-            parser.do_parse(&mut options, &mut args, &command_chain, &first_argument)?
-        {
+        while let Some((new_parser, command)) = parser.do_parse(
+            &mut options,
+            &mut args,
+            &command_chain,
+            &first_argument,
+            program_name.as_deref(),
+            description.as_deref(),
+        )? {
             parser = new_parser;
             command_chain.push(command);
         }
@@ -189,12 +201,17 @@ impl<T, E> Parser<T, E> {
     ///  - `options` is the developer provided options to be updated
     ///  - `args` is the argument stream to be parsed from
     ///  - `command_chain` is the list of commands that precede this parser
+    ///  - `first_argument` is the first argument passed to the program, usually the path to the program
+    ///  - `program_name` is the program name to be used in help, potentially inherited
+    ///  - `description` is the program description to be used in help, potentially inherited
     fn do_parse<'a>(
         &'a mut self,
         options: &mut T,
         args: &mut ArgStream,
         command_chain: &[String],
         first_argument: &str,
+        program_name: Option<&str>,
+        description: Option<&str>,
     ) -> Result<Option<(&'a mut Parser<T, E>, String)>, Error<E>> {
         // This pointer is stored for a help message. This is required for the borrow checker.
         let self_ptr = self as *const _;
@@ -235,7 +252,9 @@ impl<T, E> Parser<T, E> {
                     HelpGenerator::new(
                         unsafe { &*(self_ptr as *const _) },
                         command_chain,
-                        first_argument
+                        first_argument,
+                        program_name,
+                        description
                     )
                 );
                 std::process::exit(0);
