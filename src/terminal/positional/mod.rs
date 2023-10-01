@@ -27,7 +27,7 @@ pub struct Positionals<T, E> {
 struct UsageDisplayer<'a, T, E>(&'a dyn PositionalParser<Options = T, Error = E>);
 
 impl<T, E> Positionals<T, E> {
-    /// Creates a new empty `Positionals`
+    /// Creates a new empty [`Positionals`]
     pub fn new() -> Self {
         Positionals {
             positionals: Vec::new(),

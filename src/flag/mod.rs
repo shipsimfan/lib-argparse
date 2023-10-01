@@ -50,7 +50,7 @@ pub struct FlagArgument<T, E: 'static> {
 }
 
 impl<T, E> FlagArgument<T, E> {
-    /// Creates a new unnamed `FlagArgument`
+    /// Creates a new unnamed [`FlagArgument`]
     ///
     ///  - `kind` is the kind of flag being created
     ///  - `description` is the description of this argument displayed in the help

@@ -7,7 +7,7 @@ use std::ops::Deref;
 pub(crate) struct FlagSet<T, E: 'static>(Vec<FlagArgument<T, E>>);
 
 impl<T, E> FlagSet<T, E> {
-    /// Creates a new empty `FlagSet`
+    /// Creates a new empty [`FlagSet`]
     pub(crate) fn new() -> Self {
         FlagSet(Vec::new())
     }
@@ -166,7 +166,7 @@ impl<T, E> FlagSet<T, E> {
     ///
     ///  - `short_name` is the short name searched for
     ///  - `long_name` is the long name searched for
-    /// At least one of the parameters is required to be `Some`
+    /// At least one of the parameters is required to be [`Some`]
     fn remove(
         &mut self,
         short_name: Option<&str>,

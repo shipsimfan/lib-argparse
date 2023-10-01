@@ -17,14 +17,14 @@ where
     /// The usage hint for help
     hint: Cow<'static, str>,
 
-    /// The list of `OsString`s collected during parsing
+    /// The list of [`OsString`]s collected during parsing
     list: Vec<OsString>,
 
     phantom_error: PhantomData<E>,
     phantom_type: PhantomData<T>,
 }
 
-/// Collects the remaining positional arguments as a `Vec<String>`
+/// Collects the remaining positional arguments as a [`Vec<String>`]
 pub struct CollectPositionalParser<E: 'static, T, F>
 where
     F: Fn(&mut T, Vec<String>) -> Result<(), E>,
@@ -40,7 +40,7 @@ where
     /// The usage hint for help
     hint: Cow<'static, str>,
 
-    /// The list of `String`s collected during parsing
+    /// The list of [`String`]s collected during parsing
     list: Vec<String>,
 
     phantom_error: PhantomData<E>,
@@ -51,7 +51,7 @@ impl<E, T, F> CollectOsPositionalParser<E, T, F>
 where
     F: Fn(&mut T, Vec<OsString>) -> Result<(), E>,
 {
-    /// Creates a new `CollectOsPositionalParser`
+    /// Creates a new [`CollectOsPositionalParser`]
     ///
     ///  - `callback` is called upon completion of parsing to update the options
     ///  - `hint` is the usage hint displayed in help
@@ -132,7 +132,7 @@ impl<E, T, F> CollectPositionalParser<E, T, F>
 where
     F: Fn(&mut T, Vec<String>) -> Result<(), E>,
 {
-    /// Creates a new `CollectPositionalParser`
+    /// Creates a new [`CollectPositionalParser`]
     ///
     ///  - `callback` is called upon completion of parsing to update the options
     ///  - `hint` is the usage hint displayed in help

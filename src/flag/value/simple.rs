@@ -1,7 +1,7 @@
 use crate::{Error, ValueParser};
 use std::{borrow::Cow, marker::PhantomData, str::FromStr};
 
-/// Parses values using the `std::str::FromStr` trait
+/// Parses values using the [`std::str::FromStr`] trait
 pub struct SimpleValueParser<T: FromStr + 'static> {
     /// Error message if the value is missing
     missing_message: Cow<'static, str>,
@@ -10,7 +10,7 @@ pub struct SimpleValueParser<T: FromStr + 'static> {
 }
 
 impl<T: FromStr> SimpleValueParser<T> {
-    /// Creates a new `SimpleValueParser`
+    /// Creates a new [`SimpleValueParser`]
     ///
     ///  - `missing_message` is the error message if the parameter is missing
     pub fn new<S: Into<Cow<'static, str>>>(missing_message: S) -> Self {

@@ -1,13 +1,18 @@
+use crate::{Parser, TerminalArgument};
+use header::__parser_header;
+use std::borrow::Cow;
+
 mod header;
 
 #[macro_export]
-/// Creates a `Parser`
+/// Creates a [`Parser`]
 ///
-///  - `program_name` is an `Option<Into<Cow<'static, str>>>` with the program name
-///  - `description` is an `Option<Into<Cow<'static, str>>>` with the description
+///  - `program_name` is the program name
+///  - `description` is the description
+///  - `terminal` is the terminal argument
 macro_rules! parser {
     {} => {
-        $crate::__parser_inner! {
+        $crate::macros::__parser_inner! {
             ::std::option::Option::None,
             ::std::option::Option::None,
         }
@@ -16,7 +21,7 @@ macro_rules! parser {
     {
         $program_name: literal
     } => {
-        $crate::__parser_inner! {
+        $crate::macros::__parser_inner! {
             ::std::option::Option::Some($program_name),
             ::std::option::Option::None,
         }
@@ -27,24 +32,54 @@ macro_rules! parser {
         $program_name: literal
         $description: literal
     } => {
-        $crate::__parser_inner! {
+        $crate::macros::__parser_inner! {
+            ::std::option::Option::Some($program_name),
+            ::std::option::Option::Some($description),
+        }
+    };
+
+    {
+        terminal: expr
+    } => {
+        $crate::macros::__parser_inner! {
+            ::std::option::Option::None,
+            ::std::option::Option::None,
+        }
+    };
+
+    {
+        $program_name: literal
+        $terminal: expr
+    } => {
+        $crate::macros::__parser_inner! {
+            ::std::option::Option::Some($program_name),
+            ::std::option::Option::None,
+        }
+    };
+
+
+    {
+        $program_name: literal
+        $description: literal
+        $terminal: expr
+    } => {
+        $crate::macros::__parser_inner! {
             ::std::option::Option::Some($program_name),
             ::std::option::Option::Some($description),
         }
     };
 }
 
-#[macro_export]
 #[doc(hidden)]
-/// Creates a `Parser`
+/// Creates a [`Parser`]
 ///
-///  - `program_name` is an `Option<Into<Cow<'static, str>>>` with the program name
-///  - `description` is an `Option<Into<Cow<'static, str>>>` with the description
-macro_rules! __parser_inner {
-    {
-        $program_name: expr,
-        $description: expr,
-    } => {
-        $crate::__parser_header_inner!($program_name, $description)
-    };
+///  - `program_name` is the program name
+///  - `description` is the description
+///  - `terminal` is the terminal argument
+pub fn __parser<T, E>(
+    program_name: Option<Cow<'static, str>>,
+    description: Option<Cow<'static, str>>,
+    terminal: TerminalArgument<T, E>,
+) -> Parser<T, E> {
+    __parser_header(program_name, description).set_terminal_argument(terminal)
 }

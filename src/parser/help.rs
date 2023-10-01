@@ -43,7 +43,7 @@ fn generate_header(
 ///
 ///  - `f` is the output
 ///  - `parser` is the parser to generate for
-///  - `command_chain` is the list of command before `parser`
+///  - `command_chain` is the list of command before [`parser`]
 ///
 /// OUTPUT:
 /// > USAGE:\
@@ -71,10 +71,10 @@ fn generate_usage<T, E>(
 }
 
 impl<'a, T, E> HelpGenerator<'a, T, E> {
-    /// Creates a new `HelpGenerator`
+    /// Creates a new [`HelpGenerator`]
     ///
     ///  - `parser` is the parser to generate for
-    ///  - `command_chain` is the list of commands preceding `parser`
+    ///  - `command_chain` is the list of commands preceding [`parser`]
     ///  - `first_argument` is the first argument provided by the operating system
     pub(super) fn new(
         parser: &'a Parser<T, E>,

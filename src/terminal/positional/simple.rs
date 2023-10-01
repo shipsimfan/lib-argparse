@@ -1,7 +1,7 @@
 use crate::{Error, PositionalParser};
 use std::{borrow::Cow, marker::PhantomData, str::FromStr};
 
-/// Parses values using the `std::str::FromStr` trait
+/// Parses values using the [`std::str::FromStr`] trait
 pub struct SimplePositionalParser<T: FromStr + 'static, O, F>
 where
     F: Fn(&mut O, T),
@@ -28,7 +28,7 @@ impl<T: FromStr, O, F> SimplePositionalParser<T, O, F>
 where
     F: Fn(&mut O, T),
 {
-    /// Creates a new `SimplePositionalParser`
+    /// Creates a new [`SimplePositionalParser`]
     ///
     ///  - `callback` is the function called to store the parsed value
     ///  - `hint` is the usage hint displayed in help

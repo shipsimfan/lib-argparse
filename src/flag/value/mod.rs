@@ -6,7 +6,7 @@ mod simple;
 
 pub use simple::SimpleValueParser;
 
-/// Parses a value for a `ValueFlag`
+/// Parses a value for a [`ValueFlag`]
 pub trait ValueParser: 'static {
     /// An error returned by the parser
     type Error;
@@ -26,9 +26,9 @@ pub struct ValueFlag<T, E: 'static> {
 }
 
 impl<T, E> ValueFlag<T, E> {
-    /// Creates a new `ValueFlag`
+    /// Creates a new [`ValueFlag`]
     ///
-    ///  - `parser` is the `ValueParser` which will parse the value
+    ///  - `parser` is the [`ValueParser`] which will parse the value
     ///  - `action` is called after the parser to update the options
     ///  - `description` is the description of this argument displayed in the help
     pub fn new<V: ValueParser<Error = E>, S: Into<Cow<'static, str>>>(

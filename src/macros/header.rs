@@ -1,19 +1,25 @@
-#[macro_export]
+use std::borrow::Cow;
+
+use crate::Parser;
+
 #[doc(hidden)]
-/// Creates a `Parser` with only defined header elements
+/// Creates a [`Parser`] with only defined header elements
 ///
-///  - `program_name` is an `Option<Into<Cow<'static, str>>>` with the program name
-///  - `description` is an `Option<Into<Cow<'static, str>>>` with the description
-macro_rules! __parser_header_inner {
-    ($program_name: expr, $description: expr) => {{
-        let mut parser = $crate::Parser::new();
-        parser = match $program_name {
-            ::std::option::Option::Some(program_name) => parser.set_program_name(program_name),
-            ::std::option::Option::None => parser,
-        };
-        match $description {
-            ::std::option::Option::Some(description) => description.set_description(description),
-            ::std::option::Option::None => parser,
-        }
-    }};
+///  - `program_name` is the program name
+///  - `description` is the description
+pub(super) fn __parser_header<T, E>(
+    program_name: Option<Cow<'static, str>>,
+    description: Option<Cow<'static, str>>,
+) -> Parser<T, E> {
+    let mut parser = crate::Parser::new();
+
+    parser = match program_name {
+        Some(program_name) => parser.set_program_name(program_name),
+        None => parser,
+    };
+
+    match description {
+        Some(description) => parser.set_description(description),
+        None => parser,
+    }
 }

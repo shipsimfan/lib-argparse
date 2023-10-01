@@ -26,7 +26,7 @@ pub struct Command<T, E: 'static> {
 }
 
 impl<T, E> Command<T, E> {
-    /// Creates a new empty `Command` set
+    /// Creates a new empty [`Command`] set
     ///
     ///  - `command_name` is the usage hint. It is also the name of the command placed at the "$" in the unknown error string "unknown $"
     pub fn new<S: Into<Cow<'static, str>>>(command_name: S) -> Self {

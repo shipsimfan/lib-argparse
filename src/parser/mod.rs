@@ -33,7 +33,7 @@ fn starts_with(argument: &OsStr, prefix: &str) -> bool {
 }
 
 impl<T, E> Parser<T, E> {
-    /// Creates a new empty `Parser`
+    /// Creates a new empty [`Parser`]
     pub fn new() -> Self {
         Parser {
             program_name: None,
@@ -81,7 +81,7 @@ impl<T, E> Parser<T, E> {
 
     /// Sets the program name
     ///
-    /// If this parser is in a `Command`, then the program name used will be inherited instead of the one set here.
+    /// If this parser is in a [`Command`], then the program name used will be inherited instead of the one set here.
     ///
     ///  - `program_name` is the string the program name will be set to
     pub fn set_program_name<S: Into<Cow<'static, str>>>(mut self, program_name: S) -> Self {
@@ -91,7 +91,7 @@ impl<T, E> Parser<T, E> {
 
     /// Sets the program description
     ///
-    /// If this parser is in a `Command`, then the program description used will be inherited instead of the one set here.
+    /// If this parser is in a [`Command`], then the program description used will be inherited instead of the one set here.
     ///
     ///  - `description` is the string the program description will be set to
     pub fn set_description<S: Into<Cow<'static, str>>>(mut self, description: S) -> Self {
@@ -120,17 +120,17 @@ impl<T, E> Parser<T, E> {
         self
     }
 
-    /// Sets the terminal argument to a `Command`
+    /// Sets the terminal argument to a [`Command`]
     ///
-    ///  - `command` is the `Command` the terminal argument will be set to
+    ///  - `command` is the [`Command`] the terminal argument will be set to
     pub fn set_terminal_command(mut self, command: Command<T, E>) -> Self {
         self.terminal_argument = TerminalArgument::Command(command);
         self
     }
 
-    /// Sets the terminal arugment to a `Positionals`
+    /// Sets the terminal arugment to a [`Positionals`]
     ///
-    ///  - `positionals` is the `Positionals` the terminal argument will be set to
+    ///  - `positionals` is the [`Positionals`] the terminal argument will be set to
     pub fn set_terminal_positionals(mut self, positionals: Positionals<T, E>) -> Self {
         self.terminal_argument = TerminalArgument::Positionals(positionals);
         self
@@ -244,7 +244,7 @@ impl<T, E> Parser<T, E> {
             }?;
 
             if argument.parse(options, args)? {
-                // UNSAFE: The borrow checker won't let us use `self` here
+                // UNSAFE: The borrow checker won't let us use [`self`] here
                 // because of the `self.as_mut()` call above. This immutable
                 // borrow is safe.
                 print!(

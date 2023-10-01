@@ -14,7 +14,7 @@ pub struct ActionFlag<T, E> {
 }
 
 impl<T, E> ActionFlag<T, E> {
-    /// Creates and `ActionFlag` with `action`
+    /// Creates an [`ActionFlag`]
     ///
     ///  - `action` is in the form `fn(&mut T)`
     ///  - `description` is the description of this argument displayed in the help
@@ -32,7 +32,7 @@ impl<T, E> ActionFlag<T, E> {
         )
     }
 
-    /// Creates and `ActionFlag` with `action`
+    /// Creates an [`ActionFlag`]
     ///
     ///  - `action` is in the form `fn(&mut T) -> Result<(), E>`
     ///  - `description` is the description of this argument displayed in the help
@@ -50,7 +50,7 @@ impl<T, E> ActionFlag<T, E> {
         )
     }
 
-    /// Creates and `ActionFlag` with `action`
+    /// Creates an [`ActionFlag`]
     ///
     ///  - `action` is in the form `fn(&mut T, &str)`
     ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
@@ -70,7 +70,7 @@ impl<T, E> ActionFlag<T, E> {
         )
     }
 
-    /// Creates and `ActionFlag` with `action`
+    /// Creates an [`ActionFlag`]
     ///
     ///  - `action` is in the form `fn(&mut T, &str) -> Result<(), E>`
     ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
@@ -90,7 +90,7 @@ impl<T, E> ActionFlag<T, E> {
         )
     }
 
-    /// Creates and `ActionFlag` with `action`
+    /// Creates an [`ActionFlag`]
     ///
     ///  - `action` is in the form `fn(&mut T, String)`
     ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
@@ -112,7 +112,7 @@ impl<T, E> ActionFlag<T, E> {
         )
     }
 
-    /// Creates and `ActionFlag` with `action`
+    /// Creates an [`ActionFlag`]
     ///
     ///  - `action` is in the form `fn(&mut T, String) -> Result<(), E>`
     ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
@@ -134,7 +134,7 @@ impl<T, E> ActionFlag<T, E> {
         )
     }
 
-    /// Creates and `ActionFlag` with `action`
+    /// Creates an [`ActionFlag`]
     ///
     ///  - `count` is the number of arguments to pull from the stream
     ///  - `action` is in the form `fn(&mut T, Vec<String>)`
@@ -156,7 +156,7 @@ impl<T, E> ActionFlag<T, E> {
         )
     }
 
-    /// Creates and `ActionFlag` with `action`
+    /// Creates and [`ActionFlag`]
     ///
     ///  - `count` is the number of parameters to pull from the stream
     ///  - `action` is in the form `fn(&mut T, Vec<String>) -> Result<(), E>`

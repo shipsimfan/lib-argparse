@@ -12,14 +12,14 @@ pub struct ArgStream {
 }
 
 impl ArgStream {
-    /// Creates a new `ArgStream` from OS arguments
+    /// Creates a new [`ArgStream`] from OS arguments
     pub(crate) fn new() -> Self {
         let args = args_os().peekable();
 
         ArgStream { args }
     }
 
-    /// Returns the next `str` in the stream without advancing the stream
+    /// Returns the next [`str`] in the stream without advancing the stream
     pub fn peek<E>(&mut self) -> Result<Option<&str>, Error<E>> {
         match self.peek_os() {
             Some(arg) => arg
@@ -30,12 +30,12 @@ impl ArgStream {
         }
     }
 
-    /// Returns the next `OsStr` in the stream without advancing the stream
+    /// Returns the next [`OsStr`] in the stream without advancing the stream
     pub fn peek_os(&mut self) -> Option<&OsStr> {
         self.args.peek().map(|string| string.as_os_str())
     }
 
-    /// Returns the next `String` in the stream and advances the stream
+    /// Returns the next [`String`] in the stream and advances the stream
     pub fn next<E>(&mut self) -> Result<Option<String>, Error<E>> {
         match self.next_os() {
             Some(arg) => arg
@@ -46,7 +46,7 @@ impl ArgStream {
         }
     }
 
-    /// Returns the next `OsString` in the stream and advances the stream
+    /// Returns the next [`OsString`] in the stream and advances the stream
     pub fn next_os(&mut self) -> Option<OsString> {
         self.args.next()
     }
