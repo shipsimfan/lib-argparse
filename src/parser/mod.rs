@@ -82,15 +82,17 @@ impl<T, E> Parser<T, E> {
     /// Sets the program name
     ///
     ///  - `program_name` is the string the program name will be set to
-    pub fn set_program_name<S: Into<Cow<'static, str>>>(&mut self, program_name: S) {
+    pub fn set_program_name<S: Into<Cow<'static, str>>>(mut self, program_name: S) -> Self {
         self.program_name = Some(program_name.into());
+        self
     }
 
     /// Sets the program description
     ///
     ///  - `description` is the string the program description will be set to
-    pub fn set_description<S: Into<Cow<'static, str>>>(&mut self, description: S) {
+    pub fn set_description<S: Into<Cow<'static, str>>>(mut self, description: S) -> Self {
         self.description = Some(description.into());
+        self
     }
 
     /// Pushes an argument into the list of flag arguments
@@ -109,51 +111,57 @@ impl<T, E> Parser<T, E> {
     /// Sets the terminal argument
     ///
     ///  - `terminal_argument` is the terminal argument the terminal argument will be set to
-    pub fn set_terminal_argument(&mut self, terminal_argument: TerminalArgument<T, E>) {
+    pub fn set_terminal_argument(mut self, terminal_argument: TerminalArgument<T, E>) -> Self {
         self.terminal_argument = terminal_argument;
+        self
     }
 
     /// Sets the terminal argument to a `Command`
     ///
     ///  - `command` is the `Command` the terminal argument will be set to
-    pub fn set_terminal_command(&mut self, command: Command<T, E>) {
+    pub fn set_terminal_command(mut self, command: Command<T, E>) -> Self {
         self.terminal_argument = TerminalArgument::Command(command);
+        self
     }
 
     /// Sets the terminal arugment to a `Positionals`
     ///
     ///  - `positionals` is the `Positionals` the terminal argument will be set to
-    pub fn set_terminal_positionals(&mut self, positionals: Positionals<T, E>) {
+    pub fn set_terminal_positionals(mut self, positionals: Positionals<T, E>) -> Self {
         self.terminal_argument = TerminalArgument::Positionals(positionals);
+        self
     }
 
     /// Removes the terminal argument
-    pub fn clear_terminal_argument(&mut self) {
+    pub fn clear_terminal_argument(mut self) -> Self {
         self.terminal_argument = TerminalArgument::None;
+        self
     }
 
     /// Sets the prefix for short names
     ///
     ///  - `short_prefix` is the string the short prefix will be set to
-    pub fn set_short_prefix<S: Into<Cow<'static, str>>>(&mut self, short_prefix: S) {
+    pub fn set_short_prefix<S: Into<Cow<'static, str>>>(mut self, short_prefix: S) -> Self {
         let short_prefix = short_prefix.into();
         assert_ne!(
             self.long_prefix, short_prefix,
             "Short prefix and long prefix cannot be the same"
         );
         self.short_prefix = short_prefix;
+        self
     }
 
     /// Sets the prefix for long names
     ///
     ///  - `long_prefix` is the string the long prefix will be set to
-    pub fn set_long_prefix<S: Into<Cow<'static, str>>>(&mut self, long_prefix: S) {
+    pub fn set_long_prefix<S: Into<Cow<'static, str>>>(mut self, long_prefix: S) -> Self {
         let long_prefix = long_prefix.into();
         assert_ne!(
             self.short_prefix, long_prefix,
             "Short prefix and long prefix cannot be the same"
         );
         self.long_prefix = long_prefix;
+        self
     }
 
     /// Parses arguments from the environment

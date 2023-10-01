@@ -110,65 +110,75 @@ impl<T, E> FlagArgument<T, E> {
     /// Sets the name which follows the short prefix
     ///
     ///  - `short_name` is the name which the short name is set to
-    pub fn set_short_name<S: Into<Cow<'static, str>>>(&mut self, short_name: S) {
-        self.short_name = Some(short_name.into())
+    pub fn set_short_name<S: Into<Cow<'static, str>>>(mut self, short_name: S) -> Self {
+        self.short_name = Some(short_name.into());
+        self
     }
 
     /// Sets the name which follows the long prefix
     ///
     ///  - `long_name` is the name which the long name is set to
-    pub fn set_long_name<S: Into<Cow<'static, str>>>(&mut self, long_name: S) {
-        self.long_name = Some(long_name.into())
+    pub fn set_long_name<S: Into<Cow<'static, str>>>(mut self, long_name: S) -> Self {
+        self.long_name = Some(long_name.into());
+        self
     }
 
     /// Sets the hint which will be displayed in the help
     ///
     ///  - `hint` is the string which will be displayed
-    pub fn set_hint<S: Into<Cow<'static, str>>>(&mut self, hint: S) {
+    pub fn set_hint<S: Into<Cow<'static, str>>>(mut self, hint: S) -> Self {
         self.hint = Some(hint.into());
+        self
     }
 
     /// Sets this argument to have no hint in the help
-    pub fn clear_hint(&mut self) {
+    pub fn clear_hint(mut self) -> Self {
         self.hint = None;
+        self
     }
 
     /// Sets the description which will be displayed in the help
     ///
     ///  - `description` is the string which will be displayed
-    pub fn set_description<S: Into<Cow<'static, str>>>(&mut self, description: S) {
+    pub fn set_description<S: Into<Cow<'static, str>>>(mut self, description: S) -> Self {
         self.description = description.into();
+        self
     }
 
     /// Sets this flag to be required
     ///
     ///  - `missing_error_message` is the error message if this argument is missing in the parse
-    pub fn set_required<S: Into<Cow<'static, str>>>(&mut self, missing_error_message: S) {
+    pub fn set_required<S: Into<Cow<'static, str>>>(mut self, missing_error_message: S) -> Self {
         self.required = Some(missing_error_message.into());
+        self
     }
 
     /// Sets this flag to be not required
-    pub fn set_not_required(&mut self) {
+    pub fn set_not_required(mut self) -> Self {
         self.required = None;
+        self
     }
 
     /// Allows this flag to appear more than once
     ///
     ///  - `repeated_error_message` is the error message if this argument is repeated in the parse
-    pub fn set_repeatable<S: Into<Cow<'static, str>>>(&mut self, repeated_error_message: S) {
+    pub fn set_repeatable<S: Into<Cow<'static, str>>>(mut self, repeated_error_message: S) -> Self {
         self.repeatable = Some(repeated_error_message.into());
+        self
     }
 
     /// Only allows this flag to appear once
-    pub fn set_not_repeatable(&mut self) {
+    pub fn set_not_repeatable(mut self) -> Self {
         self.repeatable = None;
+        self
     }
 
     /// Sets the kind of this flag
     ///
     ///  - `kind` is the kind this flag is set to
-    pub fn set_kind(&mut self, kind: FlagKind<T, E>) {
+    pub fn set_kind(mut self, kind: FlagKind<T, E>) -> Self {
         self.kind = kind;
+        self
     }
 
     /// Parses the flag argument

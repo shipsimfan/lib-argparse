@@ -151,20 +151,23 @@ where
     /// Sets this positional argument to require at least one value
     ///
     /// - `error_message` is the error message used if there are no values
-    pub fn set_required<S: Into<Cow<'static, str>>>(&mut self, error_message: S) {
+    pub fn set_required<S: Into<Cow<'static, str>>>(mut self, error_message: S) -> Self {
         self.required = Some(error_message.into());
+        self
     }
 
     /// Allows this positional argument to take no value
-    pub fn clear_required(&mut self) {
+    pub fn clear_required(mut self) -> Self {
         self.required = None;
+        self
     }
 
     /// Sets the usage hint displayed during help
     ///
     ///  - `hint` is the string the hint will be set to
-    pub fn set_hint<S: Into<Cow<'static, str>>>(&mut self, hint: S) {
+    pub fn set_hint<S: Into<Cow<'static, str>>>(mut self, hint: S) -> Self {
         self.hint = hint.into();
+        self
     }
 }
 

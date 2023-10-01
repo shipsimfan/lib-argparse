@@ -48,20 +48,23 @@ where
     /// Sets this flag to be required
     ///
     ///  - `message` is the error message used if no value is provided
-    pub fn set_required<S: Into<Cow<'static, str>>>(&mut self, message: S) {
+    pub fn set_required<S: Into<Cow<'static, str>>>(mut self, message: S) -> Self {
         self.required = Some(message.into());
+        self
     }
 
     /// Sets this flag to be not required
-    pub fn set_not_required(&mut self) {
+    pub fn set_not_required(mut self) -> Self {
         self.required = None;
+        self
     }
 
     /// Sets the usage hint displayed during help
     ///
     ///  - `hint` is the string the hint will be set to
-    pub fn set_hint<S: Into<Cow<'static, str>>>(&mut self, hint: S) {
+    pub fn set_hint<S: Into<Cow<'static, str>>>(mut self, hint: S) -> Self {
         self.hint = hint.into();
+        self
     }
 }
 

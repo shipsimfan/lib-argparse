@@ -41,13 +41,15 @@ impl<T, E> Command<T, E> {
     /// Sets this command to be required
     ///
     ///  - `missing_error_message` is the error message displayed if this command is missing
-    pub fn set_required<S: Into<Cow<'static, str>>>(&mut self, missing_error_message: S) {
+    pub fn set_required<S: Into<Cow<'static, str>>>(mut self, missing_error_message: S) -> Self {
         self.required = Some(missing_error_message.into());
+        self
     }
 
     /// Sets this command to be not required
-    pub fn set_not_required(&mut self) {
+    pub fn set_not_required(mut self) -> Self {
         self.required = None;
+        self
     }
 
     /// Sets the command name
@@ -56,8 +58,9 @@ impl<T, E> Command<T, E> {
     /// It is also the name of the command placed at the "$" in the unknown error string "unknown $"
     ///
     ///  - `command_name` is the string the hint will be set to
-    pub fn command_name<S: Into<Cow<'static, str>>>(&mut self, command_name: S) {
+    pub fn command_name<S: Into<Cow<'static, str>>>(mut self, command_name: S) -> Self {
         self.command_name = command_name.into();
+        self
     }
 
     /// Adds a new command into the set
