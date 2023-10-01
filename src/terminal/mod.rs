@@ -50,7 +50,7 @@ impl<T, E> TerminalArgument<T, E> {
     pub(crate) fn parse(&mut self, options: &mut T, argument: OsString) -> Result<bool, Error<E>> {
         match self {
             TerminalArgument::None => Err(Error::UnexpectedArgument(argument)),
-            TerminalArgument::Command(command) => command.parse(argument).map(|_| true),
+            TerminalArgument::Command(command) => command.parse(options, argument).map(|_| true),
             TerminalArgument::Positionals(positionals) => {
                 positionals.parse(options, argument).map(|_| false)
             }

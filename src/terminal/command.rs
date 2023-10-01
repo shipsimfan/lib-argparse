@@ -5,10 +5,16 @@ use std::{borrow::Cow, ffi::OsString, ops::Deref};
 pub struct Command<T, E: 'static> {
     /// The list of positionals
     ///
-    /// The first member of the tuple is the name of the command.
+    /// The first member of the tuple is the name of the command
     /// The second member is the help message
-    /// The third member is the new parser if the command is reached.
-    commands: Vec<(Cow<'static, str>, Cow<'static, str>, Parser<T, E>)>,
+    /// The third member is the new parser if the command is matched
+    /// The fourth member is the action called if the command i matched
+    commands: Vec<(
+        Cow<'static, str>,
+        Cow<'static, str>,
+        Parser<T, E>,
+        Option<Box<dyn Fn(&mut T)>>,
+    )>,
 
     /// The name of the command
     ///
@@ -76,10 +82,25 @@ impl<T, E> Command<T, E> {
         help_message: S2,
         parser: Parser<T, E>,
     ) -> Option<(Cow<'static, str>, Parser<T, E>)> {
-        let command = command.into();
-        let ret = self.remove(&command);
-        self.commands.push((command, help_message.into(), parser));
-        ret
+        self.add_command_inner(command, help_message, parser, None)
+    }
+
+    /// Adds a new command into the set
+    ///
+    /// Returns the old command if there is a name conflict
+    ///
+    ///  - `command` is the name of the command to be matched against
+    ///  - `help_message` is a description of the command displayed in the help
+    ///  - `parser` is the parser returned if the command is matched
+    ///  - `action` is the action that may be called if the command is matched
+    pub fn add_command_action<S1: Into<Cow<'static, str>>, S2: Into<Cow<'static, str>>>(
+        &mut self,
+        command: S1,
+        help_message: S2,
+        parser: Parser<T, E>,
+        action: impl Fn(&mut T) + 'static,
+    ) -> Option<(Cow<'static, str>, Parser<T, E>)> {
+        self.add_command_inner(command, help_message, parser, Some(Box::new(action)))
     }
 
     /// Generates the help result
@@ -97,14 +118,14 @@ impl<T, E> Command<T, E> {
         writeln!(f, "COMMANDS:")?;
 
         let mut longest_command = 0;
-        for (command, _, _) in &self.commands {
+        for (command, _, _, _) in &self.commands {
             if command.len() > longest_command {
                 longest_command = command.len();
             }
         }
         let command_padding = longest_command + 2;
 
-        for (command, help_message, _) in &self.commands {
+        for (command, help_message, _, _) in &self.commands {
             write!(f, "  {}", command)?;
             for _ in 0..command_padding - command.len() {
                 write!(f, " ")?;
@@ -117,8 +138,9 @@ impl<T, E> Command<T, E> {
 
     /// Parses a command from the argument stream
     ///
+    ///  - `options` is the developer provided options to be modified
     ///  - `argument` is the argument to be parsed
-    pub(super) fn parse(&mut self, argument: OsString) -> Result<(), Error<E>> {
+    pub(super) fn parse(&mut self, options: &mut T, argument: OsString) -> Result<(), Error<E>> {
         assert!(self.command_index.is_none());
 
         let argument = argument
@@ -128,6 +150,7 @@ impl<T, E> Command<T, E> {
         for i in 0..self.commands.len() {
             if self.commands[i].0.as_ref() == argument.as_str() {
                 self.command_index = Some((i, argument));
+                self.commands[i].3.as_ref().map(|f| (f)(options));
                 return Ok(());
             }
         }
@@ -148,6 +171,28 @@ impl<T, E> Command<T, E> {
         Ok(Some((&mut self.commands[command_index].2, command)))
     }
 
+    /// Adds a new command into the set
+    ///
+    /// Returns the old command if there is a name conflict
+    ///
+    ///  - `command` is the name of the command to be matched against
+    ///  - `help_message` is a description of the command displayed in the help
+    ///  - `parser` is the parser returned if the command is matched
+    ///  - `action` is the action that may be called if the command is matched
+    fn add_command_inner<S1: Into<Cow<'static, str>>, S2: Into<Cow<'static, str>>>(
+        &mut self,
+        command: S1,
+        help_message: S2,
+        parser: Parser<T, E>,
+        action: Option<Box<dyn Fn(&mut T)>>,
+    ) -> Option<(Cow<'static, str>, Parser<T, E>)> {
+        let command = command.into();
+        let ret = self.remove(&command);
+        self.commands
+            .push((command, help_message.into(), parser, action));
+        ret
+    }
+
     /// Removes a command based on its name
     ///
     ///  - `command` is the name of the command to be removed
@@ -164,7 +209,12 @@ impl<T, E> Command<T, E> {
 }
 
 impl<T, E> Deref for Command<T, E> {
-    type Target = [(Cow<'static, str>, Cow<'static, str>, Parser<T, E>)];
+    type Target = [(
+        Cow<'static, str>,
+        Cow<'static, str>,
+        Parser<T, E>,
+        Option<Box<dyn Fn(&mut T)>>,
+    )];
 
     fn deref(&self) -> &Self::Target {
         &self.commands
