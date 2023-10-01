@@ -76,15 +76,8 @@ impl<T, E> FlagSet<T, E> {
 
             let start = match argument.long_name() {
                 Some(long_name) => {
-                    let mut length = 0;
-
-                    if argument.short_name().is_some() {
-                        write!(f, ", ")?;
-                        length += 2;
-                    }
-
                     write!(f, "{}{}", long_prefix, long_name)?;
-                    length + long_prefix.len() + long_name.len()
+                    long_prefix.len() + long_name.len()
                 }
                 None => 0,
             };
