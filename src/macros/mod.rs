@@ -4,6 +4,7 @@ use std::borrow::Cow;
 
 mod command;
 mod header;
+mod positionals;
 
 #[doc(hidden)]
 pub use command::__command;
