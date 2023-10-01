@@ -56,6 +56,7 @@
 
 mod error;
 mod flag;
+mod macros;
 mod parser;
 mod stream;
 mod terminal;
