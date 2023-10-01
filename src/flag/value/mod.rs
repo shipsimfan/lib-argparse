@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::{ArgStream, FlagArgument, FlagKind};
 
 mod simple;
@@ -28,16 +30,21 @@ impl<T, E> ValueFlag<T, E> {
     ///
     ///  - `parser` is the `ValueParser` which will parse the value
     ///  - `action` is called after the parser to update the options
-    pub fn new<V: ValueParser<Error = E>>(
+    ///  - `description` is the description of this argument displayed in the help
+    pub fn new<V: ValueParser<Error = E>, S: Into<Cow<'static, str>>>(
         mut parser: V,
         action: impl Fn(&mut T, V::Value) -> Result<(), crate::Error<E>> + 'static,
+        description: S,
     ) -> FlagArgument<T, E> {
-        FlagArgument::new(FlagKind::Value(ValueFlag {
-            parser: Box::new(move |options, args| {
-                let value = parser.parse(args)?;
-                action(options, value)
+        FlagArgument::new(
+            FlagKind::Value(ValueFlag {
+                parser: Box::new(move |options, args| {
+                    let value = parser.parse(args)?;
+                    action(options, value)
+                }),
             }),
-        }))
+            description,
+        )
     }
 
     /// Parses an object

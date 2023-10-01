@@ -17,85 +17,121 @@ impl<T, E> ActionFlag<T, E> {
     /// Creates and `ActionFlag` with `action`
     ///
     ///  - `action` is in the form `fn(&mut T)`
-    pub fn simple(action: impl Fn(&mut T) + 'static) -> FlagArgument<T, E> {
-        FlagArgument::new(FlagKind::Action(ActionFlag {
-            action: Box::new(move |options, _| Ok(action(options))),
-            missing_error_message: "".into(),
-            count: 0,
-        }))
+    ///  - `description` is the description of this argument displayed in the help
+    pub fn simple<S: Into<Cow<'static, str>>>(
+        action: impl Fn(&mut T) + 'static,
+        description: S,
+    ) -> FlagArgument<T, E> {
+        FlagArgument::new(
+            FlagKind::Action(ActionFlag {
+                action: Box::new(move |options, _| Ok(action(options))),
+                missing_error_message: "".into(),
+                count: 0,
+            }),
+            description,
+        )
     }
 
     /// Creates and `ActionFlag` with `action`
     ///
     ///  - `action` is in the form `fn(&mut T) -> Result<(), E>`
-    pub fn simple_res(action: impl Fn(&mut T) -> Result<(), E> + 'static) -> FlagArgument<T, E> {
-        FlagArgument::new(FlagKind::Action(ActionFlag {
-            action: Box::new(move |options, _| action(options)),
-            missing_error_message: "".into(),
-            count: 0,
-        }))
+    ///  - `description` is the description of this argument displayed in the help
+    pub fn simple_res<S: Into<Cow<'static, str>>>(
+        action: impl Fn(&mut T) -> Result<(), E> + 'static,
+        description: S,
+    ) -> FlagArgument<T, E> {
+        FlagArgument::new(
+            FlagKind::Action(ActionFlag {
+                action: Box::new(move |options, _| action(options)),
+                missing_error_message: "".into(),
+                count: 0,
+            }),
+            description,
+        )
     }
 
     /// Creates and `ActionFlag` with `action`
     ///
     ///  - `action` is in the form `fn(&mut T, &str)`
     ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
-    pub fn str<S: Into<Cow<'static, str>>>(
+    ///  - `description` is the description of this argument displayed in the help
+    pub fn str<S1: Into<Cow<'static, str>>, S2: Into<Cow<'static, str>>>(
         action: impl Fn(&mut T, &str) + 'static,
-        missing_parameter_message: S,
+        missing_parameter_message: S1,
+        description: S2,
     ) -> FlagArgument<T, E> {
-        FlagArgument::new(FlagKind::Action(ActionFlag {
-            action: Box::new(move |options, strings| Ok(action(options, &strings[0]))),
-            missing_error_message: missing_parameter_message.into(),
-            count: 1,
-        }))
+        FlagArgument::new(
+            FlagKind::Action(ActionFlag {
+                action: Box::new(move |options, strings| Ok(action(options, &strings[0]))),
+                missing_error_message: missing_parameter_message.into(),
+                count: 1,
+            }),
+            description,
+        )
     }
 
     /// Creates and `ActionFlag` with `action`
     ///
     ///  - `action` is in the form `fn(&mut T, &str) -> Result<(), E>`
     ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
-    pub fn str_res<S: Into<Cow<'static, str>>>(
+    ///  - `description` is the description of this argument displayed in the help
+    pub fn str_res<S1: Into<Cow<'static, str>>, S2: Into<Cow<'static, str>>>(
         action: impl Fn(&mut T, &str) -> Result<(), E> + 'static,
-        missing_parameter_message: S,
+        missing_parameter_message: S1,
+        description: S2,
     ) -> FlagArgument<T, E> {
-        FlagArgument::new(FlagKind::Action(ActionFlag {
-            action: Box::new(move |options, strings| action(options, &strings[0])),
-            missing_error_message: missing_parameter_message.into(),
-            count: 1,
-        }))
+        FlagArgument::new(
+            FlagKind::Action(ActionFlag {
+                action: Box::new(move |options, strings| action(options, &strings[0])),
+                missing_error_message: missing_parameter_message.into(),
+                count: 1,
+            }),
+            description,
+        )
     }
 
     /// Creates and `ActionFlag` with `action`
     ///
     ///  - `action` is in the form `fn(&mut T, String)`
     ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
-    pub fn string<S: Into<Cow<'static, str>>>(
+    ///  - `description` is the description of this argument displayed in the help
+    pub fn string<S1: Into<Cow<'static, str>>, S2: Into<Cow<'static, str>>>(
         action: impl Fn(&mut T, String) + 'static,
-        missing_parameter_message: S,
+        missing_parameter_message: S1,
+        description: S2,
     ) -> FlagArgument<T, E> {
-        FlagArgument::new(FlagKind::Action(ActionFlag {
-            action: Box::new(move |options, mut strings| {
-                Ok(action(options, strings.swap_remove(0)))
+        FlagArgument::new(
+            FlagKind::Action(ActionFlag {
+                action: Box::new(move |options, mut strings| {
+                    Ok(action(options, strings.swap_remove(0)))
+                }),
+                missing_error_message: missing_parameter_message.into(),
+                count: 1,
             }),
-            missing_error_message: missing_parameter_message.into(),
-            count: 1,
-        }))
+            description,
+        )
     }
 
     /// Creates and `ActionFlag` with `action`
     ///
     ///  - `action` is in the form `fn(&mut T, String) -> Result<(), E>`
     ///  - `missing_parameter_message` is the message for if the parameter is missing during the parse
-    pub fn string_res<S: Into<Cow<'static, str>>>(
+    ///  - `description` is the description of this argument displayed in the help
+    pub fn string_res<S1: Into<Cow<'static, str>>, S2: Into<Cow<'static, str>>>(
         action: impl Fn(&mut T, String) -> Result<(), E> + 'static,
-        missing_parameter_message: S,
+        missing_parameter_message: S1,
+        description: S2,
     ) -> FlagArgument<T, E> {
-        FlagArgument::new(FlagKind::Action(ActionFlag {
-            action: Box::new(move |options, mut strings| action(options, strings.swap_remove(0))),
-            missing_error_message: missing_parameter_message.into(),
-            count: 1,
-        }))
+        FlagArgument::new(
+            FlagKind::Action(ActionFlag {
+                action: Box::new(move |options, mut strings| {
+                    action(options, strings.swap_remove(0))
+                }),
+                missing_error_message: missing_parameter_message.into(),
+                count: 1,
+            }),
+            description,
+        )
     }
 
     /// Creates and `ActionFlag` with `action`
@@ -103,16 +139,21 @@ impl<T, E> ActionFlag<T, E> {
     ///  - `count` is the number of arguments to pull from the stream
     ///  - `action` is in the form `fn(&mut T, Vec<String>)`
     ///  - `missing_parameter_message` is the message for if a parameter is missing during the parse
-    pub fn vec_string<S: Into<Cow<'static, str>>>(
+    ///  - `description` is the description of this argument displayed in the help
+    pub fn vec_string<S1: Into<Cow<'static, str>>, S2: Into<Cow<'static, str>>>(
         count: usize,
         action: impl Fn(&mut T, Vec<String>) + 'static,
-        missing_parameter_message: S,
+        missing_parameter_message: S1,
+        description: S2,
     ) -> FlagArgument<T, E> {
-        FlagArgument::new(FlagKind::Action(ActionFlag {
-            action: Box::new(move |options, strings| Ok(action(options, strings))),
-            missing_error_message: missing_parameter_message.into(),
-            count,
-        }))
+        FlagArgument::new(
+            FlagKind::Action(ActionFlag {
+                action: Box::new(move |options, strings| Ok(action(options, strings))),
+                missing_error_message: missing_parameter_message.into(),
+                count,
+            }),
+            description,
+        )
     }
 
     /// Creates and `ActionFlag` with `action`
@@ -120,16 +161,21 @@ impl<T, E> ActionFlag<T, E> {
     ///  - `count` is the number of parameters to pull from the stream
     ///  - `action` is in the form `fn(&mut T, Vec<String>) -> Result<(), E>`
     ///  - `missing_parameter_message` is the message for if a parameter is missing during the parse
-    pub fn vec_string_res<S: Into<Cow<'static, str>>>(
+    ///  - `description` is the description of this argument displayed in the help
+    pub fn vec_string_res<S1: Into<Cow<'static, str>>, S2: Into<Cow<'static, str>>>(
         count: usize,
         action: impl Fn(&mut T, Vec<String>) -> Result<(), E> + 'static,
-        missing_parameter_message: S,
+        missing_parameter_message: S1,
+        description: S2,
     ) -> FlagArgument<T, E> {
-        FlagArgument::new(FlagKind::Action(ActionFlag {
-            action: Box::new(move |options, strings| action(options, strings)),
-            missing_error_message: missing_parameter_message.into(),
-            count,
-        }))
+        FlagArgument::new(
+            FlagKind::Action(ActionFlag {
+                action: Box::new(move |options, strings| action(options, strings)),
+                missing_error_message: missing_parameter_message.into(),
+                count,
+            }),
+            description,
+        )
     }
 
     /// Parses this flag from the stream

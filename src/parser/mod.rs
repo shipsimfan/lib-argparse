@@ -1,5 +1,8 @@
 use crate::{ArgStream, Command, Error, FlagArgument, FlagSet, Positionals, TerminalArgument};
+use help::HelpGenerator;
 use std::{borrow::Cow, ffi::OsStr, ops::Deref};
+
+mod help;
 
 /// Argument Parser
 pub struct Parser<T, E: 'static = ()> {
@@ -159,9 +162,15 @@ impl<T, E> Parser<T, E> {
     pub fn parse(&mut self, mut options: T) -> Result<T, Error<E>> {
         let mut args = ArgStream::new();
 
+        let first_argument = args.next()?.unwrap();
+
         let mut parser = self;
-        while let Some(new_parser) = parser.do_parse(&mut options, &mut args)? {
+        let mut command_chain = Vec::new();
+        while let Some((new_parser, command)) =
+            parser.do_parse(&mut options, &mut args, &command_chain, &first_argument)?
+        {
             parser = new_parser;
+            command_chain.push(command);
         }
 
         Ok(options)
@@ -171,11 +180,17 @@ impl<T, E> Parser<T, E> {
     ///
     ///  - `options` is the developer provided options to be updated
     ///  - `args` is the argument stream to be parsed from
+    ///  - `command_chain` is the list of commands that precede this parser
     fn do_parse<'a>(
         &'a mut self,
         options: &mut T,
         args: &mut ArgStream,
-    ) -> Result<Option<&'a mut Parser<T, E>>, Error<E>> {
+        command_chain: &[String],
+        first_argument: &str,
+    ) -> Result<Option<(&'a mut Parser<T, E>, String)>, Error<E>> {
+        // This pointer is stored for a help message. This is required for the borrow checker.
+        let self_ptr = self as *const _;
+
         let (flags, terminal, short_prefix, long_prefix) = self.as_mut();
 
         while let Some(argument) = args.next_os() {
@@ -204,11 +219,23 @@ impl<T, E> Parser<T, E> {
             }?;
 
             if argument.parse(options, args)? {
-                todo!("Generate help")
+                // UNSAFE: The borrow checker won't let us use `self` here
+                // because of the `self.as_mut()` call above. This immutable
+                // borrow is safe.
+                print!(
+                    "{}",
+                    HelpGenerator::new(
+                        unsafe { &*(self_ptr as *const _) },
+                        command_chain,
+                        first_argument
+                    )
+                );
+                std::process::exit(0);
             }
         }
 
         flags.finalize()?;
+
         terminal.finalize(options)
     }
 

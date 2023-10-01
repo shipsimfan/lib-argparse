@@ -14,6 +14,9 @@ where
     /// The callback for updating the options
     callback: F,
 
+    /// The usage hint for help
+    hint: Cow<'static, str>,
+
     /// The list of `OsString`s collected during parsing
     list: Vec<OsString>,
 
@@ -34,6 +37,9 @@ where
     /// The callback for updating the options
     callback: F,
 
+    /// The usage hint for help
+    hint: Cow<'static, str>,
+
     /// The list of `String`s collected during parsing
     list: Vec<String>,
 
@@ -48,10 +54,12 @@ where
     /// Creates a new `CollectOsPositionalParser`
     ///
     ///  - `callback` is called upon completion of parsing to update the options
-    pub fn new(callback: F) -> Self {
+    ///  - `hint` is the usage hint displayed in help
+    pub fn new<S: Into<Cow<'static, str>>>(callback: F, hint: S) -> Self {
         CollectOsPositionalParser {
             required: None,
             callback,
+            hint: hint.into(),
 
             list: Vec::new(),
             phantom_error: PhantomData,
@@ -69,6 +77,13 @@ where
     /// Allows this positional argument to take no value
     pub fn clear_required(&mut self) {
         self.required = None;
+    }
+
+    /// Sets the usage hint displayed during help
+    ///
+    ///  - `hint` is the string the hint will be set to
+    pub fn set_hint<S: Into<Cow<'static, str>>>(&mut self, hint: S) {
+        self.hint = hint.into();
     }
 }
 
@@ -95,6 +110,22 @@ where
 
         (self.callback)(options, strings).map_err(|error| Error::Other(error))
     }
+
+    fn generate_usage(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, " ")?;
+
+        if self.required.is_none() {
+            write!(f, "[")?;
+        }
+
+        write!(f, "{}..", self.hint)?;
+
+        if self.required.is_none() {
+            write!(f, "]")?;
+        }
+
+        Ok(())
+    }
 }
 
 impl<E, T, F> CollectPositionalParser<E, T, F>
@@ -104,10 +135,12 @@ where
     /// Creates a new `CollectPositionalParser`
     ///
     ///  - `callback` is called upon completion of parsing to update the options
-    pub fn new(callback: F) -> Self {
+    ///  - `hint` is the usage hint displayed in help
+    pub fn new<S: Into<Cow<'static, str>>>(callback: F, hint: S) -> Self {
         CollectPositionalParser {
             required: None,
             callback,
+            hint: hint.into(),
 
             list: Vec::new(),
             phantom_error: PhantomData,
@@ -125,6 +158,13 @@ where
     /// Allows this positional argument to take no value
     pub fn clear_required(&mut self) {
         self.required = None;
+    }
+
+    /// Sets the usage hint displayed during help
+    ///
+    ///  - `hint` is the string the hint will be set to
+    pub fn set_hint<S: Into<Cow<'static, str>>>(&mut self, hint: S) {
+        self.hint = hint.into();
     }
 }
 
@@ -154,5 +194,21 @@ where
         }
 
         (self.callback)(options, strings).map_err(|error| Error::Other(error))
+    }
+
+    fn generate_usage(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, " ")?;
+
+        if self.required.is_none() {
+            write!(f, "[")?;
+        }
+
+        write!(f, "{}..", self.hint)?;
+
+        if self.required.is_none() {
+            write!(f, "]")?;
+        }
+
+        Ok(())
     }
 }

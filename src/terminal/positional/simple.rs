@@ -8,10 +8,14 @@ where
 {
     /// Function called when parsing is complete
     callback: F,
+
     /// Determines if this positional is required
     ///
     /// The contained string holds the error message if no value is provided
     required: Option<Cow<'static, str>>,
+
+    /// The usage hint display in help
+    hint: Cow<'static, str>,
 
     /// Variable for storing if a value was parsed
     recieved_value: bool,
@@ -27,10 +31,12 @@ where
     /// Creates a new `SimplePositionalParser`
     ///
     ///  - `callback` is the function called to store the parsed value
-    pub fn new(callback: F) -> Self {
+    ///  - `hint` is the usage hint displayed in help
+    pub fn new<S: Into<Cow<'static, str>>>(callback: F, hint: S) -> Self {
         SimplePositionalParser {
             callback,
             required: None,
+            hint: hint.into(),
 
             recieved_value: false,
 
@@ -49,6 +55,13 @@ where
     /// Sets this flag to be not required
     pub fn set_not_required(&mut self) {
         self.required = None;
+    }
+
+    /// Sets the usage hint displayed during help
+    ///
+    ///  - `hint` is the string the hint will be set to
+    pub fn set_hint<S: Into<Cow<'static, str>>>(&mut self, hint: S) {
+        self.hint = hint.into();
     }
 }
 
@@ -82,6 +95,22 @@ where
         }
 
         self.recieved_value = false;
+        Ok(())
+    }
+
+    fn generate_usage(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, " ")?;
+
+        if self.required.is_none() {
+            write!(f, "[")?;
+        }
+
+        write!(f, "{}", self.hint)?;
+
+        if self.required.is_none() {
+            write!(f, "]")?;
+        }
+
         Ok(())
     }
 }

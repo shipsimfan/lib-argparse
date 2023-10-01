@@ -31,4 +31,9 @@ pub trait PositionalParser {
     fn finalize(&mut self, options: &mut Self::Options) -> Result<(), crate::Error<Self::Error>> {
         Ok(())
     }
+
+    /// Generates the usage hint for help
+    ///
+    ///  - `f` is the output
+    fn generate_usage(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
 }

@@ -12,11 +12,92 @@ impl<T, E> FlagSet<T, E> {
         FlagSet(Vec::new())
     }
 
-    /// Returns an iterator that allows modifying each value.
+    /// Generates the help display
     ///
-    /// The iterator yields all items from start to end.
-    pub(crate) fn iter_mut(&mut self) -> std::slice::IterMut<FlagArgument<T, E>> {
-        self.0.iter_mut()
+    ///  - `f` is the output
+    pub(crate) fn generate_help(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+        short_prefix: &str,
+        long_prefix: &str,
+    ) -> std::fmt::Result {
+        if self.len() == 0 {
+            return Ok(());
+        }
+
+        writeln!(f)?;
+        writeln!(f, "OPTIONS:")?;
+
+        let mut longest_short_name = 0;
+        let mut longest_total = 0;
+        for argument in self {
+            let mut total_length = 0;
+            if let Some(short_name) = argument.short_name() {
+                let mut short_name_len = short_name.len() + short_prefix.len();
+                if argument.long_name().is_some() {
+                    short_name_len += 2;
+                }
+
+                if short_name_len > longest_short_name {
+                    longest_short_name = short_name_len;
+                }
+
+                total_length += short_name_len;
+            }
+
+            if let Some(long_name) = argument.long_name() {
+                total_length += long_name.len() + long_prefix.len();
+            }
+
+            if total_length > longest_total {
+                longest_total = total_length;
+            }
+        }
+
+        let short_padding = longest_short_name;
+        let total_padding = longest_total + 2;
+
+        /*
+         * -s, --long HINT  Description
+         */
+        for argument in self {
+            write!(f, "  ")?;
+
+            let mut length = 0;
+            match argument.short_name() {
+                Some(short_name) => {
+                    write!(f, "{}{}", short_prefix, short_name)?;
+                    length += short_prefix.len() + short_name.len();
+                }
+                None => {
+                    for _ in 0..short_padding {
+                        write!(f, " ")?;
+                    }
+                    length += short_padding;
+                }
+            }
+
+            match argument.long_name() {
+                Some(long_name) => {
+                    if argument.short_name().is_some() {
+                        write!(f, ", ")?;
+                        length += 2;
+                    }
+
+                    write!(f, "{}{}", long_prefix, long_name)?;
+                    length += long_prefix.len() + long_name.len();
+                }
+                None => {}
+            }
+
+            for _ in 0..total_padding - length {
+                write!(f, " ")?;
+            }
+
+            writeln!(f, "{}", argument.description())?;
+        }
+
+        Ok(())
     }
 
     /// Gets an argument based on its short name
@@ -141,11 +222,20 @@ impl<T, E> Deref for FlagSet<T, E> {
     }
 }
 
+impl<'a, T, E> IntoIterator for &'a FlagSet<T, E> {
+    type Item = &'a FlagArgument<T, E>;
+    type IntoIter = std::slice::Iter<'a, FlagArgument<T, E>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 impl<'a, T, E> IntoIterator for &'a mut FlagSet<T, E> {
     type Item = &'a mut FlagArgument<T, E>;
     type IntoIter = std::slice::IterMut<'a, FlagArgument<T, E>>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+        self.0.iter_mut()
     }
 }

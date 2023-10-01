@@ -6,12 +6,14 @@ pub struct Command<T, E: 'static> {
     /// The list of positionals
     ///
     /// The first member of the tuple is the name of the command.
-    /// The second member is the new parser if the command is reached.
-    commands: Vec<(Cow<'static, str>, Parser<T, E>)>,
+    /// The second member is the help message
+    /// The third member is the new parser if the command is reached.
+    commands: Vec<(Cow<'static, str>, Cow<'static, str>, Parser<T, E>)>,
 
     /// The name of the command
     ///
-    /// Placed at the "$" in the unknown command error string "unknown $"
+    /// Placed at the "$" in the unknown command error string "unknown $".
+    /// It is also placed as the usage hint.
     command_name: Cow<'static, str>,
 
     /// Determines if this command is required
@@ -19,14 +21,14 @@ pub struct Command<T, E: 'static> {
     /// The string contained is the error message displayed if this command is missing
     required: Option<Cow<'static, str>>,
 
-    /// The command index found during parsing.
-    command_index: Option<usize>,
+    /// The command index and command name found during parsing.
+    command_index: Option<(usize, String)>,
 }
 
 impl<T, E> Command<T, E> {
     /// Creates a new empty `Command` set
     ///
-    ///  - `command_name` is the name of the command placed at the "$" in the unknown error string "unknown $"
+    ///  - `command_name` is the usage hint. It is also the name of the command placed at the "$" in the unknown error string "unknown $"
     pub fn new<S: Into<Cow<'static, str>>>(command_name: S) -> Self {
         Command {
             commands: Vec::new(),
@@ -48,27 +50,72 @@ impl<T, E> Command<T, E> {
         self.required = None;
     }
 
+    /// Sets the command name
+    ///
+    /// The command name is shown as the usage hint during help.
+    /// It is also the name of the command placed at the "$" in the unknown error string "unknown $"
+    ///
+    ///  - `command_name` is the string the hint will be set to
+    pub fn command_name<S: Into<Cow<'static, str>>>(&mut self, command_name: S) {
+        self.command_name = command_name.into();
+    }
+
     /// Adds a new command into the set
     ///
     /// Returns the old command if there is a name conflict
     ///
     ///  - `command` is the name of the command to be matched against
+    ///  - `help_message` is a description of the command displayed in the help
     ///  - `parser` is the parser returned if the command is matched
-    pub fn add_command<S: Into<Cow<'static, str>>>(
+    pub fn add_command<S1: Into<Cow<'static, str>>, S2: Into<Cow<'static, str>>>(
         &mut self,
-        command: S,
+        command: S1,
+        help_message: S2,
         parser: Parser<T, E>,
     ) -> Option<(Cow<'static, str>, Parser<T, E>)> {
         let command = command.into();
         let ret = self.remove(&command);
-        self.commands.push((command, parser));
+        self.commands.push((command, help_message.into(), parser));
         ret
+    }
+
+    /// Generates the help result
+    ///
+    ///  - `f` is the output
+    pub(super) fn generate_usage(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, " {}", self.command_name)
+    }
+
+    /// Generates the help display
+    ///
+    ///  - `f` is the output
+    pub(super) fn generate_help(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f)?;
+        writeln!(f, "COMMANDS:")?;
+
+        let mut longest_command = 0;
+        for (command, _, _) in &self.commands {
+            if command.len() > longest_command {
+                longest_command = command.len();
+            }
+        }
+        let command_padding = longest_command + 2;
+
+        for (command, help_message, _) in &self.commands {
+            write!(f, "  {}", command)?;
+            for _ in 0..command_padding - command.len() {
+                write!(f, " ")?;
+            }
+            writeln!(f, "{}", help_message)?;
+        }
+
+        Ok(())
     }
 
     /// Parses a command from the argument stream
     ///
     ///  - `argument` is the argument to be parsed
-    pub(crate) fn parse(&mut self, argument: OsString) -> Result<(), Error<E>> {
+    pub(super) fn parse(&mut self, argument: OsString) -> Result<(), Error<E>> {
         assert!(self.command_index.is_none());
 
         let argument = argument
@@ -77,7 +124,7 @@ impl<T, E> Command<T, E> {
 
         for i in 0..self.commands.len() {
             if self.commands[i].0.as_ref() == argument.as_str() {
-                self.command_index = Some(i);
+                self.command_index = Some((i, argument));
                 return Ok(());
             }
         }
@@ -86,8 +133,8 @@ impl<T, E> Command<T, E> {
     }
 
     /// Verifies if this command is required that it was parsed
-    pub(crate) fn finalize(&mut self) -> Result<Option<&mut Parser<T, E>>, Error<E>> {
-        let command_index = match self.command_index.take() {
+    pub(super) fn finalize(&mut self) -> Result<Option<(&mut Parser<T, E>, String)>, Error<E>> {
+        let (command_index, command) = match self.command_index.take() {
             Some(command_index) => command_index,
             None => match &self.required {
                 Some(error_message) => return Err(Error::MissingCommand(error_message.clone())),
@@ -95,7 +142,7 @@ impl<T, E> Command<T, E> {
             },
         };
 
-        Ok(Some(&mut self.commands[command_index].1))
+        Ok(Some((&mut self.commands[command_index].2, command)))
     }
 
     /// Removes a command based on its name
@@ -104,7 +151,8 @@ impl<T, E> Command<T, E> {
     fn remove(&mut self, command: &str) -> Option<(Cow<'static, str>, Parser<T, E>)> {
         for i in 0..self.commands.len() {
             if command == self.commands[i].0 {
-                return Some(self.commands.swap_remove(i));
+                let command = self.commands.swap_remove(i);
+                return Some((command.0, command.2));
             }
         }
 
@@ -113,7 +161,7 @@ impl<T, E> Command<T, E> {
 }
 
 impl<T, E> Deref for Command<T, E> {
-    type Target = [(Cow<'static, str>, Parser<T, E>)];
+    type Target = [(Cow<'static, str>, Cow<'static, str>, Parser<T, E>)];
 
     fn deref(&self) -> &Self::Target {
         &self.commands

@@ -17,6 +17,28 @@ pub enum TerminalArgument<T, E: 'static> {
 }
 
 impl<T, E> TerminalArgument<T, E> {
+    /// Generates the help usage for this terminal argument
+    ///
+    ///  - `f` is the output
+    pub(crate) fn generate_usage(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TerminalArgument::None => Ok(()),
+            TerminalArgument::Command(command) => command.generate_usage(f),
+            TerminalArgument::Positionals(positionals) => positionals.generate_usage(f),
+        }
+    }
+
+    /// Generates the help display
+    ///
+    ///  - `f` is the output
+    pub(crate) fn generate_help(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TerminalArgument::None => Ok(()),
+            TerminalArgument::Command(command) => command.generate_help(f),
+            TerminalArgument::Positionals(positionals) => positionals.generate_help(f),
+        }
+    }
+
     /// Parses a terminal argument
     ///
     /// Returns if a command was parsed
@@ -41,7 +63,7 @@ impl<T, E> TerminalArgument<T, E> {
     pub(crate) fn finalize(
         &mut self,
         options: &mut T,
-    ) -> Result<Option<&mut Parser<T, E>>, Error<E>> {
+    ) -> Result<Option<(&mut Parser<T, E>, String)>, Error<E>> {
         match self {
             TerminalArgument::None => Ok(None),
             TerminalArgument::Command(command) => command.finalize(),

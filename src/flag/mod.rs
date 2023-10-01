@@ -1,4 +1,4 @@
-use std::{borrow::Cow, ops::Deref};
+use std::borrow::Cow;
 
 mod action;
 mod set;
@@ -26,6 +26,12 @@ pub struct FlagArgument<T, E: 'static> {
     /// The name following the long prefix
     long_name: Option<Cow<'static, str>>,
 
+    /// The hint displayed in the help
+    hint: Option<Cow<'static, str>>,
+
+    /// The description displayed in the help
+    description: Cow<'static, str>,
+
     /// Determines if this flag is required
     ///
     /// The contained string is the message displayed if missing
@@ -47,10 +53,13 @@ impl<T, E> FlagArgument<T, E> {
     /// Creates a new unnamed `FlagArgument`
     ///
     ///  - `kind` is the kind of flag being created
-    pub fn new(kind: FlagKind<T, E>) -> Self {
+    ///  - `description` is the description of this argument displayed in the help
+    pub fn new<S: Into<Cow<'static, str>>>(kind: FlagKind<T, E>, description: S) -> Self {
         FlagArgument {
             short_name: None,
             long_name: None,
+            hint: None,
+            description: description.into(),
             required: None,
             repeatable: None,
             kind,
@@ -61,14 +70,22 @@ impl<T, E> FlagArgument<T, E> {
 
     /// Returns the name which follows the short prefix
     pub fn short_name(&self) -> Option<&str> {
-        self.short_name
-            .as_ref()
-            .map(|short_name| short_name.deref())
+        self.short_name.as_deref()
     }
 
     /// Returns the name which follows the long prefix
     pub fn long_name(&self) -> Option<&str> {
-        self.long_name.as_ref().map(|long_name| long_name.deref())
+        self.long_name.as_deref()
+    }
+
+    /// Returns the hint displayed in the help
+    pub fn hint(&self) -> Option<&str> {
+        self.hint.as_deref()
+    }
+
+    /// Returns the description displayed in the help
+    pub fn description(&self) -> &str {
+        &self.description
     }
 
     /// Is this flag required
@@ -102,6 +119,25 @@ impl<T, E> FlagArgument<T, E> {
     ///  - `long_name` is the name which the long name is set to
     pub fn set_long_name<S: Into<Cow<'static, str>>>(&mut self, long_name: S) {
         self.long_name = Some(long_name.into())
+    }
+
+    /// Sets the hint which will be displayed in the help
+    ///
+    ///  - `hint` is the string which will be displayed
+    pub fn set_hint<S: Into<Cow<'static, str>>>(&mut self, hint: S) {
+        self.hint = Some(hint.into());
+    }
+
+    /// Sets this argument to have no hint in the help
+    pub fn clear_hint(&mut self) {
+        self.hint = None;
+    }
+
+    /// Sets the description which will be displayed in the help
+    ///
+    ///  - `description` is the string which will be displayed
+    pub fn set_description<S: Into<Cow<'static, str>>>(&mut self, description: S) {
+        self.description = description.into();
     }
 
     /// Sets this flag to be required
