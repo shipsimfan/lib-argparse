@@ -29,25 +29,66 @@ impl<T, E> FlagSet<T, E> {
         writeln!(f, "OPTIONS:")?;
 
         let mut longest_short_name = 0;
-        let mut longest_long_name = 0;
+        let mut short = false;
+        let mut long = false;
         for argument in self {
             if let Some(short_name) = argument.short_name() {
+                short = true;
+
                 let short_name_len = short_name.len() + short_prefix.len();
                 if short_name_len > longest_short_name {
                     longest_short_name = short_name_len;
                 }
             }
 
-            if let Some(long_name) = argument.long_name() {
-                let long_name_len = long_name.len() + long_prefix.len();
-                if long_name_len > longest_long_name {
-                    longest_long_name = long_name_len;
-                }
-            }
+            long |= argument.long_name().is_some();
         }
 
+        let both = short & long;
+
         let short_padding = longest_short_name + 2;
-        let long_padding = longest_long_name + 2;
+        let total_padding = if both {
+            let mut longest_total = 0;
+            for argument in self {
+                let mut length = short_padding;
+
+                if let Some(long_name) = argument.long_name() {
+                    length += long_name.len() + long_prefix.len();
+                };
+
+                if let Some(hint) = argument.hint() {
+                    length += 1 + hint.len();
+                }
+
+                if length > longest_total {
+                    longest_total = length;
+                }
+            }
+            longest_total + 2
+        } else {
+            let mut longest_total = 0;
+            for argument in self {
+                let mut length = 0;
+                if let Some(short_name) = argument.short_name() {
+                    length += short_name.len() + short_prefix.len();
+                } else {
+                    length += short_padding;
+                }
+
+                if let Some(long_name) = argument.long_name() {
+                    length += long_name.len() + long_prefix.len();
+                };
+
+                if let Some(hint) = argument.hint() {
+                    length += 1 + hint.len();
+                }
+
+                if length > longest_total {
+                    longest_total = length;
+                }
+            }
+            longest_total + 2
+        };
 
         /*
          * -s, --long HINT  Description
@@ -55,34 +96,44 @@ impl<T, E> FlagSet<T, E> {
         for argument in self {
             write!(f, "  ")?;
 
-            let start = match argument.short_name() {
+            let mut length = 0;
+            let pad = match argument.short_name() {
                 Some(short_name) => {
-                    let mut length = 0;
-
                     write!(f, "{}{}", short_prefix, short_name)?;
+                    length += short_prefix.len() + short_name.len();
+
                     if argument.long_name().is_some() {
                         write!(f, ", ")?;
                         length += 2;
+                        true
+                    } else if let Some(hint) = argument.hint() {
+                        write!(f, " {}", hint)?;
+                        length += hint.len() + 1;
+                        false
+                    } else {
+                        false
                     }
-
-                    length + short_prefix.len() + short_name.len()
                 }
-                None => 0,
+                None => true,
             };
 
-            for _ in start..short_padding {
-                write!(f, " ")?;
+            if pad {
+                for _ in 0..short_padding - length {
+                    write!(f, " ")?;
+                }
             }
 
-            let start = match argument.long_name() {
-                Some(long_name) => {
-                    write!(f, "{}{}", long_prefix, long_name)?;
-                    long_prefix.len() + long_name.len()
-                }
-                None => 0,
-            };
+            if let Some(long_name) = argument.long_name() {
+                write!(f, "{}{}", long_prefix, long_name)?;
+                length += long_prefix.len() + long_name.len();
 
-            for _ in start..long_padding {
+                if let Some(hint) = argument.hint() {
+                    write!(f, " {}", hint)?;
+                    length += hint.len() + 1;
+                }
+            }
+
+            for _ in 0..total_padding - length {
                 write!(f, " ")?;
             }
 
