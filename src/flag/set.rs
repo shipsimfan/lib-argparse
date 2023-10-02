@@ -121,6 +121,7 @@ impl<T, E> FlagSet<T, E> {
                 for _ in 0..short_padding - length {
                     write!(f, " ")?;
                 }
+                length = short_padding;
             }
 
             if let Some(long_name) = argument.long_name() {
