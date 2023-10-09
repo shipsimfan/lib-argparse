@@ -11,7 +11,7 @@ Place the following into your `Cargo.toml`:
 argparse = {git = "https://github.com/shipsimfan/lib-argparse", branch = "v2"}
 ```
 
-**TODO:** Describe library usage
+See the documentation on in [lib.rs](./src/lib.rs).
 
 ## Contributing
 
