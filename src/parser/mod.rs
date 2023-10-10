@@ -1,6 +1,10 @@
 use crate::{ArgStream, Command, Error, FlagArgument, FlagSet, Positionals, TerminalArgument};
 use help::HelpGenerator;
-use std::{borrow::Cow, ffi::OsStr, ops::Deref};
+use std::{
+    borrow::Cow,
+    ffi::{OsStr, OsString},
+    ops::Deref,
+};
 
 mod help;
 
@@ -168,12 +172,42 @@ impl<T, E> Parser<T, E> {
         self
     }
 
+    /// Parses arguments from the [`String`] stream
+    ///
+    ///  - `iter` is the [`String`] iterator to be parsed from
+    ///  - `options` is the developer provided options to be updated
+    pub fn parse<I: IntoIterator<Item = String> + 'static>(
+        &mut self,
+        iter: I,
+        options: T,
+    ) -> Result<T, Error<E>> {
+        self.begin_parse(ArgStream::new(iter), options)
+    }
+
+    /// Parses arguments from the [`OsString`] stream
+    ///
+    ///  - `iter` is the [`OsString`] iterator to be parsed from
+    ///  - `options` is the developer provided options to be updated
+    pub fn parse_os<I: IntoIterator<Item = OsString> + 'static>(
+        &mut self,
+        iter: I,
+        options: T,
+    ) -> Result<T, Error<E>> {
+        self.begin_parse(ArgStream::new_os(iter), options)
+    }
+
     /// Parses arguments from the environment
     ///
     ///  - `options` is the developer provided options to be updated
-    pub fn parse(&mut self, mut options: T) -> Result<T, Error<E>> {
-        let mut args = ArgStream::new();
+    pub fn parse_env(&mut self, options: T) -> Result<T, Error<E>> {
+        self.begin_parse(ArgStream::new_env(), options)
+    }
 
+    /// Parses arguments from the stream
+    ///
+    ///  - `args` is the argument stream to be parse from
+    ///  - `options` is the developer provided options to be updated
+    fn begin_parse(&mut self, mut args: ArgStream, mut options: T) -> Result<T, Error<E>> {
         let first_argument = args.next()?.unwrap();
 
         let program_name = self.program_name().map(|string| string.to_owned());
