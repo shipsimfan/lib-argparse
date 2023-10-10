@@ -15,7 +15,7 @@ use crate::{ArgStream, Error};
 
 /// The type of a flag
 pub enum FlagKind<T, E: 'static> {
-    Help,
+    Help { exit: bool },
     Action(ActionFlag<T, E>),
     Value(ValueFlag<T, E>),
 }
@@ -193,7 +193,7 @@ impl<T, E> FlagArgument<T, E> {
         &mut self,
         options: &mut T,
         args: &mut ArgStream,
-    ) -> Result<bool, Error<E>> {
+    ) -> Result<Option<bool>, Error<E>> {
         if let Some(error_message) = &self.repeatable {
             if self.count >= 1 {
                 return Err(Error::RepeatedArgument(error_message.clone()));
@@ -203,11 +203,11 @@ impl<T, E> FlagArgument<T, E> {
         self.count += 1;
 
         match &mut self.kind {
-            FlagKind::Help => return Ok(true),
+            FlagKind::Help { exit } => return Ok(Some(*exit)),
             FlagKind::Action(action_flag) => action_flag.parse(options, args),
             FlagKind::Value(value_flag) => value_flag.parse(options, args),
         }
-        .map(|_| false)
+        .map(|_| None)
     }
 
     /// Resets this argument's count before a parse and verifies that it is required

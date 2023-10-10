@@ -8,6 +8,12 @@ use std::{
 
 mod help;
 
+enum ParseResult<'a, T, E: 'static> {
+    Continue(&'a mut Parser<T, E>, String),
+    Complete,
+    Help,
+}
+
 /// Argument Parser
 pub struct Parser<T, E: 'static = ()> {
     /// Program name to display for help
@@ -176,11 +182,13 @@ impl<T, E> Parser<T, E> {
     ///
     ///  - `iter` is the [`String`] iterator to be parsed from
     ///  - `options` is the developer provided options to be updated
+    ///
+    /// Returns if the parsing completed. `false` if this returned from a help flag or `true` if this completed.
     pub fn parse<I: IntoIterator<Item = String> + 'static>(
         &mut self,
         iter: I,
-        options: T,
-    ) -> Result<T, Error<E>> {
+        options: &mut T,
+    ) -> Result<bool, Error<E>> {
         self.begin_parse(ArgStream::new(iter), options)
     }
 
@@ -188,18 +196,22 @@ impl<T, E> Parser<T, E> {
     ///
     ///  - `iter` is the [`OsString`] iterator to be parsed from
     ///  - `options` is the developer provided options to be updated
+    ///
+    /// Returns if the parsing completed. `false` if this returned from a help flag or `true` if this completed.
     pub fn parse_os<I: IntoIterator<Item = OsString> + 'static>(
         &mut self,
         iter: I,
-        options: T,
-    ) -> Result<T, Error<E>> {
+        options: &mut T,
+    ) -> Result<bool, Error<E>> {
         self.begin_parse(ArgStream::new_os(iter), options)
     }
 
     /// Parses arguments from the environment
     ///
     ///  - `options` is the developer provided options to be updated
-    pub fn parse_env(&mut self, options: T) -> Result<T, Error<E>> {
+    ///
+    /// Returns if the parsing completed. `false` if this returned from a help flag or `true` if this completed.
+    pub fn parse_env(&mut self, options: &mut T) -> Result<bool, Error<E>> {
         self.begin_parse(ArgStream::new_env(), options)
     }
 
@@ -207,7 +219,9 @@ impl<T, E> Parser<T, E> {
     ///
     ///  - `args` is the argument stream to be parse from
     ///  - `options` is the developer provided options to be updated
-    fn begin_parse(&mut self, mut args: ArgStream, mut options: T) -> Result<T, Error<E>> {
+    ///
+    /// Returns if the parsing completed. `false` if this returned from a help flag or `true` if this completed.
+    fn begin_parse(&mut self, mut args: ArgStream, options: &mut T) -> Result<bool, Error<E>> {
         let first_argument = args.next()?.unwrap();
 
         let program_name = self.program_name().map(|string| string.to_owned());
@@ -215,19 +229,23 @@ impl<T, E> Parser<T, E> {
 
         let mut parser = self;
         let mut command_chain = Vec::new();
-        while let Some((new_parser, command)) = parser.do_parse(
-            &mut options,
-            &mut args,
-            &command_chain,
-            &first_argument,
-            program_name.as_deref(),
-            description.as_deref(),
-        )? {
-            parser = new_parser;
-            command_chain.push(command);
+        loop {
+            match parser.do_parse(
+                options,
+                &mut args,
+                &command_chain,
+                &first_argument,
+                program_name.as_deref(),
+                description.as_deref(),
+            )? {
+                ParseResult::Continue(new_parser, command) => {
+                    parser = new_parser;
+                    command_chain.push(command);
+                }
+                ParseResult::Complete => return Ok(true),
+                ParseResult::Help => return Ok(false),
+            }
         }
-
-        Ok(options)
     }
 
     /// Performs a parse run of a single parser
@@ -246,7 +264,7 @@ impl<T, E> Parser<T, E> {
         first_argument: &str,
         program_name: Option<&str>,
         description: Option<&str>,
-    ) -> Result<Option<(&'a mut Parser<T, E>, String)>, Error<E>> {
+    ) -> Result<ParseResult<'a, T, E>, Error<E>> {
         // This pointer is stored for a help message. This is required for the borrow checker.
         let self_ptr = self as *const _;
 
@@ -277,7 +295,7 @@ impl<T, E> Parser<T, E> {
                 continue;
             }?;
 
-            if argument.parse(options, args)? {
+            if let Some(exit) = argument.parse(options, args)? {
                 // UNSAFE: The borrow checker won't let us use [`self`] here
                 // because of the `self.as_mut()` call above. This immutable
                 // borrow is safe.
@@ -291,13 +309,21 @@ impl<T, E> Parser<T, E> {
                         description
                     )
                 );
-                std::process::exit(0);
+
+                if exit {
+                    std::process::exit(0);
+                } else {
+                    return Ok(ParseResult::Help);
+                }
             }
         }
 
         flags.finalize()?;
 
-        terminal.finalize(options)
+        terminal.finalize(options).map(|parser| match parser {
+            Some((parser, command)) => ParseResult::Continue(parser, command),
+            None => ParseResult::Complete,
+        })
     }
 
     fn as_mut<'a>(
