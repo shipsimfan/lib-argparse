@@ -1,5 +1,5 @@
 use crate::{Error, Parser};
-use std::ffi::OsString;
+use std::{borrow::Cow, ffi::OsString};
 
 mod command;
 mod positional;
@@ -17,6 +17,35 @@ pub enum TerminalArgument<T, E: 'static> {
 }
 
 impl<T, E> TerminalArgument<T, E> {
+    /// Sets this command to be required
+    ///
+    /// Can only be applied to [`TerminalArgument::Command`]
+    ///
+    ///  - `missing_error_message` is the error message displayed if this command is missing
+    pub fn set_required<S: Into<Cow<'static, str>>>(self, missing_error_message: S) -> Self {
+        match self {
+            TerminalArgument::None => {
+                panic!("Cannot set a TerminalArgument::None to required")
+            }
+            TerminalArgument::Command(command) => {
+                TerminalArgument::Command(command.set_required(missing_error_message))
+            }
+            TerminalArgument::Positionals(_) => {
+                panic!("Cannot set a TerminalArgument::Positionals to required")
+            }
+        }
+    }
+
+    /// Sets this command to be not required
+    pub fn set_not_required(self) -> Self {
+        match self {
+            TerminalArgument::Command(command) => {
+                TerminalArgument::Command(command.set_not_required())
+            }
+            _ => self,
+        }
+    }
+
     /// Generates the help usage for this terminal argument
     ///
     ///  - `f` is the output
