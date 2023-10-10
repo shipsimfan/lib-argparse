@@ -1,6 +1,11 @@
 #[macro_export]
 /// Creates a [`Positionals`]
 ///
+/// Format:
+///
+/// `\[(help_description positional,)*\]`
+///
+/// Arguments:
 ///  - `help_description` is the description of a positional in the help
 ///  - `positional` is the parser for a positional
 macro_rules! positionals {

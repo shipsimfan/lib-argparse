@@ -9,6 +9,11 @@ mod value;
 #[macro_export]
 /// Creates a [`FlagArgument`]
 ///
+/// Format:
+///
+/// `[short_name][, long_name] [hint] description => kind`
+///
+/// Arguments:
 ///  - `short_name` is the short name
 ///  - `long_name` is the long name
 ///  - `hint` is the usage hint displayed in the help

@@ -4,9 +4,16 @@ use std::borrow::Cow;
 #[macro_export]
 /// Creates a [`Command`]
 ///
+/// Format:
+///
+/// `command_name [\[(command help [\(|options| action\)] => parser,)*\]]`
+///
+/// Arguments:
 ///  - `command_name` is the usage hint. It is also the name of the command placed at the "$" in the unknown error string "unknown $"
 ///  - `command` is the name of one command
 ///  - `help` is the help message for a command
+///  - `options` is the identifier for the developer provided options in the optional action
+///  - `action` is the optional action called on matching this command
 ///  - `parser` is the parser returned on matching the command
 macro_rules! command {
     ($command_name: expr) => {
@@ -22,7 +29,7 @@ macro_rules! command {
     };
 
     ($command_name: expr, [
-        $($command: literal $help: literal (|$options: ident| $action: tt) => $parser: expr),*
+        $($command: literal $help: literal (|$options: ident| $action: expr) => $parser: expr),*
     ]) => {
         $crate::macros::__command($command_name.into(), ::std::vec![
             $(($command.into(), $help.into(), $parser, ::std::option::Option::Some(::std::boxed::Box::new(|$options| $action)))),*

@@ -14,6 +14,11 @@ pub use terminal::__command;
 #[macro_export]
 /// Creates a [`Parser`]
 ///
+/// Format:
+///
+/// `[program_name] [description] [(terminal|None) [\[(flags,)*\]]]`
+///
+/// Arguments:
 ///  - `program_name` is the program name
 ///  - `description` is the description
 ///  - `terminal` is the terminal argument

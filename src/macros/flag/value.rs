@@ -4,6 +4,11 @@ use crate::{FlagArgument, ValueParser};
 #[macro_export]
 /// Creates a [`FlagArgument`]
 ///
+/// Format:
+///
+/// `[short_name][, long_name] [hint] description \(parser\) => |options, value| action`
+///
+/// Arguments:
 ///  - `short_name` is the short name
 ///  - `long_name` is the long name
 ///  - `hint` is the usage hint displayed in the help
@@ -13,7 +18,7 @@ use crate::{FlagArgument, ValueParser};
 ///  - `value` is the name of the value in the action
 ///  - `action` is the action called to update the developer provided options
 macro_rules! value_flag {
-    ($short_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: tt) => {
+    ($short_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| Ok($action), $description),
             ::std::option::Option::Some($short_name.into()),
@@ -22,7 +27,7 @@ macro_rules! value_flag {
         )
     };
 
-    (, $long_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: tt) => {
+    (, $long_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| Ok($action), $description),
             ::std::option::Option::None,
@@ -31,7 +36,7 @@ macro_rules! value_flag {
         )
     };
 
-    ($short_name: literal, $long_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: tt) => {
+    ($short_name: literal, $long_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| Ok($action), $description),
             ::std::option::Option::Some($short_name.into()),
@@ -40,7 +45,7 @@ macro_rules! value_flag {
         )
     };
 
-    ($short_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: tt) => {
+    ($short_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| $action, $description),
             ::std::option::Option::Some($short_name.into()),
@@ -49,7 +54,7 @@ macro_rules! value_flag {
         )
     };
 
-    (, $long_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: tt) => {
+    (, $long_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| $action, $description),
             ::std::option::Option::None,
@@ -58,7 +63,7 @@ macro_rules! value_flag {
         )
     };
 
-    ($short_name: literal, $long_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: tt) => {
+    ($short_name: literal, $long_name: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| $action, $description),
             ::std::option::Option::Some($short_name.into()),
@@ -67,7 +72,7 @@ macro_rules! value_flag {
         )
     };
 
-    ($short_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: tt) => {
+    ($short_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| Ok($action), $description),
             ::std::option::Option::Some($short_name.into()),
@@ -76,7 +81,7 @@ macro_rules! value_flag {
         )
     };
 
-    (, $long_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: tt) => {
+    (, $long_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| Ok($action), $description),
             ::std::option::Option::None,
@@ -85,7 +90,7 @@ macro_rules! value_flag {
         )
     };
 
-    ($short_name: literal, $long_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: tt) => {
+    ($short_name: literal, $long_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident| $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| Ok($action), $description),
             ::std::option::Option::Some($short_name.into()),
@@ -94,7 +99,7 @@ macro_rules! value_flag {
         )
     };
 
-    ($short_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: tt) => {
+    ($short_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| $action, $description),
             ::std::option::Option::Some($short_name.into()),
@@ -103,7 +108,7 @@ macro_rules! value_flag {
         )
     };
 
-    (, $long_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: tt) => {
+    (, $long_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| $action, $description),
             ::std::option::Option::None,
@@ -112,7 +117,7 @@ macro_rules! value_flag {
         )
     };
 
-    ($short_name: literal, $long_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: tt) => {
+    ($short_name: literal, $long_name: literal $hint: literal $description: literal ($parser: expr) => |$options: ident, $value: ident|? $action: expr) => {
         $crate::macros::__name_flag(
             $crate::ValueFlag::new($parser, |$options, $value| $action, $description),
             ::std::option::Option::Some($short_name.into()),
