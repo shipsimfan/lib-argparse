@@ -109,13 +109,13 @@ impl<T, E> Command<T, E> {
     pub(super) fn generate_usage(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, " ")?;
 
-        if self.required.is_some() {
+        if self.required.is_none() {
             write!(f, "[")?;
         }
 
         write!(f, "{}", self.command_name)?;
 
-        if self.required.is_some() {
+        if self.required.is_none() {
             write!(f, "]")?;
         }
 
