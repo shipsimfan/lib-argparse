@@ -53,7 +53,13 @@ pub fn __command<T: 'static, E>(
 ) -> TerminalArgument<T, E> {
     let mut command = Command::new(command_name);
 
-    for (command_name, help_message, parser, action) in commands {
+    for (command_name, help_message, mut parser, action) in commands {
+        parser = if parser.prologue().is_none() {
+            parser.set_prologue(help_message.clone())
+        } else {
+            parser
+        };
+
         let result = if let Some(action) = action {
             command.add_command_action(command_name, help_message, parser, action)
         } else {

@@ -6,6 +6,8 @@ pub(super) struct HelpGenerator<'a, T, E: 'static> {
     first_argument: &'a str,
     program_name: Option<&'a str>,
     description: Option<&'a str>,
+    prologue: Option<&'a str>,
+    epilogue: Option<&'a str>,
 }
 
 /// Generates a the help header
@@ -15,11 +17,14 @@ pub(super) struct HelpGenerator<'a, T, E: 'static> {
 ///
 /// OUTPUT:
 /// > Program Name\
-/// > Program Description
+/// > Program Description\
+/// > \
+/// > Prologue
 fn generate_header(
     f: &mut std::fmt::Formatter<'_>,
     program_name: Option<&str>,
     description: Option<&str>,
+    prologue: Option<&str>,
 ) -> std::fmt::Result {
     let mut header = false;
     if let Some(program_name) = program_name {
@@ -29,6 +34,11 @@ fn generate_header(
 
     if let Some(description) = description {
         writeln!(f, "{}", description)?;
+        header = true;
+    }
+
+    if let Some(prologue) = prologue {
+        writeln!(f, "{}", prologue)?;
         header = true;
     }
 
@@ -76,12 +86,16 @@ impl<'a, T, E> HelpGenerator<'a, T, E> {
     ///  - `parser` is the parser to generate for
     ///  - `command_chain` is the list of commands preceding [`parser`]
     ///  - `first_argument` is the first argument provided by the operating system
+    ///  - `prologue` is the help prologue
+    ///  - `epilogue` is the help epilogue
     pub(super) fn new(
         parser: &'a Parser<T, E>,
         command_chain: &'a [String],
         first_argument: &'a str,
         program_name: Option<&'a str>,
         description: Option<&'a str>,
+        prologue: Option<&'a str>,
+        epilogue: Option<&'a str>,
     ) -> Self {
         HelpGenerator {
             parser,
@@ -89,13 +103,15 @@ impl<'a, T, E> HelpGenerator<'a, T, E> {
             first_argument,
             program_name,
             description,
+            prologue,
+            epilogue,
         }
     }
 }
 
 impl<'a, T, E> std::fmt::Display for HelpGenerator<'a, T, E> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        generate_header(f, self.program_name, self.description)?;
+        generate_header(f, self.program_name, self.description, self.prologue)?;
 
         generate_usage(f, self.parser, self.command_chain, self.first_argument)?;
 
@@ -105,6 +121,13 @@ impl<'a, T, E> std::fmt::Display for HelpGenerator<'a, T, E> {
             f,
             &self.parser.short_prefix,
             &self.parser.long_prefix,
-        )
+        )?;
+
+        if let Some(epilogue) = self.epilogue {
+            writeln!(f)?;
+            writeln!(f, "{}", epilogue)?;
+        }
+
+        Ok(())
     }
 }

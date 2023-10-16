@@ -3,7 +3,6 @@ use help::HelpGenerator;
 use std::{
     borrow::Cow,
     ffi::{OsStr, OsString},
-    ops::Deref,
 };
 
 mod help;
@@ -20,6 +19,11 @@ pub struct Parser<T, E: 'static = ()> {
     program_name: Option<Cow<'static, str>>,
     /// Program description for help
     description: Option<Cow<'static, str>>,
+
+    /// Prologue for help
+    prologue: Option<Cow<'static, str>>,
+    /// Epilogue for help
+    epilogue: Option<Cow<'static, str>>,
 
     /// Prefixes for flag arguments
     short_prefix: Cow<'static, str>,
@@ -49,6 +53,9 @@ impl<T, E> Parser<T, E> {
             program_name: None,
             description: None,
 
+            prologue: None,
+            epilogue: None,
+
             short_prefix: "-".into(),
             long_prefix: "--".into(),
 
@@ -59,14 +66,22 @@ impl<T, E> Parser<T, E> {
 
     /// Returns the program name
     pub fn program_name(&self) -> Option<&str> {
-        self.program_name
-            .as_ref()
-            .map(|long_name| long_name.deref())
+        self.program_name.as_deref()
     }
 
     /// Returns the program description
     pub fn description(&self) -> Option<&str> {
-        self.description.as_ref().map(|long_name| long_name.deref())
+        self.description.as_deref()
+    }
+
+    /// Returns the help prologue
+    pub fn prologue(&self) -> Option<&str> {
+        self.prologue.as_deref()
+    }
+
+    /// Returns the help epilogue
+    pub fn epilogue(&self) -> Option<&str> {
+        self.epilogue.as_deref()
     }
 
     /// Returns the flag arugments
@@ -106,6 +121,22 @@ impl<T, E> Parser<T, E> {
     ///  - `description` is the string the program description will be set to
     pub fn set_description<S: Into<Cow<'static, str>>>(mut self, description: S) -> Self {
         self.description = Some(description.into());
+        self
+    }
+
+    /// Sets the help prologue
+    ///
+    ///  - `prologue` is the string the program description will be set to
+    pub fn set_prologue<S: Into<Cow<'static, str>>>(mut self, prologue: S) -> Self {
+        self.prologue = Some(prologue.into());
+        self
+    }
+
+    /// Sets the help epilogue
+    ///
+    ///  - `epilogue` is the string the program description will be set to
+    pub fn set_epilogue<S: Into<Cow<'static, str>>>(mut self, epilogue: S) -> Self {
+        self.epilogue = Some(epilogue.into());
         self
     }
 
@@ -268,7 +299,7 @@ impl<T, E> Parser<T, E> {
         // This pointer is stored for a help message. This is required for the borrow checker.
         let self_ptr = self as *const _;
 
-        let (flags, terminal, short_prefix, long_prefix) = self.as_mut();
+        let (flags, terminal, short_prefix, long_prefix, prologue, epilogue) = self.as_mut();
 
         while let Some(argument) = args.next_os() {
             let argument = if starts_with(&argument, long_prefix) {
@@ -306,7 +337,9 @@ impl<T, E> Parser<T, E> {
                         command_chain,
                         first_argument,
                         program_name,
-                        description
+                        description,
+                        prologue,
+                        epilogue
                     )
                 );
 
@@ -331,14 +364,18 @@ impl<T, E> Parser<T, E> {
     ) -> (
         &'a mut FlagSet<T, E>,
         &'a mut TerminalArgument<T, E>,
-        &str,
-        &str,
+        &'a str,
+        &'a str,
+        Option<&'a str>,
+        Option<&'a str>,
     ) {
         (
             &mut self.flag_arguments,
             &mut self.terminal_argument,
             self.short_prefix.as_ref(),
             self.long_prefix.as_ref(),
+            self.prologue.as_deref(),
+            self.epilogue.as_deref(),
         )
     }
 }
