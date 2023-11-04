@@ -7,7 +7,7 @@ mod positional;
 pub use command::Command;
 pub use positional::{
     CollectOsPositionalParser, CollectPositionalParser, PositionalParser, Positionals,
-    SimplePositionalParser,
+    SimplePositionalParser, SimplePositionalParserOS, SimplePositionalParserTry,
 };
 
 pub enum TerminalArgument<T, E: 'static> {

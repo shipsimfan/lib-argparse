@@ -72,7 +72,7 @@ pub use parser::Parser;
 pub use stream::ArgStream;
 pub use terminal::{
     CollectOsPositionalParser, CollectPositionalParser, Command, PositionalParser, Positionals,
-    SimplePositionalParser, TerminalArgument,
+    SimplePositionalParser, SimplePositionalParserOS, SimplePositionalParserTry, TerminalArgument,
 };
 
 pub(crate) use flag::FlagSet;

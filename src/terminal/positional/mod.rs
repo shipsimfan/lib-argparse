@@ -7,7 +7,7 @@ mod simple;
 
 pub use collect::{CollectOsPositionalParser, CollectPositionalParser};
 pub use parser::PositionalParser;
-pub use simple::SimplePositionalParser;
+pub use simple::{SimplePositionalParser, SimplePositionalParserOS, SimplePositionalParserTry};
 
 /// An ordered list of positional arguments
 pub struct Positionals<T, E> {
