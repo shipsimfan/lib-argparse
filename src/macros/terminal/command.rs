@@ -21,7 +21,7 @@ macro_rules! command {
     };
 
     ($command_name: expr, [
-        $($command: literal $help: literal => $parser: expr),*
+        $($command: tt $help: tt => $parser: expr),*
     ]) => {
         $crate::macros::__command($command_name.into(), ::std::vec![
             $(($command.into(), $help.into(), $parser, ::std::option::Option::None)),*
@@ -29,7 +29,7 @@ macro_rules! command {
     };
 
     ($command_name: expr, [
-        $($command: literal $help: literal (|$options: ident| $action: expr) => $parser: expr),*
+        $($command: tt $help: tt (|$options: ident| $action: expr) => $parser: expr),*
     ]) => {
         $crate::macros::__command($command_name.into(), ::std::vec![
             $(($command.into(), $help.into(), $parser, ::std::option::Option::Some(::std::boxed::Box::new(|$options| $action)))),*

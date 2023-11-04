@@ -33,7 +33,7 @@ macro_rules! parser {
     };
 
     {
-        $program_name: literal
+        $program_name: tt
     } => {
         $crate::macros::__parser(
             ::std::option::Option::Some($program_name.into()),
@@ -45,8 +45,8 @@ macro_rules! parser {
 
 
     {
-        $program_name: literal
-        $description: literal
+        $program_name: tt
+        $description: tt
     } => {
         $crate::macros::__parser(
             ::std::option::Option::Some($program_name.into()),
@@ -68,7 +68,7 @@ macro_rules! parser {
     };
 
     {
-        $program_name: literal
+        $program_name: tt
         $terminal: expr
     } => {
         $crate::macros::__parser(
@@ -81,8 +81,8 @@ macro_rules! parser {
 
 
     {
-        $program_name: literal
-        $description: literal
+        $program_name: tt
+        $description: tt
         $terminal: expr
     } => {
         $crate::macros::__parser(
@@ -118,7 +118,7 @@ macro_rules! parser {
     };
 
     {
-        $program_name: literal
+        $program_name: tt
         None,
         [$($flag: expr),*]
     } => {
@@ -131,7 +131,7 @@ macro_rules! parser {
     };
 
     {
-        $program_name: literal
+        $program_name: tt
         $terminal: expr,
         [$($flag: expr),*]
     } => {
@@ -144,8 +144,8 @@ macro_rules! parser {
     };
 
     {
-        $program_name: literal
-        $description: literal
+        $program_name: tt
+        $description: tt
         None,
         [$($flag: expr),*]
     } => {
@@ -158,8 +158,8 @@ macro_rules! parser {
     };
 
     {
-        $program_name: literal
-        $description: literal
+        $program_name: tt
+        $description: tt
         $terminal: expr,
         [$($flag: expr),*]
     } => {

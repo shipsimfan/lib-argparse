@@ -20,7 +20,7 @@ mod value;
 ///  - `description` is the description displayed in the help
 ///  - `kind` is the flag kind
 macro_rules! flag {
-    ($short_name: literal $description: literal => $kind: expr) => {
+    ($short_name: tt $description: tt => $kind: expr) => {
         $crate::macros::__flag(
             ::std::option::Option::Some($short_name.into()),
             ::std::option::Option::None,
@@ -30,7 +30,7 @@ macro_rules! flag {
         )
     };
 
-    (, $long_name: literal $description: literal => $kind: expr) => {
+    (, $long_name: tt $description: tt => $kind: expr) => {
         $crate::macros::__flag(
             ::std::option::Option::None,
             ::std::option::Option::Some($long_name.into()),
@@ -40,7 +40,7 @@ macro_rules! flag {
         )
     };
 
-    ($short_name: literal, $long_name: literal $description: literal => $kind: expr) => {
+    ($short_name: tt, $long_name: tt $description: tt => $kind: expr) => {
         $crate::macros::__flag(
             ::std::option::Option::Some($short_name.into()),
             ::std::option::Option::Some($long_name.into()),
@@ -50,7 +50,7 @@ macro_rules! flag {
         )
     };
 
-    ($short_name: literal $hint: literal $description: literal => $kind: expr) => {
+    ($short_name: tt $hint: tt $description: tt => $kind: expr) => {
         $crate::macros::__flag(
             ::std::option::Option::Some($short_name.into()),
             ::std::option::Option::None,
@@ -60,7 +60,7 @@ macro_rules! flag {
         )
     };
 
-    (, $long_name: literal $hint: literal $description: literal => $kind: expr) => {
+    (, $long_name: tt $hint: tt $description: tt => $kind: expr) => {
         $crate::macros::__flag(
             ::std::option::Option::None,
             ::std::option::Option::Some($long_name.into()),
@@ -70,7 +70,7 @@ macro_rules! flag {
         )
     };
 
-    ($short_name: literal, $long_name: literal $hint: literal  $description: literal => $kind: expr) => {
+    ($short_name: tt, $long_name: tt $hint: tt  $description: tt => $kind: expr) => {
         $crate::macros::__flag(
             ::std::option::Option::Some($short_name.into()),
             ::std::option::Option::Some($long_name.into()),

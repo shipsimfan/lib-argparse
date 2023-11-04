@@ -15,39 +15,39 @@ use crate::FlagKind;
 ///  - `long_name` is the long name
 #[macro_export]
 macro_rules! help_flag {
-    ($short_name: literal) => {
+    ($short_name: tt) => {
         $crate::flag!($short_name "Displays this help message" => $crate::FlagKind::Help { exit: true })
     };
 
-    (, $long_name: literal) => {
+    (, $long_name: tt) => {
         $crate::flag!(, $long_name "Displays this help message" => $crate::FlagKind::Help { exit: true })
     };
 
-    ($short_name: literal, $long_name: literal) => {
+    ($short_name: tt, $long_name: tt) => {
         $crate::flag!($short_name, $long_name "Displays this help message" => $crate::FlagKind::Help { exit: true })
     };
 
-    ($short_name: literal exit) => {
+    ($short_name: tt exit) => {
         $crate::flag!($short_name "Displays this help message" => $crate::FlagKind::Help { exit: true })
     };
 
-    (, $long_name: literal exit) => {
+    (, $long_name: tt exit) => {
         $crate::flag!(, $long_name "Displays this help message" => $crate::FlagKind::Help { exit: true })
     };
 
-    ($short_name: literal, $long_name: literal exit) => {
+    ($short_name: tt, $long_name: tt exit) => {
         $crate::flag!($short_name, $long_name "Displays this help message" => $crate::FlagKind::Help { exit: true })
     };
 
-    ($short_name: literal no-exit) => {
+    ($short_name: tt no-exit) => {
         $crate::flag!($short_name "Displays this help message" => $crate::FlagKind::Help { exit: false })
     };
 
-    (, $long_name: literal no-exit) => {
+    (, $long_name: tt no-exit) => {
         $crate::flag!(, $long_name "Displays this help message" => $crate::FlagKind::Help { exit: false })
     };
 
-    ($short_name: literal, $long_name: literal no-exit) => {
+    ($short_name: tt, $long_name: tt no-exit) => {
         $crate::flag!($short_name, $long_name "Displays this help message" => $crate::FlagKind::Help { exit: false })
     };
 }
