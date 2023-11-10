@@ -8,3 +8,8 @@
 //! **TODO**
 
 #![deny(missing_docs)]
+#![feature(const_trait_impl)]
+
+mod parser;
+
+pub use parser::Parser;
