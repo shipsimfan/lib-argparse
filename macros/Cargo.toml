@@ -1,0 +1,11 @@
+[package]
+name = "macros"
+description = "Macros for lib-argparse"
+
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+readme.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true

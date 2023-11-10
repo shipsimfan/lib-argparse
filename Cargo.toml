@@ -1,9 +1,31 @@
-[package]
-name = "argparse"
+
+[workspace]
+default-members = ["."]
+
+[workspace.package]
 version = "3.0.0"
+description = "Argument parsing library"
 authors = ["Lance Hart <me@lancehart>"]
 edition = "2021"
 readme = "README.md"
 repository = "https://github.com/shipsimfan/lib-argparse.git"
 license = "GPL-3.0-or-later"
 publish = false
+
+[workspace.dependencies]
+macros.path = "macros"
+
+[package]
+name = "argparse"
+
+description.workspace = true
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+readme.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+macros.workspace = true
