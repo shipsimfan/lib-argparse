@@ -12,4 +12,5 @@
 
 mod parser;
 
+pub use macros::parser;
 pub use parser::Parser;
