@@ -45,7 +45,7 @@ impl Parser {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified name
-    pub fn name(mut self, name: &'static str) -> Self {
+    pub const fn name(mut self, name: &'static str) -> Self {
         self.name = Some(name);
         self
     }
@@ -57,7 +57,7 @@ impl Parser {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified description
-    pub fn description(mut self, description: &'static str) -> Self {
+    pub const fn description(mut self, description: &'static str) -> Self {
         self.description = Some(description);
         self
     }
@@ -69,7 +69,7 @@ impl Parser {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified prologue
-    pub fn prologue(mut self, prologue: &'static str) -> Self {
+    pub const fn prologue(mut self, prologue: &'static str) -> Self {
         self.prologue = Some(prologue);
         self
     }
@@ -81,7 +81,7 @@ impl Parser {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified epilogue
-    pub fn epilogue(mut self, epilogue: &'static str) -> Self {
+    pub const fn epilogue(mut self, epilogue: &'static str) -> Self {
         self.epilogue = Some(epilogue);
         self
     }
@@ -93,7 +93,7 @@ impl Parser {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified short prefix
-    pub fn short_prefix(mut self, short_prefix: &'static str) -> Self {
+    pub const fn short_prefix(mut self, short_prefix: &'static str) -> Self {
         self.short_prefix = short_prefix;
         self
     }
@@ -105,7 +105,7 @@ impl Parser {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified long prefix
-    pub fn long_prefix(mut self, long_prefix: &'static str) -> Self {
+    pub const fn long_prefix(mut self, long_prefix: &'static str) -> Self {
         self.long_prefix = long_prefix;
         self
     }
