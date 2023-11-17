@@ -311,6 +311,18 @@ impl<Options> Parser<Options> {
         short_name: Option<&str>,
         long_name: Option<&str>,
     ) -> Option<(&dyn FlagArgument<Options>, usize)> {
-        todo!("Implement `Parser::get_flag_argument`");
+        assert!(short_name.is_some() || long_name.is_some());
+
+        for (i, flag) in self.flags.iter().enumerate() {
+            if short_name.is_some() && flag.short_name() == short_name {
+                return Some((*flag, i));
+            }
+
+            if long_name.is_some() && flag.long_name() == long_name {
+                return Some((*flag, i));
+            }
+        }
+
+        None
     }
 }
