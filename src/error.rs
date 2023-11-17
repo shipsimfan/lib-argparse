@@ -15,6 +15,18 @@ pub enum ErrorKind {
     /// An argument has invalid UTF-8
     InvalidUTF8,
 
+    /// The argument stream is missing the zero argument
+    MissingZeroArgument,
+
+    /// An unexpected argument was encountered in the stream
+    UnexpectedArgument,
+
+    /// An unknown flag was passed
+    UnknownFlag,
+
+    /// A flag was repeated that cannot be
+    RepeatedFlag,
+
     /// Another error
     Custom,
 }
@@ -69,6 +81,50 @@ impl Error {
     /// Returns the newly created [`Error`]
     pub fn invalid_utf8() -> Self {
         Error::new(ErrorKind::InvalidUTF8, "invalid UTF-8 in argument")
+    }
+
+    /// Creates a new [`Error`] with [`ErrorKind::MissingZeroArgument`]
+    ///
+    /// ## Return Value
+    /// Returns the newly created [`Error`]
+    pub fn missing_zero_argument() -> Self {
+        Error::new(
+            ErrorKind::MissingZeroArgument,
+            "missing the zero argument in the stream",
+        )
+    }
+
+    /// Creates a new [`Error`] with [`ErrorKind::UnexpectedArgument`]
+    ///
+    /// ## Parameters
+    ///  * `message` - The message to be displayed for the new [`Error`]
+    ///
+    /// ## Return Value
+    /// Returns the newly created [`Error`]
+    pub fn unexpected_argument<S: Into<Cow<'static, str>>>(message: S) -> Self {
+        Error::new(ErrorKind::UnexpectedArgument, message)
+    }
+
+    /// Creates a new [`Error`] with [`ErrorKind::UnknownFlag`]
+    ///
+    /// ## Parameters
+    ///  * `message` - The message to be displayed for the new [`Error`]
+    ///
+    /// ## Return Value
+    /// Returns the newly created [`Error`]
+    pub fn unknown_flag<S: Into<Cow<'static, str>>>(message: S) -> Self {
+        Error::new(ErrorKind::UnknownFlag, message)
+    }
+
+    /// Creates a new [`Error`] with [`ErrorKind::RepeatedFlag`]
+    ///
+    /// ## Parameters
+    ///  * `message` - The message to be displayed for the new [`Error`]
+    ///
+    /// ## Return Value
+    /// Returns the newly created [`Error`]
+    pub fn repeated_flag<S: Into<Cow<'static, str>>>(message: S) -> Self {
+        Error::new(ErrorKind::RepeatedFlag, message)
     }
 
     /// Creates a new [`Error`] with [`ErrorKind::Custom`]

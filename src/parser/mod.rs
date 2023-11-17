@@ -1,4 +1,4 @@
-use crate::{FlagArgument, Result};
+use crate::{Error, FlagArgument, Result};
 use std::ffi::OsString;
 use stream::ArgumentStream;
 
@@ -141,7 +141,7 @@ impl<Options> Parser<Options> {
     /// ## Return Value
     /// Returns the changed options if parsing is successful, returns the error otherwise.
     pub fn parse<I: IntoIterator<Item = String>>(
-        &mut self,
+        &self,
         options: Options,
         arguments: I,
     ) -> Result<Options> {
@@ -160,7 +160,7 @@ impl<Options> Parser<Options> {
     /// ## Return Value
     /// Returns the changed options if parsing is successful, returns the error otherwise.
     pub fn parse_os<I: IntoIterator<Item = OsString>>(
-        &mut self,
+        &self,
         options: Options,
         arguments: I,
     ) -> Result<Options> {
@@ -177,7 +177,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns the changed options if parsing is successful, returns the error otherwise.
-    pub fn parse_env(&mut self, options: Options) -> Result<Options> {
+    pub fn parse_env(&self, options: Options) -> Result<Options> {
         self.parse_os(options, std::env::args_os())
     }
 
@@ -189,7 +189,128 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns the changed options if parsing is successful, returns the error otherwise.
-    fn do_parse(&mut self, options: Options, stream: &mut ArgumentStream) -> Result<Options> {
-        todo!("Implement `Parser::do_parse()`");
+    fn do_parse(&self, mut options: Options, stream: &mut ArgumentStream) -> Result<Options> {
+        // Remove the zero argument
+        let zero_argument = stream.next_os().ok_or_else(Error::missing_zero_argument)?;
+
+        // Mark all flags as not ran
+        let mut flags_ran = vec![false; self.flags.len()];
+
+        while let Some(argument) = stream.next_os() {
+            let argument =
+                match self.handle_flag_argument(argument, &mut options, stream, &mut flags_ran)? {
+                    Some(argument) => argument,
+                    None => continue,
+                };
+
+            return Err(Error::unexpected_argument(format!(
+                "unexpected argument \"{}\"",
+                argument.to_string_lossy()
+            )));
+        }
+
+        // Finalize flags
+        for (i, flag) in self.flags.into_iter().enumerate() {
+            flag.finalize(flags_ran[i])?;
+        }
+
+        // Return options
+        Ok(options)
+    }
+
+    /// Handles a flag argument during parsing
+    ///
+    /// ## Parameters
+    ///  * `argument` - The argument to be handled
+    ///  * `options` - The options to modified by the parser
+    ///  * `stream` - The stream of arguments to be parsed from
+    ///  * `flags_ran` - The slice of flag running information
+    ///
+    /// ## Return Value
+    /// Returns the argument if it is not a flag argument. Returns `Ok(None)` on successful parsing
+    /// of the flag argument or the error if it is unsuccessful.
+    fn handle_flag_argument(
+        &self,
+        argument: OsString,
+        options: &mut Options,
+        stream: &mut ArgumentStream,
+        flags_ran: &mut [bool],
+    ) -> Result<Option<OsString>> {
+        // Check for long or short prefix
+        let is_long = argument
+            .as_encoded_bytes()
+            .starts_with(self.long_prefix.as_bytes());
+        let is_short = argument
+            .as_encoded_bytes()
+            .starts_with(self.short_prefix.as_bytes())
+            && !is_long;
+
+        if is_long || is_short {
+            // Convert to UTF-8
+            let argument = argument.into_string().map_err(Into::<Error>::into)?;
+
+            // Find the flag argument
+            let (flag_argument, flag_index) = self
+                .get_flag_argument(
+                    if is_short {
+                        Some(&argument[self.short_prefix.len()..])
+                    } else {
+                        None
+                    },
+                    if is_long {
+                        Some(&argument[self.long_prefix.len()..])
+                    } else {
+                        None
+                    },
+                )
+                .ok_or_else(|| Error::unknown_flag(format!("unknown flag \"{}\"", argument)))?;
+
+            // Make sure its not repeated
+            if !flag_argument.repeatable() && flags_ran[flag_index] {
+                return Err(Error::repeated_flag(format!(
+                    "\"{}\" cannot appear more than once",
+                    argument
+                )));
+            }
+            flags_ran[flag_index] = true;
+
+            // Check if the flag is a help flag
+            if flag_argument.class().is_help() {
+                todo!("Implement help generator");
+            }
+
+            // Parse the parameters from the stream
+            let count = flag_argument.count();
+            let mut parameters = Vec::with_capacity(count);
+            for _ in 0..count {
+                match stream.next_os() {
+                    Some(parameter) => parameters.push(parameter),
+                    None => break,
+                }
+            }
+
+            // Call the action
+            flag_argument.action(options, parameters)?;
+
+            Ok(None)
+        } else {
+            Ok(Some(argument))
+        }
+    }
+
+    /// Gets the flag argument given its name
+    ///
+    /// ## Parameters
+    ///  * `long_name` - The long name to look for
+    ///  * `short_name` - The short name to look for
+    ///
+    /// ## Return Value
+    /// If found, it will return the flag argument and its index
+    fn get_flag_argument(
+        &self,
+        short_name: Option<&str>,
+        long_name: Option<&str>,
+    ) -> Option<(&dyn FlagArgument<Options>, usize)> {
+        todo!("Implement `Parser::get_flag_argument`");
     }
 }

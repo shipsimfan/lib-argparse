@@ -33,6 +33,14 @@ pub trait FlagArgument<Options: 'static> {
     /// Returns the maximum number of parameters this flag requires from the argument stream
     fn count(&self) -> usize;
 
+    /// Is this flag repeatable?
+    ///
+    /// ## Return Value
+    /// Returns `true` if this flag can appear multiple times
+    fn repeatable(&self) -> bool {
+        false
+    }
+
     /// The action called upon matching this flag
     ///
     /// ## Parameters
@@ -42,9 +50,12 @@ pub trait FlagArgument<Options: 'static> {
     ///
     /// ## Return Value
     /// Can return an error if there is a problem with the parameters
-    fn action(&mut self, options: &mut Options, parameters: Vec<OsString>) -> Result<()>;
+    fn action(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<()>;
 
     /// Called for every flag in the current parsing upon completion of the parsing
+    ///
+    /// ## Parameters
+    ///  * `ran` - `true` if this flag argument was run at least once, `false` otherwise
     ///
     /// ## Return Value
     /// Returns a result if there is an error
@@ -52,10 +63,8 @@ pub trait FlagArgument<Options: 'static> {
     /// ## Remarks
     /// An example usage of this function is to allow a flag argument to error if it is required
     /// but wasn't passed.
-    ///
-    /// This function should also be used to reset any values that may change during a call to
-    /// `action`.
-    fn finalize(&mut self) -> Result<()> {
+    #[allow(unused_variables)]
+    fn finalize(&self, ran: bool) -> Result<()> {
         Ok(())
     }
 
@@ -85,5 +94,29 @@ pub trait FlagArgument<Options: 'static> {
     /// parsing parameters and running the action but instead runs the help generator to print out the help to `stdout`.
     fn class(&self) -> FlagClass {
         FlagClass::Normal
+    }
+}
+
+impl FlagClass {
+    /// Should this flag display the help instead of running the action?
+    ///
+    /// ## Return Value
+    /// Returns `true` if this flag should display the help
+    pub const fn is_help(&self) -> bool {
+        match self {
+            FlagClass::Normal => false,
+            FlagClass::Help | FlagClass::HelpNoExit => true,
+        }
+    }
+
+    /// Should this flag exit after running?
+    ///
+    /// ## Return Value
+    /// Returns `true` if this flag should exit after running
+    pub const fn is_exit(&self) -> bool {
+        match self {
+            FlagClass::Normal | FlagClass::HelpNoExit => false,
+            FlagClass::Help => true,
+        }
     }
 }
