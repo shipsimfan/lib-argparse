@@ -1,5 +1,6 @@
 use crate::{FlagArgument, Result};
 use std::ffi::OsString;
+use stream::ArgumentStream;
 
 /// An object which parses command line arguments
 pub struct Parser<Options: 'static> {
@@ -27,6 +28,8 @@ pub struct Parser<Options: 'static> {
 
 const DEFAULT_SHORT_PREFIX: &str = "-";
 const DEFAULT_LONG_PREFIX: &str = "--";
+
+mod stream;
 
 impl<Options> Parser<Options> {
     /// Creates a new [`Parser`]
@@ -142,7 +145,10 @@ impl<Options> Parser<Options> {
         options: Options,
         arguments: I,
     ) -> Result<Options> {
-        todo!("Implement `Parser::parse()`")
+        self.do_parse(
+            options,
+            &mut ArgumentStream::new(&mut arguments.into_iter()),
+        )
     }
 
     /// Parses arguments from an iterator of [`OsString`]s
@@ -158,7 +164,10 @@ impl<Options> Parser<Options> {
         options: Options,
         arguments: I,
     ) -> Result<Options> {
-        todo!("Implement `Parser::parse_os()`")
+        self.do_parse(
+            options,
+            &mut ArgumentStream::new_os(&mut arguments.into_iter()),
+        )
     }
 
     /// Parses arguments using the environment
@@ -170,5 +179,17 @@ impl<Options> Parser<Options> {
     /// Returns the changed options if parsing is successful, returns the error otherwise.
     pub fn parse_env(&mut self, options: Options) -> Result<Options> {
         self.parse_os(options, std::env::args_os())
+    }
+
+    /// Parse arguments from an [`ArgumentStream`]
+    ///
+    /// ## Parameters
+    ///  * `options` - The options to modified by the parser
+    ///  * `stream` - The stream of arguments to be parsed
+    ///
+    /// ## Return Value
+    /// Returns the changed options if parsing is successful, returns the error otherwise.
+    fn do_parse(&mut self, options: Options, stream: &mut ArgumentStream) -> Result<Options> {
+        todo!("Implement `Parser::do_parse()`");
     }
 }
