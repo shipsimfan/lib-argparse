@@ -52,35 +52,5 @@ impl ToTokens for Parser {
         }
 
         Token![;].to_tokens(generator);
-
-        /*
-        Token![const].to_tokens(generator);
-        generator.identifier(self.variable_name.clone());
-        Token![:].to_tokens(generator);
-        generate_parser_type_name(generator);
-
-        self.equals.to_tokens(generator);
-
-        generate_parser_type_name(generator);
-        Token![::].to_tokens(generator);
-        generator.identifier_string("new");
-        generator.group(Delimiter::Parenthesis);
-
-        Token![.].to_tokens(generator);
-        generator.identifier_string("name");
-
-        let mut name_parameters = generator.group(Delimiter::Parenthesis);
-        name_parameters.literal(self.name.clone());
-
-        if let Some(description) = self.description.clone() {
-            Token![.].to_tokens(generator);
-            generator.identifier_string("description");
-
-            let mut description_parameters = generator.group(Delimiter::Parenthesis);
-            description_parameters.literal(description);
-        }
-
-        Token![;].to_tokens(generator);
-        */
     }
 }
