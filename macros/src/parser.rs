@@ -1,30 +1,22 @@
-use proc_macro::Delimiter;
 use proc_macro_util::{
+    to_tokens,
     tokens::{Equals, Identifier, Literal},
-    Generator, Parse, ToTokens, Token,
+    Generator, Parse, Result, ToTokens, Token,
 };
 
 pub struct Parser {
     variable_name: Identifier,
-    equals: Equals,
     name: Literal,
     description: Option<Literal>,
 }
 
-fn generate_parser_type_name(generator: &mut Generator) {
-    Token![::].to_tokens(generator);
-    generator.identifier_string("argparse");
-    Token![::].to_tokens(generator);
-    generator.identifier_string("Parser");
-}
-
 impl Parse for Parser {
-    fn parse(parser: &mut proc_macro_util::Parser) -> proc_macro_util::Result<Self> {
+    fn parse(parser: &mut proc_macro_util::Parser) -> Result<Self> {
         let variable_name = parser
             .parse()
             .map_err(|error| error.append("expected a variable name for the parser"))?;
 
-        let equals = parser.parse()?;
+        parser.parse::<Equals>()?;
 
         let name = parser
             .parse()
@@ -35,7 +27,6 @@ impl Parse for Parser {
 
         Ok(Parser {
             variable_name,
-            equals,
             name,
             description,
         })
@@ -43,7 +34,26 @@ impl Parse for Parser {
 }
 
 impl ToTokens for Parser {
-    fn to_tokens(&self, generator: &mut proc_macro_util::Generator) {
+    fn to_tokens(&self, generator: &mut Generator) {
+        let Parser {
+            variable_name,
+            name,
+            description,
+        } = self;
+
+        to_tokens!(generator
+            const #variable_name: ::argparse::Parser = ::argparse::Parser::new().name(#name)
+        );
+
+        if let Some(description) = description {
+            to_tokens!(generator
+                .description(#description)
+            );
+        }
+
+        Token![;].to_tokens(generator);
+
+        /*
         Token![const].to_tokens(generator);
         generator.identifier(self.variable_name.clone());
         Token![:].to_tokens(generator);
@@ -71,5 +81,6 @@ impl ToTokens for Parser {
         }
 
         Token![;].to_tokens(generator);
+        */
     }
 }
