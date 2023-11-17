@@ -39,7 +39,13 @@ impl<'a> ArgumentStream<'a> {
     /// Returns the next [`String`] in the stream if it exists, or an error if it contains invalid
     /// UTF-8.
     pub(super) fn next(&mut self) -> Result<Option<String>> {
-        todo!("Implement `ArgumentStream::next()`");
+        match self {
+            ArgumentStream::OsString(iter) => match iter.next() {
+                Some(os_string) => os_string.into_string().map(Some).map_err(Into::into),
+                None => Ok(None),
+            },
+            ArgumentStream::String(iter) => Ok(iter.next()),
+        }
     }
 
     /// Gets the next [`OsString`] in the stream
@@ -49,7 +55,7 @@ impl<'a> ArgumentStream<'a> {
     pub(super) fn next_os(&mut self) -> Option<OsString> {
         match self {
             ArgumentStream::OsString(iter) => iter.next(),
-            ArgumentStream::String(iter) => iter.next().map(|string| OsString::from(string)),
+            ArgumentStream::String(iter) => iter.next().map(OsString::from),
         }
     }
 

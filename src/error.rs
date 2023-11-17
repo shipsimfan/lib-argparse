@@ -12,6 +12,9 @@ pub enum ErrorKind {
     /// A required argument wasn't provided
     MissingRequired,
 
+    /// An argument has invalid UTF-8
+    InvalidUTF8,
+
     /// Another error
     Custom,
 }
@@ -60,6 +63,14 @@ impl Error {
         Error::new(ErrorKind::MissingRequired, message)
     }
 
+    /// Creates a new [`Error`] with [`ErrorKind::InvalidUTF8`]
+    ///
+    /// ## Return Value
+    /// Returns the newly created [`Error`]
+    pub fn invalid_utf8() -> Self {
+        Error::new(ErrorKind::InvalidUTF8, "invalid UTF-8 in argument")
+    }
+
     /// Creates a new [`Error`] with [`ErrorKind::Custom`]
     ///
     /// ## Parameters
@@ -99,5 +110,11 @@ impl std::fmt::Display for Error {
 impl std::fmt::Debug for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self, f)
+    }
+}
+
+impl From<std::ffi::OsString> for Error {
+    fn from(_: std::ffi::OsString) -> Self {
+        Error::invalid_utf8()
     }
 }
