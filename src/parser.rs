@@ -1,4 +1,5 @@
-use crate::FlagArgument;
+use crate::{FlagArgument, Result};
+use std::ffi::OsString;
 
 /// An object which parses command line arguments
 pub struct Parser<Options: 'static> {
@@ -126,5 +127,48 @@ impl<Options> Parser<Options> {
     pub const fn flags(mut self, flags: &'static [&'static dyn FlagArgument<Options>]) -> Self {
         self.flags = flags;
         self
+    }
+
+    /// Parses arguments from an iterator of [`String`]s
+    ///
+    /// ## Parameters
+    ///  * `options` - The options to modified by the parser
+    ///  * `arguments` - The list of arguments to be parsed
+    ///
+    /// ## Return Value
+    /// Returns the changed options if parsing is successful, returns the error otherwise.
+    pub fn parse<I: IntoIterator<Item = String>>(
+        &mut self,
+        options: Options,
+        arguments: I,
+    ) -> Result<Options> {
+        todo!("Implement `Parser::parse()`")
+    }
+
+    /// Parses arguments from an iterator of [`OsString`]s
+    ///
+    /// ## Parameters
+    ///  * `options` - The options to modified by the parser
+    ///  * `arguments` - The list of arguments to be parsed
+    ///
+    /// ## Return Value
+    /// Returns the changed options if parsing is successful, returns the error otherwise.
+    pub fn parse_os<I: IntoIterator<Item = OsString>>(
+        &mut self,
+        options: Options,
+        arguments: I,
+    ) -> Result<Options> {
+        todo!("Implement `Parser::parse_os()`")
+    }
+
+    /// Parses arguments using the environment
+    ///
+    /// ## Parameters
+    ///  * `options` - The options to modified by the parser
+    ///
+    /// ## Return Value
+    /// Returns the changed options if parsing is successful, returns the error otherwise.
+    pub fn parse_env(&mut self, options: Options) -> Result<Options> {
+        self.parse_os(options, std::env::args_os())
     }
 }

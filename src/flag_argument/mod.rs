@@ -51,6 +51,9 @@ pub trait FlagArgument<Options: 'static> {
     /// ## Remarks
     /// An example usage of this function is to allow a flag argument to error if it is required
     /// but wasn't passed.
+    ///
+    /// This function should also be used to reset any values that may change during a call to
+    /// `action`.
     fn finalize(&mut self) -> Result<()> {
         Ok(())
     }
