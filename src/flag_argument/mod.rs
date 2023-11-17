@@ -1,4 +1,5 @@
 use crate::Result;
+use std::ffi::OsString;
 
 /// The class of flag that a flag argument is
 pub enum FlagClass {
@@ -41,7 +42,7 @@ pub trait FlagArgument<Options: 'static> {
     ///
     /// ## Return Value
     /// Can return an error if there is a problem with the parameters
-    fn action(&mut self, options: &mut Options, parameters: Vec<String>) -> Result<()>;
+    fn action(&mut self, options: &mut Options, parameters: Vec<OsString>) -> Result<()>;
 
     /// Called for every flag in the current parsing upon completion of the parsing
     ///
