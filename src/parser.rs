@@ -1,5 +1,7 @@
+use crate::FlagArgument;
+
 /// An object which parses command line arguments
-pub struct Parser {
+pub struct Parser<Options: 'static> {
     /// Program name to display for help
     name: Option<&'static str>,
 
@@ -17,12 +19,15 @@ pub struct Parser {
 
     /// Prefix for the long name of flag arguments
     long_prefix: &'static str,
+
+    /// The list of flag arguments
+    flags: &'static [&'static dyn FlagArgument<Options>],
 }
 
 const DEFAULT_SHORT_PREFIX: &str = "-";
 const DEFAULT_LONG_PREFIX: &str = "--";
 
-impl Parser {
+impl<Options> Parser<Options> {
     /// Creates a new [`Parser`]
     ///
     /// ## Return Value
@@ -35,6 +40,7 @@ impl Parser {
             epilogue: None,
             short_prefix: DEFAULT_SHORT_PREFIX,
             long_prefix: DEFAULT_LONG_PREFIX,
+            flags: &[],
         }
     }
 
@@ -107,6 +113,18 @@ impl Parser {
     /// Returns this [`Parser`] with the modified long prefix
     pub const fn long_prefix(mut self, long_prefix: &'static str) -> Self {
         self.long_prefix = long_prefix;
+        self
+    }
+
+    /// Sets the flag arguments
+    ///
+    /// ## Parameters
+    ///  * `flags` - The list of flag arguments
+    ///
+    /// ## Return Value
+    /// Returns this [`Parser`] with the provided flags
+    pub const fn flags(mut self, flags: &'static [&'static dyn FlagArgument<Options>]) -> Self {
+        self.flags = flags;
         self
     }
 }
