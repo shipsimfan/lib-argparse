@@ -1,10 +1,29 @@
 # ToDo List
  1. Add flag arguments
-     1. Add simple flag (zero or more arguments -> action)
+     1. Add flags to the parser macro
+     2. Add simple flag (zero or more arguments -> action)
      2. Add parsing flag (one argument -> FromStr/From<String>/From<&str>/From<OsString>/From<&OsStr> -> action | error_map)
      3. Add help flag (with no-exit)
          1. Add help generator
      4. Add version flag (with no-exit)
+     5. Add flag macros
+         1. Add help flag macro
+         2. Add version flag macro
+         3. Add simple flag macro
+         4. Add parsing flag macro
  2. Add terminal arguments
-     1. Add commands
-     2. Add positionals
+     1. Add terminal argument trait
+     2. Add terminal argument parsing
+     3. Update help generator for terminal arguments
+     4. Add terminal arguments to parser macro
+     5. Add commands
+         1. Add command struct
+         2. Add commands struct (List of command that implements terminal argument)
+     6. Add commands macro
+     7. Add positionals
+         1. Add positional trait
+         2. Add simple positional (one or more arguments -> action)
+         3. Add parsing positional (one argument -> FromStr/From<String>/From<&str>/From<OsString>/From<&OsStr> -> action | error_map)
+     8. Add positional macros
+         1. Add simple positional macro
+         2. Add parsing positional macro
