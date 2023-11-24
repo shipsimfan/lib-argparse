@@ -1,10 +1,11 @@
-use crate::{Error, FlagArgument, Result};
+use crate::FlagArgument;
 use std::{ffi::OsString, marker::PhantomData};
 
 /// A simple flag argument that can take zero or more parameters and pass them into an action
 pub struct SimpleFlagArgument<
     Options: 'static,
-    Action: Fn(&mut Options, Vec<OsString>) -> Result<()>,
+    Error: std::fmt::Display + 'static,
+    Action: Fn(&mut Options, Vec<OsString>) -> Result<(), Error>,
 > {
     /// The name to follow the short prefix
     short_name: Option<&'static str>,
@@ -33,8 +34,11 @@ pub struct SimpleFlagArgument<
     phantom: PhantomData<Options>,
 }
 
-impl<Options, Action: Fn(&mut Options, Vec<OsString>) -> Result<()>>
-    SimpleFlagArgument<Options, Action>
+impl<
+        Options,
+        Error: std::fmt::Display,
+        Action: Fn(&mut Options, Vec<OsString>) -> Result<(), Error>,
+    > SimpleFlagArgument<Options, Error, Action>
 {
     /// Creates a new [`SimpleFlagArgument`]
     pub const fn new(count: usize, action: Action) -> Self {
@@ -90,8 +94,11 @@ impl<Options, Action: Fn(&mut Options, Vec<OsString>) -> Result<()>>
     }
 }
 
-impl<Options, Action: Fn(&mut Options, Vec<OsString>) -> Result<()>> FlagArgument<Options>
-    for SimpleFlagArgument<Options, Action>
+impl<
+        Options,
+        Error: std::fmt::Display,
+        Action: Fn(&mut Options, Vec<OsString>) -> Result<(), Error>,
+    > FlagArgument<Options> for SimpleFlagArgument<Options, Error, Action>
 {
     fn short_name(&self) -> Option<&str> {
         self.short_name
@@ -109,14 +116,14 @@ impl<Options, Action: Fn(&mut Options, Vec<OsString>) -> Result<()>> FlagArgumen
         self.repeatable
     }
 
-    fn action(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<()> {
-        (self.action)(options, parameters)
+    fn action(&self, options: &mut Options, parameters: Vec<OsString>) -> crate::Result<()> {
+        (self.action)(options, parameters).map_err(|error| crate::Error::custom(error.to_string()))
     }
 
-    fn finalize(&self, ran: bool) -> Result<()> {
+    fn finalize(&self, ran: bool) -> crate::Result<()> {
         if let Some(message) = self.required {
             if !ran {
-                return Err(Error::missing_required(message));
+                return Err(crate::Error::missing_required(message));
             }
         }
 
