@@ -1,14 +1,18 @@
 use proc_macro_util::{
     ast::{Expression, Punctuated},
-    to_tokens, Delimiter, Parse, ToTokens, Token,
+    to_tokens, Delimiter, Generator, Parse, Parser, ToTokens, Token,
 };
 
 pub struct Flags<'a> {
-    flags: Punctuated<Expression<'a>, Token![,]>,
+    flags: Punctuated<Flag<'a>, Token![,]>,
+}
+
+struct Flag<'a> {
+    expression: Expression<'a>,
 }
 
 impl<'a> Parse<'a> for Flags<'a> {
-    fn parse(parser: &mut proc_macro_util::Parser<'a>) -> proc_macro_util::Result<Self> {
+    fn parse(parser: &mut Parser<'a>) -> proc_macro_util::Result<Self> {
         if parser.empty() {
             return Ok(Flags {
                 flags: Punctuated::new(),
@@ -43,7 +47,7 @@ impl<'a> Parse<'a> for Flags<'a> {
 }
 
 impl<'a> ToTokens for Flags<'a> {
-    fn to_tokens(&self, generator: &mut proc_macro_util::Generator) {
+    fn to_tokens(&self, generator: &mut Generator) {
         if self.flags.len() == 0 {
             return;
         }
@@ -52,6 +56,23 @@ impl<'a> ToTokens for Flags<'a> {
 
         to_tokens!(generator
             .flags(&[#flags])
+        );
+    }
+}
+
+impl<'a> Parse<'a> for Flag<'a> {
+    fn parse(parser: &mut Parser<'a>) -> proc_macro_util::Result<Self> {
+        let expression = parser.parse()?;
+
+        Ok(Flag { expression })
+    }
+}
+
+impl<'a> ToTokens for Flag<'a> {
+    fn to_tokens(&self, generator: &mut Generator) {
+        let expression = &self.expression;
+        to_tokens!(generator
+            &#expression
         );
     }
 }
