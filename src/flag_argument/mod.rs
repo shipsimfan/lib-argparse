@@ -101,6 +101,53 @@ pub trait FlagArgument<Options: 'static> {
     }
 }
 
+impl<Options: 'static, T: FlagArgument<Options>> FlagArgument<Options> for &T {
+    #[inline(always)]
+    fn short_name(&self) -> Option<&str> {
+        T::short_name(self)
+    }
+
+    #[inline(always)]
+    fn long_name(&self) -> Option<&str> {
+        T::long_name(self)
+    }
+
+    #[inline(always)]
+    fn count(&self) -> usize {
+        T::count(self)
+    }
+
+    #[inline(always)]
+    fn repeatable(&self) -> bool {
+        T::repeatable(self)
+    }
+
+    #[inline(always)]
+    fn action(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<()> {
+        T::action(self, options, parameters)
+    }
+
+    #[inline(always)]
+    fn finalize(&self, ran: bool) -> Result<()> {
+        T::finalize(self, ran)
+    }
+
+    #[inline(always)]
+    fn hint(&self) -> Option<&str> {
+        T::hint(self)
+    }
+
+    #[inline(always)]
+    fn description(&self) -> Option<&[&str]> {
+        T::description(self)
+    }
+
+    #[inline(always)]
+    fn class(&self) -> FlagClass {
+        T::class(self)
+    }
+}
+
 impl FlagClass {
     /// Should this flag display the help instead of running the action?
     ///
