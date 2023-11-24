@@ -1,5 +1,6 @@
 use proc_macro_util::{
     ast::{Expression, Punctuated},
+    to_tokens,
     tokens::Comma,
     Delimiter, Parse, ToTokens,
 };
@@ -29,6 +30,14 @@ impl<'a> Parse<'a> for Flags<'a> {
 
 impl<'a> ToTokens for Flags<'a> {
     fn to_tokens(&self, generator: &mut proc_macro_util::Generator) {
-        todo!()
+        if self.flags.len() == 0 {
+            return;
+        }
+
+        let flags = &self.flags;
+
+        to_tokens!(generator
+            .flags(&[#flags])
+        );
     }
 }
