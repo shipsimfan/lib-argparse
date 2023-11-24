@@ -13,6 +13,10 @@ pub enum FlagClass {
     HelpNoExit,
 }
 
+mod simple;
+
+pub use simple::SimpleFlagArgument;
+
 /// An argument triggered by a flag in the stream
 pub trait FlagArgument<Options: 'static> {
     /// Gets the short name for this flag
