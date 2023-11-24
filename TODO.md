@@ -1,6 +1,5 @@
 # ToDo List
  1. Add flag arguments
-     1. Add flags to the parser macro
      2. Add simple flag (zero or more arguments -> action)
      2. Add parsing flag (one argument -> FromStr/From<String>/From<&str>/From<OsString>/From<&OsStr> -> action | error_map)
      3. Add help flag (with no-exit)
