@@ -1,12 +1,10 @@
 use proc_macro_util::{
     ast::{Expression, Punctuated},
-    to_tokens,
-    tokens::Comma,
-    Delimiter, Parse, ToTokens,
+    to_tokens, Delimiter, Parse, ToTokens, Token,
 };
 
 pub struct Flags<'a> {
-    flags: Punctuated<Expression<'a>, Comma>,
+    flags: Punctuated<Expression<'a>, Token![,]>,
 }
 
 impl<'a> Parse<'a> for Flags<'a> {
@@ -24,7 +22,23 @@ impl<'a> Parse<'a> for Flags<'a> {
             return Err(parser.error("expected square bracket delimiters"));
         }
 
-        todo!()
+        let mut flags = Punctuated::new();
+        let mut parser = group.tokens();
+        while !parser.empty() {
+            flags.push_element(parser.parse()?);
+
+            if parser.peek::<Token![,]>() {
+                flags.push_seperator(parser.parse()?);
+            } else {
+                break;
+            }
+        }
+
+        if parser.empty() {
+            Ok(Flags { flags })
+        } else {
+            Err(parser.error("expected a ',' or the end of the flags"))
+        }
     }
 }
 
