@@ -1,17 +1,21 @@
+use flags::Flags;
 use proc_macro_util::{
     to_tokens,
     tokens::{Equals, Identifier, Literal},
     Generator, Parse, Result, ToTokens, Token,
 };
 
-pub struct Parser {
+mod flags;
+
+pub struct Parser<'a> {
     variable_name: Identifier,
     name: Literal,
     description: Option<Literal>,
+    flags: Flags<'a>,
 }
 
-impl Parse for Parser {
-    fn parse(parser: &mut proc_macro_util::Parser) -> Result<Self> {
+impl<'a> Parse<'a> for Parser<'a> {
+    fn parse(parser: &mut proc_macro_util::Parser<'a>) -> Result<Self> {
         let variable_name = parser
             .parse()
             .map_err(|error| error.append("expected a variable name for the parser"))?;
@@ -24,21 +28,24 @@ impl Parse for Parser {
         let description = parser
             .parse()
             .map_err(|error| error.append("expected a description or the end"))?;
+        let flags = parser.parse()?;
 
         Ok(Parser {
             variable_name,
             name,
             description,
+            flags,
         })
     }
 }
 
-impl ToTokens for Parser {
+impl<'a> ToTokens for Parser<'a> {
     fn to_tokens(&self, generator: &mut Generator) {
         let Parser {
             variable_name,
             name,
             description,
+            flags,
         } = self;
 
         to_tokens!(generator
@@ -50,6 +57,8 @@ impl ToTokens for Parser {
                 .description(#description)
             );
         }
+
+        flags.to_tokens(generator);
 
         Token![;].to_tokens(generator);
     }
