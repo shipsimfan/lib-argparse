@@ -144,10 +144,14 @@ impl<'a, Options> Parser<'a, Options> {
         &self,
         options: Options,
         arguments: I,
+        prefix_argument: Option<OsString>,
     ) -> Result<Options> {
         self.do_parse(
             options,
             &mut ArgumentStream::new(&mut arguments.into_iter()),
+            prefix_argument
+                .map(|prefix_argument| vec![prefix_argument])
+                .unwrap_or(Vec::new()),
         )
     }
 
@@ -163,10 +167,14 @@ impl<'a, Options> Parser<'a, Options> {
         &self,
         options: Options,
         arguments: I,
+        prefix_argument: Option<OsString>,
     ) -> Result<Options> {
         self.do_parse(
             options,
             &mut ArgumentStream::new_os(&mut arguments.into_iter()),
+            prefix_argument
+                .map(|prefix_argument| vec![prefix_argument])
+                .unwrap_or(Vec::new()),
         )
     }
 
@@ -178,7 +186,10 @@ impl<'a, Options> Parser<'a, Options> {
     /// ## Return Value
     /// Returns the changed options if parsing is successful, returns the error otherwise.
     pub fn parse_env(&self, options: Options) -> Result<Options> {
-        self.parse_os(options, std::env::args_os())
+        let mut args = std::env::args_os();
+        let prefix = args.next().unwrap();
+
+        self.parse_os(options, args, Some(prefix))
     }
 
     /// Parse arguments from an [`ArgumentStream`]
@@ -189,10 +200,12 @@ impl<'a, Options> Parser<'a, Options> {
     ///
     /// ## Return Value
     /// Returns the changed options if parsing is successful, returns the error otherwise.
-    fn do_parse(&self, mut options: Options, stream: &mut ArgumentStream) -> Result<Options> {
-        // Remove the zero argument
-        let zero_argument = stream.next_os().ok_or_else(Error::missing_zero_argument)?;
-
+    fn do_parse(
+        &self,
+        mut options: Options,
+        stream: &mut ArgumentStream,
+        command_list: Vec<OsString>,
+    ) -> Result<Options> {
         // Mark all flags as not ran
         let mut flags_ran = vec![false; self.flags.len()];
 
