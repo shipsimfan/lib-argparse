@@ -29,6 +29,9 @@ pub struct ParsingFlagArgument<
     /// The action to be called upon matching
     action: Action,
 
+    /// The flag group this flag belongs to
+    group: Option<&'a str>,
+
     /// The hint to be displayed in the help
     hint: Option<&'a dyn std::fmt::Display>,
 
@@ -58,6 +61,7 @@ impl<
             repeatable: false,
             required: None,
             action,
+            group: None,
             hint: None,
             description: None,
             phantom_options: PhantomData,
@@ -87,6 +91,12 @@ impl<
     /// Sets if this flag is required and the message to be displayed if it is
     pub const fn required(mut self, required: Option<&'a dyn std::fmt::Display>) -> Self {
         self.required = required;
+        self
+    }
+
+    /// Sets the flag group this flag is apart of
+    pub const fn group(mut self, group: &'a str) -> Self {
+        self.group = Some(group);
         self
     }
 
@@ -158,6 +168,10 @@ impl<
 
     fn repeatable(&self) -> bool {
         self.repeatable
+    }
+
+    fn group(&self) -> Option<&str> {
+        self.group
     }
 
     fn hint(&self) -> Option<&dyn std::fmt::Display> {

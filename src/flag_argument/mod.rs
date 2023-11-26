@@ -74,6 +74,9 @@ pub trait FlagArgument<'a, Options: 'a> {
         Ok(())
     }
 
+    /// Gets the flag group this flag belongs in, if it is in one
+    fn group(&self) -> Option<&str>;
+
     /// Gets the hint for displaying in the help
     ///
     /// ## Return Value
@@ -132,6 +135,10 @@ impl<'a, Options: 'a, T: FlagArgument<'a, Options>> FlagArgument<'a, Options> fo
     #[inline(always)]
     fn finalize(&self, ran: bool) -> Result<()> {
         T::finalize(self, ran)
+    }
+
+    fn group(&self) -> Option<&str> {
+        T::group(self)
     }
 
     #[inline(always)]
