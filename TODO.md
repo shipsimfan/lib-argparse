@@ -1,10 +1,9 @@
 # ToDo List
  1. Add flag arguments
-     1. Add parsing flag (one argument -> FromStr/From<String>/From<&str>/From<OsString>/From<&OsStr> -> action | error_map)
-     2. Add help flag (with no-exit)
+     1. Add help flag (with no-exit)
          1. Add help generator
-     3. Add version flag (with no-exit)
-     4. Add flag macros
+     2. Add version flag (with no-exit)
+     3. Add flag macros
          1. Add help flag macro
          2. Add version flag macro
          3. Add simple flag macro

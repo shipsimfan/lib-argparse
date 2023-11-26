@@ -15,6 +15,6 @@ mod flag_argument;
 mod parser;
 
 pub use error::{Error, Result};
-pub use flag_argument::{FlagArgument, SimpleFlagArgument};
+pub use flag_argument::{FlagArgument, ParsingFlagArgument, SimpleFlagArgument};
 pub use macros::parser;
 pub use parser::Parser;

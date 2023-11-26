@@ -13,8 +13,10 @@ pub enum FlagClass {
     HelpNoExit,
 }
 
+mod parsing;
 mod simple;
 
+pub use parsing::ParsingFlagArgument;
 pub use simple::SimpleFlagArgument;
 
 /// An argument triggered by a flag in the stream
