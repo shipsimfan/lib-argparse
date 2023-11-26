@@ -53,12 +53,12 @@ impl<'a> ToTokens for Parser<'a> {
         } = self;
 
         to_tokens!(generator
-            const #variable_name: ::argparse::Parser<#options_type> = ::argparse::Parser::new().name(#name)
+            const #variable_name: ::argparse::Parser<#options_type> = ::argparse::Parser::new().name(&#name)
         );
 
         if let Some(description) = description {
             to_tokens!(generator
-                .description(#description)
+                .description(&#description)
             );
         }
 
