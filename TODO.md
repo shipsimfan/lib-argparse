@@ -1,5 +1,7 @@
 # ToDo List
- 1. Add flag arguments
+ 1. Generalize to std::fmt::Display instead of str
+ 2. Generalize to 'a instead of 'static
+ 3. Add flag arguments
      1. Add flag groups
      2. Add help flag (with no-exit)
          1. Add help generator
@@ -9,7 +11,7 @@
          2. Add version flag macro
          3. Add simple flag macro
          4. Add parsing flag macro
- 2. Add terminal arguments
+ 4. Add terminal arguments
      1. Add terminal argument trait
      2. Add terminal argument parsing
      3. Update help generator for terminal arguments
