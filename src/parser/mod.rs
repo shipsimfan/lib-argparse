@@ -5,16 +5,16 @@ use stream::ArgumentStream;
 /// An object which parses command line arguments
 pub struct Parser<Options: 'static> {
     /// Program name to display for help
-    name: Option<&'static str>,
+    name: Option<&'static dyn std::fmt::Display>,
 
     /// Program description displayed in the help
-    description: Option<&'static str>,
+    description: Option<&'static dyn std::fmt::Display>,
 
     /// Prologue for help
-    prologue: Option<&'static str>,
+    prologue: Option<&'static dyn std::fmt::Display>,
 
     /// Epilogue for help
-    epilogue: Option<&'static str>,
+    epilogue: Option<&'static dyn std::fmt::Display>,
 
     /// Prefix for the short name of flag arguments
     short_prefix: &'static str,
@@ -55,7 +55,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified name
-    pub const fn name(mut self, name: &'static str) -> Self {
+    pub const fn name(mut self, name: &'static dyn std::fmt::Display) -> Self {
         self.name = Some(name);
         self
     }
@@ -67,7 +67,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified description
-    pub const fn description(mut self, description: &'static str) -> Self {
+    pub const fn description(mut self, description: &'static dyn std::fmt::Display) -> Self {
         self.description = Some(description);
         self
     }
@@ -79,7 +79,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified prologue
-    pub const fn prologue(mut self, prologue: &'static str) -> Self {
+    pub const fn prologue(mut self, prologue: &'static dyn std::fmt::Display) -> Self {
         self.prologue = Some(prologue);
         self
     }
@@ -91,7 +91,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified epilogue
-    pub const fn epilogue(mut self, epilogue: &'static str) -> Self {
+    pub const fn epilogue(mut self, epilogue: &'static dyn std::fmt::Display) -> Self {
         self.epilogue = Some(epilogue);
         self
     }

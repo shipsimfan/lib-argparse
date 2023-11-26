@@ -29,10 +29,10 @@ pub struct SimpleFlagArgument<
     action: Action,
 
     /// The hint to be displayed in the help
-    hint: Option<&'static str>,
+    hint: Option<&'static dyn std::fmt::Display>,
 
     /// The description to be displayed in the help
-    description: Option<&'static [&'static str]>,
+    description: Option<&'static [&'static dyn std::fmt::Display]>,
 
     phantom: PhantomData<Options>,
 }
@@ -86,7 +86,7 @@ impl<
     }
 
     /// Sets if the hint to be displayed in the help
-    pub const fn hint(mut self, hint: &'static str) -> Self {
+    pub const fn hint(mut self, hint: &'static dyn std::fmt::Display) -> Self {
         self.hint = Some(hint);
         self
     }
@@ -94,7 +94,10 @@ impl<
     /// Sets if the description to be displayed in the help
     ///
     /// Each value in the slice will be dislayed on its own line
-    pub const fn description(mut self, description: &'static [&'static str]) -> Self {
+    pub const fn description(
+        mut self,
+        description: &'static [&'static dyn std::fmt::Display],
+    ) -> Self {
         self.description = Some(description);
         self
     }
@@ -140,11 +143,11 @@ impl<
         Ok(())
     }
 
-    fn hint(&self) -> Option<&str> {
+    fn hint(&self) -> Option<&dyn std::fmt::Display> {
         self.hint
     }
 
-    fn description(&self) -> Option<&[&str]> {
+    fn description(&self) -> Option<&[&dyn std::fmt::Display]> {
         self.description
     }
 }

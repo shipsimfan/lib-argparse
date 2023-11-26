@@ -78,7 +78,7 @@ pub trait FlagArgument<Options: 'static> {
     ///
     /// ## Return Value
     /// Returns the hint if it has one
-    fn hint(&self) -> Option<&str>;
+    fn hint(&self) -> Option<&dyn std::fmt::Display>;
 
     /// Gets the description for displaying the help
     ///
@@ -88,7 +88,7 @@ pub trait FlagArgument<Options: 'static> {
     /// ## Remarks
     /// This function allows multi-line help descriptions by providing a slice return. Each element
     /// in the slice will be one line.
-    fn description(&self) -> Option<&[&str]>;
+    fn description(&self) -> Option<&[&dyn std::fmt::Display]>;
 
     /// Gets the class of flag
     ///
@@ -135,12 +135,12 @@ impl<Options: 'static, T: FlagArgument<Options>> FlagArgument<Options> for &T {
     }
 
     #[inline(always)]
-    fn hint(&self) -> Option<&str> {
+    fn hint(&self) -> Option<&dyn std::fmt::Display> {
         T::hint(self)
     }
 
     #[inline(always)]
-    fn description(&self) -> Option<&[&str]> {
+    fn description(&self) -> Option<&[&dyn std::fmt::Display]> {
         T::description(self)
     }
 
