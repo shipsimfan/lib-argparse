@@ -20,7 +20,7 @@ pub use parsing::ParsingFlagArgument;
 pub use simple::SimpleFlagArgument;
 
 /// An argument triggered by a flag in the stream
-pub trait FlagArgument<Options: 'static> {
+pub trait FlagArgument<'a, Options: 'a> {
     /// Gets the short name for this flag
     ///
     /// ## Return Value
@@ -103,7 +103,7 @@ pub trait FlagArgument<Options: 'static> {
     }
 }
 
-impl<Options: 'static, T: FlagArgument<Options>> FlagArgument<Options> for &T {
+impl<'a, Options: 'a, T: FlagArgument<'a, Options>> FlagArgument<'a, Options> for &T {
     #[inline(always)]
     fn short_name(&self) -> Option<&str> {
         T::short_name(self)

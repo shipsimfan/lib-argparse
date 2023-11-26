@@ -1,7 +1,5 @@
-use std::borrow::Cow;
-
 /// A result of parsing arguments
-pub type Result<T> = std::result::Result<T, Error>;
+pub type Result<'a, T> = std::result::Result<T, Error<'a>>;
 
 /// A class of error that occurred
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -31,13 +29,19 @@ pub enum ErrorKind {
     Custom,
 }
 
-/// An error that occurred while parsing arguments
-pub struct Error {
-    kind: ErrorKind,
-    message: Cow<'static, str>,
+pub enum ErrorMessage<'a> {
+    Display(&'a dyn std::fmt::Display),
+    Str(&'a str),
+    Owned(String),
 }
 
-impl Error {
+/// An error that occurred while parsing arguments
+pub struct Error<'a> {
+    kind: ErrorKind,
+    message: ErrorMessage<'a>,
+}
+
+impl<'a> Error<'a> {
     /// Creates a new [`Error`]
     ///
     /// ## Parameters
@@ -46,7 +50,7 @@ impl Error {
     ///
     /// ## Return Value
     /// Returns the newly created [`Error`]
-    pub fn new<S: Into<Cow<'static, str>>>(kind: ErrorKind, message: S) -> Self {
+    pub fn new<S: Into<ErrorMessage<'a>>>(kind: ErrorKind, message: S) -> Self {
         Error {
             kind,
             message: message.into(),
@@ -60,7 +64,7 @@ impl Error {
     ///
     /// ## Return Value
     /// Returns the newly created [`Error`]
-    pub fn missing_parameters<S: Into<Cow<'static, str>>>(message: S) -> Self {
+    pub fn missing_parameters<S: Into<ErrorMessage<'a>>>(message: S) -> Self {
         Error::new(ErrorKind::MissingParameters, message)
     }
 
@@ -71,7 +75,7 @@ impl Error {
     ///
     /// ## Return Value
     /// Returns the newly created [`Error`]
-    pub fn missing_required<S: Into<Cow<'static, str>>>(message: S) -> Self {
+    pub fn missing_required<S: Into<ErrorMessage<'a>>>(message: S) -> Self {
         Error::new(ErrorKind::MissingRequired, message)
     }
 
@@ -101,7 +105,7 @@ impl Error {
     ///
     /// ## Return Value
     /// Returns the newly created [`Error`]
-    pub fn unexpected_argument<S: Into<Cow<'static, str>>>(message: S) -> Self {
+    pub fn unexpected_argument<S: Into<ErrorMessage<'a>>>(message: S) -> Self {
         Error::new(ErrorKind::UnexpectedArgument, message)
     }
 
@@ -112,7 +116,7 @@ impl Error {
     ///
     /// ## Return Value
     /// Returns the newly created [`Error`]
-    pub fn unknown_flag<S: Into<Cow<'static, str>>>(message: S) -> Self {
+    pub fn unknown_flag<S: Into<ErrorMessage<'a>>>(message: S) -> Self {
         Error::new(ErrorKind::UnknownFlag, message)
     }
 
@@ -123,7 +127,7 @@ impl Error {
     ///
     /// ## Return Value
     /// Returns the newly created [`Error`]
-    pub fn repeated_flag<S: Into<Cow<'static, str>>>(message: S) -> Self {
+    pub fn repeated_flag<S: Into<ErrorMessage<'a>>>(message: S) -> Self {
         Error::new(ErrorKind::RepeatedFlag, message)
     }
 
@@ -134,7 +138,7 @@ impl Error {
     ///
     /// ## Return Value
     /// Returns the newly created [`Error`]
-    pub fn custom<S: Into<Cow<'static, str>>>(message: S) -> Self {
+    pub fn custom<S: Into<ErrorMessage<'a>>>(message: S) -> Self {
         Error::new(ErrorKind::Custom, message)
     }
 
@@ -150,27 +154,73 @@ impl Error {
     ///
     /// ## Return Value
     /// Returns the message for the error
-    pub fn message(&self) -> &str {
+    pub fn message(&self) -> &dyn std::fmt::Display {
         &self.message
     }
-}
 
-impl std::error::Error for Error {}
-
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.message)
+    /// Converts the contents to be owned and no longer borrowed
+    pub fn to_owned(self) -> Error<'static> {
+        Error {
+            kind: self.kind,
+            message: self.message.to_owned(),
+        }
     }
 }
 
-impl std::fmt::Debug for Error {
+impl<'a> std::error::Error for Error<'a> {}
+
+impl<'a> std::fmt::Display for Error<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.message.fmt(f)
+    }
+}
+
+impl<'a> std::fmt::Debug for Error<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self, f)
     }
 }
 
-impl From<std::ffi::OsString> for Error {
+impl<'a> From<std::ffi::OsString> for Error<'a> {
     fn from(_: std::ffi::OsString) -> Self {
         Error::invalid_utf8()
+    }
+}
+
+impl<'a> ErrorMessage<'a> {
+    pub fn to_owned(self) -> ErrorMessage<'static> {
+        match self {
+            ErrorMessage::Display(display) => ErrorMessage::Owned(display.to_string()),
+            ErrorMessage::Str(str) => ErrorMessage::Owned(str.to_owned()),
+            ErrorMessage::Owned(string) => ErrorMessage::Owned(string),
+        }
+    }
+}
+
+impl<'a> std::fmt::Display for ErrorMessage<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ErrorMessage::Display(display) => display.fmt(f),
+            ErrorMessage::Str(str) => f.write_str(str),
+            ErrorMessage::Owned(owned) => f.write_str(owned),
+        }
+    }
+}
+
+impl<'a, T: std::fmt::Display> From<&'a T> for ErrorMessage<'a> {
+    fn from(display: &'a T) -> Self {
+        ErrorMessage::Display(display)
+    }
+}
+
+impl<'a> From<&'a str> for ErrorMessage<'a> {
+    fn from(value: &'a str) -> Self {
+        ErrorMessage::Str(value)
+    }
+}
+
+impl<'a> From<String> for ErrorMessage<'a> {
+    fn from(string: String) -> Self {
+        ErrorMessage::Owned(string)
     }
 }

@@ -3,27 +3,27 @@ use std::ffi::OsString;
 use stream::ArgumentStream;
 
 /// An object which parses command line arguments
-pub struct Parser<Options: 'static> {
+pub struct Parser<'a, Options: 'a> {
     /// Program name to display for help
-    name: Option<&'static dyn std::fmt::Display>,
+    name: Option<&'a dyn std::fmt::Display>,
 
     /// Program description displayed in the help
-    description: Option<&'static dyn std::fmt::Display>,
+    description: Option<&'a dyn std::fmt::Display>,
 
     /// Prologue for help
-    prologue: Option<&'static dyn std::fmt::Display>,
+    prologue: Option<&'a dyn std::fmt::Display>,
 
     /// Epilogue for help
-    epilogue: Option<&'static dyn std::fmt::Display>,
+    epilogue: Option<&'a dyn std::fmt::Display>,
 
     /// Prefix for the short name of flag arguments
-    short_prefix: &'static str,
+    short_prefix: &'a str,
 
     /// Prefix for the long name of flag arguments
-    long_prefix: &'static str,
+    long_prefix: &'a str,
 
     /// The list of flag arguments
-    flags: &'static [&'static dyn FlagArgument<Options>],
+    flags: &'a [&'a dyn FlagArgument<'a, Options>],
 }
 
 const DEFAULT_SHORT_PREFIX: &str = "-";
@@ -31,7 +31,7 @@ const DEFAULT_LONG_PREFIX: &str = "--";
 
 mod stream;
 
-impl<Options> Parser<Options> {
+impl<'a, Options> Parser<'a, Options> {
     /// Creates a new [`Parser`]
     ///
     /// ## Return Value
@@ -55,7 +55,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified name
-    pub const fn name(mut self, name: &'static dyn std::fmt::Display) -> Self {
+    pub const fn name(mut self, name: &'a dyn std::fmt::Display) -> Self {
         self.name = Some(name);
         self
     }
@@ -67,7 +67,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified description
-    pub const fn description(mut self, description: &'static dyn std::fmt::Display) -> Self {
+    pub const fn description(mut self, description: &'a dyn std::fmt::Display) -> Self {
         self.description = Some(description);
         self
     }
@@ -79,7 +79,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified prologue
-    pub const fn prologue(mut self, prologue: &'static dyn std::fmt::Display) -> Self {
+    pub const fn prologue(mut self, prologue: &'a dyn std::fmt::Display) -> Self {
         self.prologue = Some(prologue);
         self
     }
@@ -91,7 +91,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified epilogue
-    pub const fn epilogue(mut self, epilogue: &'static dyn std::fmt::Display) -> Self {
+    pub const fn epilogue(mut self, epilogue: &'a dyn std::fmt::Display) -> Self {
         self.epilogue = Some(epilogue);
         self
     }
@@ -103,7 +103,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified short prefix
-    pub const fn short_prefix(mut self, short_prefix: &'static str) -> Self {
+    pub const fn short_prefix(mut self, short_prefix: &'a str) -> Self {
         self.short_prefix = short_prefix;
         self
     }
@@ -115,7 +115,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified long prefix
-    pub const fn long_prefix(mut self, long_prefix: &'static str) -> Self {
+    pub const fn long_prefix(mut self, long_prefix: &'a str) -> Self {
         self.long_prefix = long_prefix;
         self
     }
@@ -127,7 +127,7 @@ impl<Options> Parser<Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the provided flags
-    pub const fn flags(mut self, flags: &'static [&'static dyn FlagArgument<Options>]) -> Self {
+    pub const fn flags(mut self, flags: &'a [&'a dyn FlagArgument<'a, Options>]) -> Self {
         self.flags = flags;
         self
     }
@@ -310,7 +310,7 @@ impl<Options> Parser<Options> {
         &self,
         short_name: Option<&str>,
         long_name: Option<&str>,
-    ) -> Option<(&dyn FlagArgument<Options>, usize)> {
+    ) -> Option<(&'a dyn FlagArgument<'a, Options>, usize)> {
         assert!(short_name.is_some() || long_name.is_some());
 
         for (i, flag) in self.flags.iter().enumerate() {
