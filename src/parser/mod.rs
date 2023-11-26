@@ -55,7 +55,7 @@ impl<'a, Options> Parser<'a, Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified name
-    pub const fn name(mut self, name: &'a dyn std::fmt::Display) -> Self {
+    pub const fn name<S: std::fmt::Display>(mut self, name: &'a S) -> Self {
         self.name = Some(name);
         self
     }
@@ -67,7 +67,7 @@ impl<'a, Options> Parser<'a, Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified description
-    pub const fn description(mut self, description: &'a dyn std::fmt::Display) -> Self {
+    pub const fn description<S: std::fmt::Display>(mut self, description: &'a S) -> Self {
         self.description = Some(description);
         self
     }
@@ -79,7 +79,7 @@ impl<'a, Options> Parser<'a, Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified prologue
-    pub const fn prologue(mut self, prologue: &'a dyn std::fmt::Display) -> Self {
+    pub const fn prologue<S: std::fmt::Display>(mut self, prologue: &'a S) -> Self {
         self.prologue = Some(prologue);
         self
     }
@@ -91,7 +91,7 @@ impl<'a, Options> Parser<'a, Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified epilogue
-    pub const fn epilogue(mut self, epilogue: &'a dyn std::fmt::Display) -> Self {
+    pub const fn epilogue<S: std::fmt::Display>(mut self, epilogue: &'a S) -> Self {
         self.epilogue = Some(epilogue);
         self
     }

@@ -92,7 +92,7 @@ impl<
     }
 
     /// Sets if the hint to be displayed in the help
-    pub const fn hint(mut self, hint: &'a dyn std::fmt::Display) -> Self {
+    pub const fn hint<S: std::fmt::Display>(mut self, hint: &'a S) -> Self {
         self.hint = Some(hint);
         self
     }
