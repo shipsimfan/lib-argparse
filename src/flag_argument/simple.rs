@@ -16,6 +16,9 @@ pub struct SimpleFlagArgument<
     /// The number of parameters to accept
     count: usize,
 
+    /// The message displayed if less than `count` parameters are passed
+    missing_parameters: &'static str,
+
     /// Is this flag repeatable?
     repeatable: bool,
 
@@ -41,11 +44,14 @@ impl<
     > SimpleFlagArgument<Options, Error, Action>
 {
     /// Creates a new [`SimpleFlagArgument`]
-    pub const fn new(count: usize, action: Action) -> Self {
+    ///
+    /// This structure guarantees that exactly `count` parameters will be passed to `action`
+    pub const fn new(count: usize, missing_parameters: &'static str, action: Action) -> Self {
         SimpleFlagArgument {
             short_name: None,
             long_name: None,
             count,
+            missing_parameters,
             repeatable: false,
             required: None,
             action,
@@ -117,6 +123,10 @@ impl<
     }
 
     fn action(&self, options: &mut Options, parameters: Vec<OsString>) -> crate::Result<()> {
+        if parameters.len() != self.count {
+            return Err(crate::Error::missing_parameters(self.missing_parameters));
+        }
+
         (self.action)(options, parameters).map_err(|error| crate::Error::custom(error.to_string()))
     }
 
