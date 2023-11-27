@@ -17,10 +17,12 @@ pub enum FlagClass {
 mod help;
 mod parsing;
 mod simple;
+mod version;
 
-pub use help::HelpFlag;
+pub use help::HelpFlagArgument;
 pub use parsing::ParsingFlagArgument;
 pub use simple::SimpleFlagArgument;
+pub use version::VersionFlagArgument;
 
 /// An argument triggered by a flag in the stream
 pub trait FlagArgument<'a, Options: 'a> {

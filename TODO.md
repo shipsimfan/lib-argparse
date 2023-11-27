@@ -1,7 +1,6 @@
 # ToDo List
  1. Add flag arguments
-     1. Add version flag (with no-exit)
-     2. Add flag macros
+     1. Add flag macros
          1. Add help flag macro
          2. Add version flag macro
          3. Add simple flag macro

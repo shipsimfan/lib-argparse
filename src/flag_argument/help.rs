@@ -1,7 +1,7 @@
 use crate::{FlagArgument, FlagClass, Result};
 
 /// A flag which displays a help message
-pub struct HelpFlag<'a> {
+pub struct HelpFlagArgument<'a> {
     /// The name to follow the short prefix
     short_name: Option<&'a str>,
 
@@ -15,10 +15,10 @@ pub struct HelpFlag<'a> {
     exit: FlagClass,
 }
 
-impl<'a> HelpFlag<'a> {
+impl<'a> HelpFlagArgument<'a> {
     /// Creates a new [`HelpFlag`]
     pub const fn new() -> Self {
-        HelpFlag {
+        HelpFlagArgument {
             short_name: None,
             long_name: None,
             group: None,
@@ -57,7 +57,7 @@ impl<'a> HelpFlag<'a> {
     }
 }
 
-impl<'a, Options: 'a> FlagArgument<'a, Options> for HelpFlag<'a> {
+impl<'a, Options: 'a> FlagArgument<'a, Options> for HelpFlagArgument<'a> {
     fn short_name(&self) -> Option<&str> {
         self.short_name
     }
