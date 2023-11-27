@@ -19,7 +19,6 @@ pub struct Parser<'a, Options: 'a> {
     /// The usage description of the program
     ///
     /// The specified string can have special values:
-    ///  * "%f" - Generates the flags usage
     ///  * "%t" - Generates the terminal usage
     ///  * "%N" - Where "N" can be any number, generates the given command list value
     ///  * "%c" - Displays all values in the command list seperated by spaces
@@ -99,7 +98,6 @@ impl<'a, Options> Parser<'a, Options> {
     /// Sets the usage description of the program
     ///
     /// The specified string can have special values:
-    ///  * "%f" - Generates the flags usage
     ///  * "%t" - Generates the terminal usage
     ///  * "%N" - Where "N" can be any number, generates the given command list value
     ///  * "%c" - Displays all values in the command list seperated by spaces
@@ -259,12 +257,17 @@ impl<'a, Options> Parser<'a, Options> {
         let mut flags_ran = vec![false; self.flags.len()];
 
         while let Some(argument) = stream.next_os() {
-            let argument =
-                match self.handle_flag_argument(argument, &mut options, stream, &mut flags_ran)? {
-                    FlagArgumentResult::NotFlag(argument) => argument,
-                    FlagArgumentResult::Handled => continue,
-                    FlagArgumentResult::Help => return Ok(None),
-                };
+            let argument = match self.handle_flag_argument(
+                argument,
+                &mut options,
+                stream,
+                &mut flags_ran,
+                &command_list,
+            )? {
+                FlagArgumentResult::NotFlag(argument) => argument,
+                FlagArgumentResult::Handled => continue,
+                FlagArgumentResult::Help => return Ok(None),
+            };
 
             return Err(Error::unexpected_argument(format!(
                 "unexpected argument \"{}\"",
@@ -298,6 +301,7 @@ impl<'a, Options> Parser<'a, Options> {
         options: &mut Options,
         stream: &mut ArgumentStream,
         flags_ran: &mut [bool],
+        command_list: &[OsString],
     ) -> Result<FlagArgumentResult> {
         // Check for long or short prefix
         let is_long = argument
@@ -339,7 +343,7 @@ impl<'a, Options> Parser<'a, Options> {
 
             // Check if the flag is a help flag
             if flag_argument.class().is_help() {
-                help::generate(self.name, self.description);
+                help::generate(self.name, self.description, self.usage, command_list);
 
                 if flag_argument.class() == FlagClass::Help {
                     std::process::exit(0);
