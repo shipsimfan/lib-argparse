@@ -10,8 +10,23 @@ pub struct Parser<'a, Options: 'a> {
     /// Program description displayed in the help
     description: Option<&'a dyn std::fmt::Display>,
 
+    /// The usage description of the program
+    ///
+    /// The specified string can have special values:
+    ///  * "%f" - Generates the flags usage
+    ///  * "%t" - Generates the terminal usage
+    ///  * "%N" - Where "N" can be any number, generates the given command list value
+    ///  * "%c" - Displays all values in the command list seperated by spaces
+    ///
+    /// A backslash preceding any character will print out just the character and won't process it
+    /// for special values.
+    usage: Option<&'a str>,
+
     /// Prologue for help
     prologue: Option<&'a dyn std::fmt::Display>,
+
+    /// The header for non-grouped flags
+    flag_header: Option<&'a dyn std::fmt::Display>,
 
     /// Epilogue for help
     epilogue: Option<&'a dyn std::fmt::Display>,
@@ -40,7 +55,9 @@ impl<'a, Options> Parser<'a, Options> {
         Parser {
             name: None,
             description: None,
+            usage: None,
             prologue: None,
+            flag_header: None,
             epilogue: None,
             short_prefix: DEFAULT_SHORT_PREFIX,
             long_prefix: DEFAULT_LONG_PREFIX,
@@ -72,6 +89,21 @@ impl<'a, Options> Parser<'a, Options> {
         self
     }
 
+    /// Sets the usage description of the program
+    ///
+    /// The specified string can have special values:
+    ///  * "%f" - Generates the flags usage
+    ///  * "%t" - Generates the terminal usage
+    ///  * "%N" - Where "N" can be any number, generates the given command list value
+    ///  * "%c" - Displays all values in the command list seperated by spaces
+    ///
+    /// A backslash preceding any character will print out just the character and won't process it
+    /// for special values.
+    pub const fn usage(mut self, usage: &'a str) -> Self {
+        self.usage = Some(usage);
+        self
+    }
+
     /// Sets the prologue displayed in the help
     ///
     /// ## Parameters
@@ -81,6 +113,12 @@ impl<'a, Options> Parser<'a, Options> {
     /// Returns this [`Parser`] with the modified prologue
     pub const fn prologue<S: std::fmt::Display>(mut self, prologue: &'a S) -> Self {
         self.prologue = Some(prologue);
+        self
+    }
+
+    /// Sets the header for non-grouped flags
+    pub const fn flag_header<S: std::fmt::Display>(mut self, flag_header: &'a S) -> Self {
+        self.flag_header = Some(flag_header);
         self
     }
 
