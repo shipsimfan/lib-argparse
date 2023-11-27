@@ -42,6 +42,8 @@ fn parse_usage(mut usage: Peekable<Chars>, command_list: &[OsString]) {
                 }
                 _ => print!("%{}", c),
             }
+        } else {
+            print!("{}", c);
         }
     }
     println!();
