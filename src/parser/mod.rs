@@ -1,6 +1,12 @@
-use crate::{Error, FlagArgument, Result};
+use crate::{Error, FlagArgument, FlagClass, Result};
 use std::ffi::OsString;
 use stream::ArgumentStream;
+
+enum FlagArgumentResult {
+    Handled,
+    Help,
+    NotFlag(OsString),
+}
 
 /// An object which parses command line arguments
 pub struct Parser<'a, Options: 'a> {
@@ -44,6 +50,7 @@ pub struct Parser<'a, Options: 'a> {
 const DEFAULT_SHORT_PREFIX: &str = "-";
 const DEFAULT_LONG_PREFIX: &str = "--";
 
+mod help;
 mod stream;
 
 impl<'a, Options> Parser<'a, Options> {
@@ -177,13 +184,14 @@ impl<'a, Options> Parser<'a, Options> {
     ///  * `arguments` - The list of arguments to be parsed
     ///
     /// ## Return Value
-    /// Returns the changed options if parsing is successful, returns the error otherwise.
+    /// Returns the changed options if parsing is successful and no help flag was matched, returns
+    /// the error otherwise.
     pub fn parse<I: IntoIterator<Item = String>>(
         &self,
         options: Options,
         arguments: I,
         prefix_argument: Option<OsString>,
-    ) -> Result<Options> {
+    ) -> Result<Option<Options>> {
         self.do_parse(
             options,
             &mut ArgumentStream::new(&mut arguments.into_iter()),
@@ -200,13 +208,14 @@ impl<'a, Options> Parser<'a, Options> {
     ///  * `arguments` - The list of arguments to be parsed
     ///
     /// ## Return Value
-    /// Returns the changed options if parsing is successful, returns the error otherwise.
+    /// Returns the changed options if parsing is successful and no help flag was matched, returns
+    /// the error otherwise.
     pub fn parse_os<I: IntoIterator<Item = OsString>>(
         &self,
         options: Options,
         arguments: I,
         prefix_argument: Option<OsString>,
-    ) -> Result<Options> {
+    ) -> Result<Option<Options>> {
         self.do_parse(
             options,
             &mut ArgumentStream::new_os(&mut arguments.into_iter()),
@@ -222,8 +231,9 @@ impl<'a, Options> Parser<'a, Options> {
     ///  * `options` - The options to modified by the parser
     ///
     /// ## Return Value
-    /// Returns the changed options if parsing is successful, returns the error otherwise.
-    pub fn parse_env(&self, options: Options) -> Result<Options> {
+    /// Returns the changed options if parsing is successful and no help flag was matched, returns
+    /// the error otherwise.
+    pub fn parse_env(&self, options: Options) -> Result<Option<Options>> {
         let mut args = std::env::args_os();
         let prefix = args.next().unwrap();
 
@@ -237,21 +247,23 @@ impl<'a, Options> Parser<'a, Options> {
     ///  * `stream` - The stream of arguments to be parsed
     ///
     /// ## Return Value
-    /// Returns the changed options if parsing is successful, returns the error otherwise.
+    /// Returns the changed options if parsing is successful and no help flag was matched, returns
+    /// the error otherwise.
     fn do_parse(
         &self,
         mut options: Options,
         stream: &mut ArgumentStream,
         command_list: Vec<OsString>,
-    ) -> Result<Options> {
+    ) -> Result<Option<Options>> {
         // Mark all flags as not ran
         let mut flags_ran = vec![false; self.flags.len()];
 
         while let Some(argument) = stream.next_os() {
             let argument =
                 match self.handle_flag_argument(argument, &mut options, stream, &mut flags_ran)? {
-                    Some(argument) => argument,
-                    None => continue,
+                    FlagArgumentResult::NotFlag(argument) => argument,
+                    FlagArgumentResult::Handled => continue,
+                    FlagArgumentResult::Help => return Ok(None),
                 };
 
             return Err(Error::unexpected_argument(format!(
@@ -266,7 +278,7 @@ impl<'a, Options> Parser<'a, Options> {
         }
 
         // Return options
-        Ok(options)
+        Ok(Some(options))
     }
 
     /// Handles a flag argument during parsing
@@ -286,7 +298,7 @@ impl<'a, Options> Parser<'a, Options> {
         options: &mut Options,
         stream: &mut ArgumentStream,
         flags_ran: &mut [bool],
-    ) -> Result<Option<OsString>> {
+    ) -> Result<FlagArgumentResult> {
         // Check for long or short prefix
         let is_long = argument
             .as_encoded_bytes()
@@ -327,7 +339,13 @@ impl<'a, Options> Parser<'a, Options> {
 
             // Check if the flag is a help flag
             if flag_argument.class().is_help() {
-                todo!("Implement help generator");
+                help::generate();
+
+                if flag_argument.class() == FlagClass::Help {
+                    std::process::exit(0);
+                } else {
+                    return Ok(FlagArgumentResult::Help);
+                }
             }
 
             // Parse the parameters from the stream
@@ -343,9 +361,9 @@ impl<'a, Options> Parser<'a, Options> {
             // Call the action
             flag_argument.action(options, parameters)?;
 
-            Ok(None)
+            Ok(FlagArgumentResult::Handled)
         } else {
-            Ok(Some(argument))
+            Ok(FlagArgumentResult::NotFlag(argument))
         }
     }
 
