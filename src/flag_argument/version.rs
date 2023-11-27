@@ -8,8 +8,8 @@ pub struct VersionFlagArgument<'a> {
     /// The name to follow the long prefix
     long_name: Option<&'a str>,
 
-    /// The string which appears before the version
-    prefix: &'a dyn std::fmt::Display,
+    /// The string which displays the programs version
+    version: &'a dyn std::fmt::Display,
 
     /// The flag group this flag belongs to
     group: Option<&'a str>,
@@ -20,11 +20,14 @@ pub struct VersionFlagArgument<'a> {
 
 impl<'a> VersionFlagArgument<'a> {
     /// Creates a new [`VersionFlagArgument`]
-    pub const fn new<T: std::fmt::Display>(prefix: &'a T) -> Self {
+    ///
+    /// `version` does not include the program's version by default. The environment variable for
+    /// the crate version is `CARGO_PKG_VERSION`.
+    pub const fn new<T: std::fmt::Display>(version: &'a T) -> Self {
         VersionFlagArgument {
             short_name: None,
             long_name: None,
-            prefix,
+            version,
             group: None,
             exit: true,
         }
@@ -42,9 +45,9 @@ impl<'a> VersionFlagArgument<'a> {
         self
     }
 
-    /// Sets the string to appear before the version number
+    /// Sets the string that displays the programs version
     pub const fn prefix<T: std::fmt::Display>(mut self, prefix: &'a T) -> Self {
-        self.prefix = prefix;
+        self.version = prefix;
         self
     }
 
@@ -81,7 +84,7 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for VersionFlagArgument<'a> {
     }
 
     fn action(&self, _: &mut Options, _: Vec<std::ffi::OsString>) -> crate::Result<()> {
-        println!("{}{}", self.prefix, env!("CARGO_PKG_VERSION"));
+        println!("{}", self.version);
 
         if self.exit {
             std::process::exit(0);
