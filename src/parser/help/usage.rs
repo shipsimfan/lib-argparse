@@ -25,7 +25,7 @@ fn parse_usage(mut usage: Peekable<Chars>, command_list: &[OsString]) {
             };
 
             match c {
-                't' => todo!("terminal usage"),
+                't' => {} // TODO: Terminal Usage,
                 'c' => display_command_list(command_list),
                 x if x.is_digit(10) => {
                     let mut value = x.to_digit(10).unwrap() as usize;
