@@ -343,7 +343,16 @@ impl<'a, Options> Parser<'a, Options> {
 
             // Check if the flag is a help flag
             if flag_argument.class().is_help() {
-                help::generate(self.name, self.description, self.usage, command_list);
+                help::generate(
+                    self.name,
+                    self.description,
+                    self.usage,
+                    command_list,
+                    self.prologue,
+                    self.flag_header,
+                    self.flags,
+                    self.epilogue,
+                );
 
                 if flag_argument.class() == FlagClass::Help {
                     std::process::exit(0);

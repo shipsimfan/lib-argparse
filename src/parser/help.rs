@@ -1,13 +1,32 @@
 use std::{ffi::OsString, iter::Peekable, str::Chars};
 
-pub(super) fn generate(
+use crate::FlagArgument;
+
+pub(super) fn generate<Options>(
     name: Option<&dyn std::fmt::Display>,
     description: Option<&dyn std::fmt::Display>,
     usage: Option<&str>,
     command_list: &[OsString],
+    prologue: Option<&dyn std::fmt::Display>,
+    header: Option<&dyn std::fmt::Display>,
+    flags: &[&dyn FlagArgument<Options>],
+    epilogue: Option<&dyn std::fmt::Display>,
 ) {
     generate_header(name, description);
     generate_usage(usage, command_list);
+    println!();
+
+    if let Some(prologue) = prologue {
+        println!("{}", prologue);
+        println!();
+    }
+
+    generate_flags(header, flags);
+
+    if let Some(epilogue) = epilogue {
+        println!();
+        println!("{}", epilogue);
+    }
 }
 
 fn generate_header(
@@ -78,6 +97,7 @@ fn parse_usage(mut usage: Peekable<Chars>, command_list: &[OsString]) {
             }
         }
     }
+    println!();
 }
 
 fn display_command_list(command_list: &[OsString]) {
@@ -90,4 +110,11 @@ fn display_command_list(command_list: &[OsString]) {
         }
         print!("{}", command.to_string_lossy());
     }
+}
+
+fn generate_flags<Options>(
+    header: Option<&dyn std::fmt::Display>,
+    flags: &[&dyn FlagArgument<Options>],
+) {
+    todo!()
 }
