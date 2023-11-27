@@ -352,6 +352,8 @@ impl<'a, Options> Parser<'a, Options> {
                     self.flag_header,
                     self.flags,
                     self.epilogue,
+                    self.short_prefix,
+                    self.long_prefix,
                 );
 
                 if flag_argument.class() == FlagClass::Help {
