@@ -2,6 +2,7 @@ use crate::Result;
 use std::ffi::OsString;
 
 /// The class of flag that a flag argument is
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum FlagClass {
     /// A normal flag with a normal action
     Normal,
@@ -13,9 +14,11 @@ pub enum FlagClass {
     HelpNoExit,
 }
 
+mod help;
 mod parsing;
 mod simple;
 
+pub use help::HelpFlag;
 pub use parsing::ParsingFlagArgument;
 pub use simple::SimpleFlagArgument;
 
