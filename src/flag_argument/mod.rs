@@ -7,6 +7,9 @@ pub enum FlagClass {
     /// A normal flag with a normal action
     Normal,
 
+    /// A flag that should stop parsing immediately and return no result
+    Interrupt,
+
     /// A flag that should display help and exit
     Help,
 
@@ -169,7 +172,7 @@ impl FlagClass {
     /// Returns `true` if this flag should display the help
     pub const fn is_help(&self) -> bool {
         match self {
-            FlagClass::Normal => false,
+            FlagClass::Normal | FlagClass::Interrupt => false,
             FlagClass::Help | FlagClass::HelpNoExit => true,
         }
     }
@@ -180,7 +183,7 @@ impl FlagClass {
     /// Returns `true` if this flag should exit after running
     pub const fn is_exit(&self) -> bool {
         match self {
-            FlagClass::Normal | FlagClass::HelpNoExit => false,
+            FlagClass::Normal | FlagClass::HelpNoExit | FlagClass::Interrupt => false,
             FlagClass::Help => true,
         }
     }

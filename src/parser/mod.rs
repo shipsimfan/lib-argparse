@@ -376,7 +376,11 @@ impl<'a, Options> Parser<'a, Options> {
             // Call the action
             flag_argument.action(options, parameters)?;
 
-            Ok(FlagArgumentResult::Handled)
+            if flag_argument.class() == FlagClass::Interrupt {
+                Ok(FlagArgumentResult::Help)
+            } else {
+                Ok(FlagArgumentResult::Handled)
+            }
         } else {
             Ok(FlagArgumentResult::NotFlag(argument))
         }

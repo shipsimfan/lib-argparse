@@ -1,4 +1,4 @@
-use crate::FlagArgument;
+use crate::{FlagArgument, FlagClass};
 
 /// A flag which displays the programs version and exits
 pub struct VersionFlagArgument<'a> {
@@ -13,6 +13,9 @@ pub struct VersionFlagArgument<'a> {
 
     /// The flag group this flag belongs to
     group: Option<&'a str>,
+
+    /// Should the program after displaying the version?
+    exit: bool,
 }
 
 impl<'a> VersionFlagArgument<'a> {
@@ -23,6 +26,7 @@ impl<'a> VersionFlagArgument<'a> {
             long_name: None,
             prefix,
             group: None,
+            exit: true,
         }
     }
 
@@ -49,6 +53,18 @@ impl<'a> VersionFlagArgument<'a> {
         self.group = Some(group);
         self
     }
+
+    /// Sets the program to exit after displaying the version
+    pub const fn set_exit(mut self) -> Self {
+        self.exit = true;
+        self
+    }
+
+    /// Sets the program to not exit after displaying the version
+    pub const fn set_no_exit(mut self) -> Self {
+        self.exit = false;
+        self
+    }
 }
 
 impl<'a, Options: 'a> FlagArgument<'a, Options> for VersionFlagArgument<'a> {
@@ -66,7 +82,12 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for VersionFlagArgument<'a> {
 
     fn action(&self, _: &mut Options, _: Vec<std::ffi::OsString>) -> crate::Result<()> {
         println!("{}{}", self.prefix, env!("CARGO_PKG_VERSION"));
-        std::process::exit(0);
+
+        if self.exit {
+            std::process::exit(0);
+        }
+
+        Ok(())
     }
 
     fn repeatable(&self) -> bool {
@@ -83,5 +104,9 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for VersionFlagArgument<'a> {
 
     fn description(&self) -> Option<&[&dyn std::fmt::Display]> {
         Some(&[&"Displays this programs version"])
+    }
+
+    fn class(&self) -> FlagClass {
+        FlagClass::Interrupt
     }
 }
