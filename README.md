@@ -8,7 +8,7 @@ Place the following into your `Cargo.toml`:
 
 ```toml
 [dependencies]
-argparse = {git = "https://github.com/shipsimfan/lib-argparse", branch = "v2"}
+argparse = {git = "https://github.com/shipsimfan/lib-argparse", branch = "static"}
 ```
 
 See the documentation on in [lib.rs](./src/lib.rs).
@@ -16,7 +16,3 @@ See the documentation on in [lib.rs](./src/lib.rs).
 ## Contributing
 
 argparse is currently not open for contributions.
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
