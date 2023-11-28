@@ -29,7 +29,7 @@ proc_macro_function!(
     ///
     /// The format for this macro is as follows:
     /// ```
-    /// help_flag!(short_name, long_name noexit)
+    /// help_flag!(short_name, long_name)
     /// ```    
     /// where:
     ///  - `short_name` is an optional literal which is the name following the short prefix
@@ -37,7 +37,24 @@ proc_macro_function!(
     ///     preceding comma is treated as part of the literal for identifying if there is a long
     ///     name. In order to specify just a long name use `help_flag!(, long_name)` and to specify
     ///     just a short name use `help_flag!(short_name)`.
-    ///  - `noexit` is optional and if present, sets this help flag to not exit after displaying
-    ///     the help.
     help_flag::HelpFlag
+);
+
+proc_macro_function!(
+    /// Creates a version flag
+    ///
+    /// The format for this macro is as follows:
+    /// ```
+    /// version_flag!(short_name, long_name version)
+    /// ```    
+    /// where:
+    ///  - `short_name` is an optional literal which is the name following the short prefix
+    ///  - `long_name` is an optional literal which is the name following the long prefix. The
+    ///     preceding comma is treated as part of the literal for identifying if there is a long
+    ///     name. In order to specify just a long name use `version_flag!(, long_name)` and to
+    ///     specify just a short name use `version_flag!(short_name)`.
+    ///  - `version` is an expression whose result must implement [`std::fmt::Display`] and will be
+    ///     the text displayed when this flag is matched. The version is not automatically
+    ///     included. The environment variable containing the version is `CARGO_PKG_VERSION`.
+    version_flag::VersionFlag
 );
