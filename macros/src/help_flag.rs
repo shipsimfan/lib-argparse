@@ -58,7 +58,5 @@ impl ToTokens for HelpFlag {
                 .set_no_exit()
             }
         }
-
-        <Token![;]>::default().to_tokens(generator);
     }
 }
