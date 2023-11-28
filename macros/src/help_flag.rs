@@ -38,7 +38,7 @@ impl<'a> Parse<'a> for HelpFlag {
 impl ToTokens for HelpFlag {
     fn to_tokens(&self, generator: &mut proc_macro_util::Generator) {
         to_tokens! { generator
-            ::argparse::HelpFlag::new()
+            ::argparse::HelpFlagArgument::new()
         };
 
         if let Some(short_name) = &self.short_name {
