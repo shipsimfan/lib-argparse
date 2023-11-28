@@ -1,9 +1,8 @@
 # ToDo List
  1. Add flag arguments
      1. Add flag macros
-         1. Add version flag macro
-         2. Add simple flag macro
-         3. Add parsing flag macro
+         1. Add simple flag macro
+         2. Add parsing flag macro
  2. Add terminal arguments
      1. Add terminal argument trait
      2. Add terminal argument to help generation
