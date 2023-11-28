@@ -1,5 +1,7 @@
 use proc_macro_util::proc_macro_function;
 
+mod flag_name;
+
 proc_macro_function!(
     /// Creates a constant time argument [`Parser`]
     ///
