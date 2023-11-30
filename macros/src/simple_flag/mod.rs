@@ -1,4 +1,4 @@
-use crate::flag_name::FlagName;
+use crate::{description::Description, flag_name::FlagName};
 use options_type::OptionsType;
 use parameter_info::ParameterInfo;
 use proc_macro::Span;
@@ -15,7 +15,7 @@ mod parameter_info;
 pub struct SimpleFlag<'a> {
     flag_name: FlagName,
     parameter_info: Option<ParameterInfo<'a>>,
-    description: Literal,
+    description: Description,
     options: VariableName,
     options_type: Option<OptionsType>,
     parameters_mut: Option<Token![mut]>,

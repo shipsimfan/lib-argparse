@@ -1,5 +1,6 @@
 use proc_macro_util::proc_macro_function;
 
+mod description;
 mod flag_name;
 
 proc_macro_function!(
