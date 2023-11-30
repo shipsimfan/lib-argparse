@@ -24,6 +24,11 @@ pub struct SimpleFlag<'a> {
     action: Expression<'a>,
 }
 
+enum ActionWrapper<'a, 'b> {
+    Wrap(&'b Expression<'a>),
+    NoWrap(&'b Expression<'a>),
+}
+
 impl<'a> Parse<'a> for SimpleFlag<'a> {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
         let flag_name = parser.parse()?;
@@ -78,6 +83,12 @@ impl<'a> ToTokens for SimpleFlag<'a> {
             action,
         } = self;
 
+        let action = if error_indicator.is_some() {
+            ActionWrapper::NoWrap(action)
+        } else {
+            ActionWrapper::Wrap(action)
+        };
+
         let hint = parameter_info
             .as_ref()
             .map(|parameter_info| parameter_info.hint());
@@ -101,13 +112,26 @@ impl<'a> ToTokens for SimpleFlag<'a> {
         }
 
         to_tokens! { generator
-            ::new(#count, #missing, |#options #options_type, #parameters_mut #parameters| #action)#flag_name.description(#description)
+            ::new(#count, &#missing, |#options #options_type, #parameters_mut #parameters| #action)#flag_name.description(#description)
         }
 
         if let Some(hint) = hint {
             to_tokens! { generator
-                .hint(#hint)
+                .hint(&#hint)
             }
+        }
+    }
+}
+
+impl<'a, 'b> ToTokens for ActionWrapper<'a, 'b> {
+    fn to_tokens(&self, generator: &mut Generator) {
+        match self {
+            ActionWrapper::Wrap(action) => {
+                to_tokens! { generator
+                    Ok(#action)
+                }
+            }
+            ActionWrapper::NoWrap(action) => action.to_tokens(generator),
         }
     }
 }
