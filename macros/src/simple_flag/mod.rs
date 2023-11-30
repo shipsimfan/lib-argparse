@@ -3,9 +3,9 @@ use options_type::OptionsType;
 use parameter_info::ParameterInfo;
 use proc_macro::Span;
 use proc_macro_util::{
-    ast::Expression,
+    ast::{Expression, VariableName},
     to_tokens,
-    tokens::{Identifier, Literal},
+    tokens::Literal,
     Generator, Parse, Parser, Result, ToTokens, Token,
 };
 
@@ -16,10 +16,10 @@ pub struct SimpleFlag<'a> {
     flag_name: FlagName,
     parameter_info: Option<ParameterInfo<'a>>,
     description: Literal,
-    options: Identifier,
+    options: VariableName,
     options_type: Option<OptionsType>,
     parameters_mut: Option<Token![mut]>,
-    parameters: Identifier,
+    parameters: VariableName,
     error_indicator: Option<Token![?]>,
     action: Expression<'a>,
 }

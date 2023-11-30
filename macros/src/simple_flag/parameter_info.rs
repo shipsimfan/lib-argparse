@@ -1,4 +1,4 @@
-use proc_macro_util::{ast::Expression, tokens::Literal, Delimiter, Parse, Parser, Result};
+use proc_macro_util::{ast::Expression, tokens::Literal, Delimiter, Parse, Parser, Result, Token};
 
 pub struct ParameterInfo<'a> {
     count: Literal,
@@ -23,6 +23,7 @@ impl<'a> ParameterInfo<'a> {
 impl<'a> Parse<'a> for ParameterInfo<'a> {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
         let count = parser.parse()?;
+        parser.parse::<Token![*]>()?;
         let hint = parser.parse()?;
 
         let missing = if let Some(group) = parser.group() {
