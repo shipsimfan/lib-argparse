@@ -38,12 +38,7 @@ impl<'a> Parse<'a> for SimpleFlag<'a> {
         parser.parse::<Token![|]>()?;
         let options = parser.parse()?;
 
-        let options_type = if parser.peek::<Token![:]>() {
-            parser.parse::<Token![:]>()?;
-            Some(parser.parse()?)
-        } else {
-            None
-        };
+        let options_type = parser.parse()?;
 
         parser.parse::<Token![,]>()?;
 
