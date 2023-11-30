@@ -60,7 +60,7 @@ proc_macro_function!(
 );
 
 proc_macro_function!(
-    /// Creates a version flag
+    /// Creates a simple flag
     ///
     /// The format for this macro is as follows:
     /// ```
