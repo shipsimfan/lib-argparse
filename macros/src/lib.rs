@@ -58,3 +58,36 @@ proc_macro_function!(
     ///     included. The environment variable containing the version is `CARGO_PKG_VERSION`.
     version_flag::VersionFlag
 );
+
+proc_macro_function!(
+    /// Creates a version flag
+    ///
+    /// The format for this macro is as follows:
+    /// ```
+    /// simple_flag!(short_name, long_name count*hint (missing) description |options: Options, mut parameters|? action)
+    /// ```    
+    /// where:
+    ///  - `short_name` is an optional literal which is the name following the short prefix
+    ///  - `long_name` is an optional literal which is the name following the long prefix. The
+    ///     preceding comma is treated as part of the literal for identifying if there is a long
+    ///     name. In order to specify just a long name use `simple_flag!(, long_name)` and to
+    ///     specify just a short name use `simple_flag!(short_name)`.
+    ///  - `count` is an optional literal which is the number of parameters to accept. If this is
+    ///     included, both `hint` and `missing` are required as well.
+    ///  - `hint` is an optional literal which is the hint displayed in the help. If this is
+    ///     included, both `count` and `missing` are required as well.
+    ///  - `missing` is an optional expression which is the message displayed if the parameters are
+    ///     missing. If this is included, both `hint` and `count` are required as well.
+    ///  - `description` is a literal which is the description displayed in the help.
+    ///  - `options` is an identifier for the developer provided options variable in the action.
+    ///  - `Options` is an optional type that specifies the options type when it is ambiguous to
+    ///     the compiler. The preceding colon indicates the presence of this field. A `&mut` is not
+    ///     nescessary and is added by the macro.
+    ///  - `mut` is an optional `mut` keyword to make the parameters mutable.
+    ///  - `parameters` is an identifier for the parameters variable in the action.
+    ///  - `?` is optional and if present, indicates that the action might return an error,
+    ///     otherwise the action return is wrapped in [`Result::Ok`] and the return type is set to
+    ///     [`Infallible`].
+    ///  - `action` is an expression which is the action itself.
+    simple_flag::SimpleFlag
+);
