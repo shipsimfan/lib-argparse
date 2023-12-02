@@ -13,7 +13,7 @@ pub struct ParsingFlag<'a> {
     flag_name: FlagName,
     hint: Literal,
     missing: Literal,
-    description: Description,
+    description: Description<'a>,
     options: VariableName,
     options_type: Option<OptionsType>,
     item_mut: Option<Token![mut]>,

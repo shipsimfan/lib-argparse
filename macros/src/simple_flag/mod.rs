@@ -16,7 +16,7 @@ mod parameter_info;
 pub struct SimpleFlag<'a> {
     flag_name: FlagName,
     parameter_info: Option<ParameterInfo<'a>>,
-    description: Description,
+    description: Description<'a>,
     options: VariableName,
     options_type: Option<OptionsType>,
     parameters_mut: Option<Token![mut]>,

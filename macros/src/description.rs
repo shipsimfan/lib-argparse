@@ -1,17 +1,18 @@
 use proc_macro::Delimiter;
 use proc_macro_util::{
-    ast::Punctuated, to_tokens, tokens::Literal, Generator, Parse, Parser, Result, ToTokens, Token,
+    ast::{Expression, Punctuated},
+    to_tokens, Generator, Parse, Parser, Result, ToTokens, Token,
 };
 
-pub struct Description {
-    lines: Punctuated<DescriptionLine, Token![,]>,
+pub struct Description<'a> {
+    lines: Punctuated<DescriptionLine<'a>, Token![,]>,
 }
 
-struct DescriptionLine {
-    line: Literal,
+struct DescriptionLine<'a> {
+    line: Expression<'a>,
 }
 
-impl<'a> Parse<'a> for Description {
+impl<'a> Parse<'a> for Description<'a> {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
         let mut lines = Punctuated::new();
 
@@ -42,7 +43,7 @@ impl<'a> Parse<'a> for Description {
     }
 }
 
-impl ToTokens for Description {
+impl<'a> ToTokens for Description<'a> {
     fn to_tokens(&self, generator: &mut Generator) {
         let lines = &self.lines;
 
@@ -52,7 +53,7 @@ impl ToTokens for Description {
     }
 }
 
-impl<'a> Parse<'a> for DescriptionLine {
+impl<'a> Parse<'a> for DescriptionLine<'a> {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
         let line = parser.parse()?;
 
@@ -60,7 +61,7 @@ impl<'a> Parse<'a> for DescriptionLine {
     }
 }
 
-impl ToTokens for DescriptionLine {
+impl<'a> ToTokens for DescriptionLine<'a> {
     fn to_tokens(&self, generator: &mut Generator) {
         let line = &self.line;
 
