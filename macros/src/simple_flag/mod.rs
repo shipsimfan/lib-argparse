@@ -1,5 +1,7 @@
-use crate::{description::Description, flag_name::FlagName};
-use options_type::OptionsType;
+use crate::{
+    action_wrapper::ActionWrapper, description::Description, flag_name::FlagName,
+    options_type::OptionsType,
+};
 use parameter_info::ParameterInfo;
 use proc_macro::Span;
 use proc_macro_util::{
@@ -9,7 +11,6 @@ use proc_macro_util::{
     Generator, Parse, Parser, Result, ToTokens, Token,
 };
 
-mod options_type;
 mod parameter_info;
 
 pub struct SimpleFlag<'a> {
@@ -22,11 +23,6 @@ pub struct SimpleFlag<'a> {
     parameters: VariableName,
     error_indicator: Option<Token![?]>,
     action: Expression<'a>,
-}
-
-enum ActionWrapper<'a, 'b> {
-    Wrap(&'b Expression<'a>),
-    NoWrap(&'b Expression<'a>),
 }
 
 impl<'a> Parse<'a> for SimpleFlag<'a> {

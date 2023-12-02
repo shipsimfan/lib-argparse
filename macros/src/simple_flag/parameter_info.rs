@@ -1,4 +1,4 @@
-use proc_macro_util::{ast::Expression, tokens::Literal, Delimiter, Parse, Parser, Result, Token};
+use proc_macro_util::{ast::Expression, tokens::Literal, Parse, Parser, Result, Token};
 
 pub struct ParameterInfo<'a> {
     count: Literal,
@@ -26,22 +26,7 @@ impl<'a> Parse<'a> for ParameterInfo<'a> {
         parser.parse::<Token![*]>()?;
         let hint = parser.parse()?;
 
-        let missing = if let Some(group) = parser.group() {
-            if group.delimiter() != Delimiter::Parenthesis {
-                return Err(parser.error("expected the missing error message"));
-            }
-            let mut group_parser = group.tokens();
-
-            let missing = group_parser.parse()?;
-
-            if !group_parser.empty() {
-                return Err(parser.error("unexpected tokens"));
-            }
-
-            missing
-        } else {
-            return Err(parser.error("expected the missing error message"));
-        };
+        let missing = parser.parse()?;
 
         Ok(ParameterInfo {
             count,

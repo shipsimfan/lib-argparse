@@ -1,7 +1,5 @@
 # ToDo List
- 1. Add flag arguments
-     1. Add flag macros
-         1. Add parsing flag macro
+ 1. Improve error messages
  2. Add tests
      1. Unit tests
      2. Integration tests

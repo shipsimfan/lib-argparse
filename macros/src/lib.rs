@@ -1,7 +1,9 @@
 use proc_macro_util::proc_macro_function;
 
+mod action_wrapper;
 mod description;
 mod flag_name;
+mod options_type;
 
 proc_macro_function!(
     /// Creates a constant time argument [`Parser`]
@@ -65,7 +67,7 @@ proc_macro_function!(
     ///
     /// The format for this macro is as follows:
     /// ```
-    /// simple_flag!(short_name, long_name count*hint (missing) description |options: Options, mut parameters|? action)
+    /// simple_flag!(short_name, long_name count*hint missing description |options: Options, mut parameters|? action)
     /// ```    
     /// where:
     ///  - `short_name` is an optional literal which is the name following the short prefix
@@ -91,4 +93,34 @@ proc_macro_function!(
     ///     [`Infallible`].
     ///  - `action` is an expression which is the action itself.
     simple_flag::SimpleFlag
+);
+
+proc_macro_function!(
+    /// Creates a simple flag
+    ///
+    /// The format for this macro is as follows:
+    /// ```
+    /// parsing_flag!(short_name, long_name hint missing description |options: Options, mut item: Type|? action)
+    /// ```    
+    /// where:
+    ///  - `short_name` is an optional literal which is the name following the short prefix
+    ///  - `long_name` is an optional literal which is the name following the long prefix. The
+    ///     preceding comma is treated as part of the literal for identifying if there is a long
+    ///     name. In order to specify just a long name use `parsing_flag!(, long_name)` and to
+    ///     specify just a short name use `parsing_flag!(short_name)`.
+    ///  - `hint` is a literal which is the hint displayed in the help.
+    ///  - `missing` is an expression which is the message displayed if the parameter is missing.
+    ///  - `description` is a literal which is the description displayed in the help.
+    ///  - `options` is an identifier for the developer provided options variable in the action.
+    ///  - `Options` is an optional type that specifies the options type when it is ambiguous to
+    ///     the compiler. The preceding colon indicates the presence of this field. A `&mut` is not
+    ///     nescessary and is added by the macro.
+    ///  - `mut` is an optional `mut` keyword to make the item mutable.
+    ///  - `item` is an identifier for the item variable in the action.
+    ///  - `Type` is the type that the parsing flag parses to. It must implement [`std::str::FromStr`]
+    ///  - `?` is optional and if present, indicates that the action might return an error,
+    ///     otherwise the action return is wrapped in [`Result::Ok`] and the return type is set to
+    ///     [`Infallible`].
+    ///  - `action` is an expression which is the action itself.
+    parsing_flag::ParsingFlag
 );
