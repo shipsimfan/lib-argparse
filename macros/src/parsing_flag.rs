@@ -114,11 +114,13 @@ impl ToTokens for ErrorIndicator {
         match self {
             ErrorIndicator::Present => {
                 to_tokens! { generator
-                    ::core::convert::Infallible
+                    _
                 }
             }
             ErrorIndicator::NotPresent => {
-                <Token![_]>::default().to_tokens(generator);
+                to_tokens! { generator
+                    ::core::convert::Infallible
+                }
             }
         }
     }
