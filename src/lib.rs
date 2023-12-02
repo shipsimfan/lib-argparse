@@ -19,5 +19,5 @@ pub use flag_argument::{
     FlagArgument, FlagClass, HelpFlagArgument, ParsingFlagArgument, SimpleFlagArgument,
     VersionFlagArgument,
 };
-pub use macros::{help_flag, parser, simple_flag, version_flag};
+pub use macros::{help_flag, parser, parsing_flag, simple_flag, version_flag};
 pub use parser::Parser;
