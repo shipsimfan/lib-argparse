@@ -101,12 +101,18 @@ mod tests {
 
     #[test]
     fn create_default() {
-        const HELP_FLAG: HelpFlagArgument = HelpFlagArgument::new();
+        let help_flag = HelpFlagArgument::new();
 
-        assert_eq!(FlagArgument::<()>::short_name(&HELP_FLAG), None);
-        assert_eq!(FlagArgument::<()>::long_name(&HELP_FLAG), None);
-        assert_eq!(FlagArgument::<()>::group(&HELP_FLAG), None);
-        assert_eq!(FlagArgument::<()>::class(&HELP_FLAG), FlagClass::Help);
+        assert_eq!(FlagArgument::<()>::short_name(&help_flag), None);
+        assert_eq!(FlagArgument::<()>::long_name(&help_flag), None);
+        assert_eq!(FlagArgument::<()>::group(&help_flag), None);
+        assert_eq!(FlagArgument::<()>::class(&help_flag), FlagClass::Help);
+
+        assert_eq!(FlagArgument::<()>::count(&help_flag), 0);
+        assert_eq!(FlagArgument::<()>::repeatable(&help_flag), true);
+        assert!(FlagArgument::<()>::action(&help_flag, &mut (), Vec::new()).is_ok());
+        assert!(FlagArgument::<()>::hint(&help_flag).is_none());
+        assert!(FlagArgument::<()>::description(&help_flag).is_some());
     }
 
     #[test]
@@ -115,15 +121,19 @@ mod tests {
         const LONG_NAME: &str = "test";
         const GROUP: &str = "EXAMPLE";
 
-        const HELP_FLAG: HelpFlagArgument = HelpFlagArgument::new()
+        let mut help_flag = HelpFlagArgument::new()
             .short_name(SHORT_NAME)
             .long_name(LONG_NAME)
             .group(GROUP)
             .set_no_exit();
 
-        assert_eq!(FlagArgument::<()>::short_name(&HELP_FLAG), Some(SHORT_NAME));
-        assert_eq!(FlagArgument::<()>::long_name(&HELP_FLAG), Some(LONG_NAME));
-        assert_eq!(FlagArgument::<()>::group(&HELP_FLAG), Some(GROUP));
-        assert_eq!(FlagArgument::<()>::class(&HELP_FLAG), FlagClass::HelpNoExit);
+        assert_eq!(FlagArgument::<()>::short_name(&help_flag), Some(SHORT_NAME));
+        assert_eq!(FlagArgument::<()>::long_name(&help_flag), Some(LONG_NAME));
+        assert_eq!(FlagArgument::<()>::group(&help_flag), Some(GROUP));
+        assert_eq!(FlagArgument::<()>::class(&help_flag), FlagClass::HelpNoExit);
+
+        help_flag = help_flag.set_exit();
+
+        assert_eq!(FlagArgument::<()>::class(&help_flag), FlagClass::Help);
     }
 }
