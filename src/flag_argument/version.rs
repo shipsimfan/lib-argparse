@@ -46,8 +46,8 @@ impl<'a> VersionFlagArgument<'a> {
     }
 
     /// Sets the string that displays the programs version
-    pub const fn prefix<T: std::fmt::Display>(mut self, prefix: &'a T) -> Self {
-        self.version = prefix;
+    pub const fn version<T: std::fmt::Display>(mut self, version: &'a T) -> Self {
+        self.version = version;
         self
     }
 
@@ -98,7 +98,7 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for VersionFlagArgument<'a> {
     }
 
     fn group(&self) -> Option<&str> {
-        None
+        self.group
     }
 
     fn hint(&self) -> Option<&dyn std::fmt::Display> {
@@ -111,5 +111,64 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for VersionFlagArgument<'a> {
 
     fn class(&self) -> FlagClass {
         FlagClass::Interrupt
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{FlagArgument, FlagClass, VersionFlagArgument};
+
+    #[test]
+    fn create_default() {
+        let version_flag = VersionFlagArgument::new(&"").set_no_exit();
+
+        assert_eq!(FlagArgument::<()>::short_name(&version_flag), None);
+        assert_eq!(FlagArgument::<()>::long_name(&version_flag), None);
+        assert_eq!(FlagArgument::<()>::group(&version_flag), None);
+        assert_eq!(
+            FlagArgument::<()>::class(&version_flag),
+            FlagClass::Interrupt
+        );
+
+        assert_eq!(FlagArgument::<()>::count(&version_flag), 0);
+        assert_eq!(FlagArgument::<()>::repeatable(&version_flag), true);
+        assert!(FlagArgument::<()>::action(&version_flag, &mut (), Vec::new()).is_ok());
+        assert!(FlagArgument::<()>::hint(&version_flag).is_none());
+        assert!(FlagArgument::<()>::description(&version_flag).is_some());
+    }
+
+    #[test]
+    fn create() {
+        const SHORT_NAME: &str = "t";
+        const LONG_NAME: &str = "test";
+        const GROUP: &str = "EXAMPLE";
+        const VERSION: &str = "example v1";
+
+        let mut version_flag = VersionFlagArgument::new(&"")
+            .short_name(SHORT_NAME)
+            .long_name(LONG_NAME)
+            .group(GROUP)
+            .version(&VERSION);
+
+        assert_eq!(
+            FlagArgument::<()>::short_name(&version_flag),
+            Some(SHORT_NAME)
+        );
+        assert_eq!(
+            FlagArgument::<()>::long_name(&version_flag),
+            Some(LONG_NAME)
+        );
+        assert_eq!(FlagArgument::<()>::group(&version_flag), Some(GROUP));
+        assert_eq!(
+            FlagArgument::<()>::class(&version_flag),
+            FlagClass::Interrupt
+        );
+
+        version_flag = version_flag.set_exit();
+
+        assert_eq!(
+            FlagArgument::<()>::class(&version_flag),
+            FlagClass::Interrupt
+        );
     }
 }
