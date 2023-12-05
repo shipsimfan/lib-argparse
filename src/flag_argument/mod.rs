@@ -2,7 +2,7 @@ use crate::Result;
 use std::ffi::OsString;
 
 /// The class of flag that a flag argument is
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FlagClass {
     /// A normal flag with a normal action
     Normal,

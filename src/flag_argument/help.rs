@@ -94,3 +94,36 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for HelpFlagArgument<'a> {
         self.exit
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{FlagArgument, FlagClass, HelpFlagArgument};
+
+    #[test]
+    fn create_default() {
+        const HELP_FLAG: HelpFlagArgument = HelpFlagArgument::new();
+
+        assert_eq!(FlagArgument::<()>::short_name(&HELP_FLAG), None);
+        assert_eq!(FlagArgument::<()>::long_name(&HELP_FLAG), None);
+        assert_eq!(FlagArgument::<()>::group(&HELP_FLAG), None);
+        assert_eq!(FlagArgument::<()>::class(&HELP_FLAG), FlagClass::Help);
+    }
+
+    #[test]
+    fn create() {
+        const SHORT_NAME: &str = "t";
+        const LONG_NAME: &str = "test";
+        const GROUP: &str = "EXAMPLE";
+
+        const HELP_FLAG: HelpFlagArgument = HelpFlagArgument::new()
+            .short_name(SHORT_NAME)
+            .long_name(LONG_NAME)
+            .group(GROUP)
+            .set_no_exit();
+
+        assert_eq!(FlagArgument::<()>::short_name(&HELP_FLAG), Some(SHORT_NAME));
+        assert_eq!(FlagArgument::<()>::long_name(&HELP_FLAG), Some(LONG_NAME));
+        assert_eq!(FlagArgument::<()>::group(&HELP_FLAG), Some(GROUP));
+        assert_eq!(FlagArgument::<()>::class(&HELP_FLAG), FlagClass::HelpNoExit);
+    }
+}
