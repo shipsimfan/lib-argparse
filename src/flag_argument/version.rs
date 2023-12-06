@@ -120,7 +120,12 @@ mod tests {
 
     #[test]
     fn create_default() {
-        let version_flag = VersionFlagArgument::new(&"").set_no_exit();
+        const SHORT_NAME: &str = "t";
+        const LONG_NAME: &str = "test";
+        const GROUP: &str = "EXAMPLE";
+        const VERSION: &str = "example v1";
+
+        let mut version_flag = VersionFlagArgument::new(&"").set_no_exit();
 
         assert_eq!(FlagArgument::<()>::short_name(&version_flag), None);
         assert_eq!(FlagArgument::<()>::long_name(&version_flag), None);
@@ -135,16 +140,8 @@ mod tests {
         assert!(FlagArgument::<()>::action(&version_flag, &mut (), Vec::new()).is_ok());
         assert!(FlagArgument::<()>::hint(&version_flag).is_none());
         assert!(FlagArgument::<()>::description(&version_flag).is_some());
-    }
 
-    #[test]
-    fn create() {
-        const SHORT_NAME: &str = "t";
-        const LONG_NAME: &str = "test";
-        const GROUP: &str = "EXAMPLE";
-        const VERSION: &str = "example v1";
-
-        let mut version_flag = VersionFlagArgument::new(&"")
+        version_flag = version_flag
             .short_name(SHORT_NAME)
             .long_name(LONG_NAME)
             .group(GROUP)

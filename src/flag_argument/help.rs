@@ -100,8 +100,12 @@ mod tests {
     use crate::{FlagArgument, FlagClass, HelpFlagArgument};
 
     #[test]
-    fn create_default() {
-        let help_flag = HelpFlagArgument::new();
+    fn create() {
+        const SHORT_NAME: &str = "t";
+        const LONG_NAME: &str = "test";
+        const GROUP: &str = "EXAMPLE";
+
+        let mut help_flag = HelpFlagArgument::new();
 
         assert_eq!(FlagArgument::<()>::short_name(&help_flag), None);
         assert_eq!(FlagArgument::<()>::long_name(&help_flag), None);
@@ -113,15 +117,8 @@ mod tests {
         assert!(FlagArgument::<()>::action(&help_flag, &mut (), Vec::new()).is_ok());
         assert!(FlagArgument::<()>::hint(&help_flag).is_none());
         assert!(FlagArgument::<()>::description(&help_flag).is_some());
-    }
 
-    #[test]
-    fn create() {
-        const SHORT_NAME: &str = "t";
-        const LONG_NAME: &str = "test";
-        const GROUP: &str = "EXAMPLE";
-
-        let mut help_flag = HelpFlagArgument::new()
+        help_flag = help_flag
             .short_name(SHORT_NAME)
             .long_name(LONG_NAME)
             .group(GROUP)
