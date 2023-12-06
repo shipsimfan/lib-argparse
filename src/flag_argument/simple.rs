@@ -171,3 +171,70 @@ impl<
         self.description
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::ffi::OsString;
+
+    use crate::{FlagArgument, FlagClass, SimpleFlagArgument};
+
+    #[test]
+    fn simple_flag() {
+        const COUNT: usize = 2;
+        const SHORT_NAME: &str = "t";
+        const LONG_NAME: &str = "test";
+        const GROUP: &str = "EXAMPLE";
+        const HINT: &str = "VAL1 VAL2";
+        const DESCRIPTION: &str = "Example";
+
+        let mut simple_flag = SimpleFlagArgument::<(), _, _>::new(COUNT, &"", |_, parameters| {
+            if parameters.len() != COUNT {
+                Err("invalid parameters")
+            } else {
+                Ok(())
+            }
+        });
+
+        assert_eq!(FlagArgument::<()>::short_name(&simple_flag), None);
+        assert_eq!(FlagArgument::<()>::long_name(&simple_flag), None);
+        assert_eq!(FlagArgument::<()>::group(&simple_flag), None);
+        assert_eq!(FlagArgument::<()>::repeatable(&simple_flag), false);
+        assert!(FlagArgument::<()>::hint(&simple_flag).is_none());
+        assert!(FlagArgument::<()>::description(&simple_flag).is_none());
+
+        assert_eq!(FlagArgument::<()>::class(&simple_flag), FlagClass::Normal);
+        assert_eq!(FlagArgument::<()>::count(&simple_flag), COUNT);
+
+        let mut parameters = Vec::new();
+        for _ in 0..COUNT {
+            assert!(FlagArgument::<()>::action(&simple_flag, &mut (), parameters.clone()).is_err());
+            parameters.push(OsString::new());
+        }
+        assert!(FlagArgument::<()>::action(&simple_flag, &mut (), parameters.clone()).is_ok());
+
+        assert!(FlagArgument::<()>::finalize(&simple_flag, false).is_ok());
+        assert!(FlagArgument::<()>::finalize(&simple_flag, true).is_ok());
+
+        simple_flag = simple_flag
+            .short_name(&SHORT_NAME)
+            .long_name(&LONG_NAME)
+            .repeatable(true)
+            .required(Some(&""))
+            .group(&GROUP)
+            .hint(&HINT)
+            .description(&[&DESCRIPTION]);
+
+        assert_eq!(
+            FlagArgument::<()>::short_name(&simple_flag),
+            Some(SHORT_NAME)
+        );
+        assert_eq!(FlagArgument::<()>::long_name(&simple_flag), Some(LONG_NAME));
+        assert_eq!(FlagArgument::<()>::group(&simple_flag), Some(GROUP));
+        assert_eq!(FlagArgument::<()>::repeatable(&simple_flag), true);
+        assert!(FlagArgument::<()>::hint(&simple_flag).is_some());
+        assert!(FlagArgument::<()>::description(&simple_flag).is_some());
+
+        assert!(FlagArgument::<()>::finalize(&simple_flag, false).is_err());
+        assert!(FlagArgument::<()>::finalize(&simple_flag, true).is_ok());
+    }
+}
