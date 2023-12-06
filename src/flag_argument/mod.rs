@@ -115,32 +115,26 @@ pub trait FlagArgument<'a, Options: 'a> {
 }
 
 impl<'a, Options: 'a, T: FlagArgument<'a, Options>> FlagArgument<'a, Options> for &T {
-    #[inline(always)]
     fn short_name(&self) -> Option<&str> {
         T::short_name(self)
     }
 
-    #[inline(always)]
     fn long_name(&self) -> Option<&str> {
         T::long_name(self)
     }
 
-    #[inline(always)]
     fn count(&self) -> usize {
         T::count(self)
     }
 
-    #[inline(always)]
     fn repeatable(&self) -> bool {
         T::repeatable(self)
     }
 
-    #[inline(always)]
     fn action(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<()> {
         T::action(self, options, parameters)
     }
 
-    #[inline(always)]
     fn finalize(&self, ran: bool) -> Result<()> {
         T::finalize(self, ran)
     }
@@ -149,17 +143,14 @@ impl<'a, Options: 'a, T: FlagArgument<'a, Options>> FlagArgument<'a, Options> fo
         T::group(self)
     }
 
-    #[inline(always)]
     fn hint(&self) -> Option<&dyn std::fmt::Display> {
         T::hint(self)
     }
 
-    #[inline(always)]
     fn description(&self) -> Option<&[&dyn std::fmt::Display]> {
         T::description(self)
     }
 
-    #[inline(always)]
     fn class(&self) -> FlagClass {
         T::class(self)
     }
@@ -186,5 +177,93 @@ impl FlagClass {
             FlagClass::Normal | FlagClass::HelpNoExit | FlagClass::Interrupt => false,
             FlagClass::Help => true,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{Error, FlagArgument, FlagClass, Result};
+    use std::ffi::OsString;
+
+    #[test]
+    fn flag_class_is_help() {
+        assert!(!FlagClass::Normal.is_help());
+        assert!(!FlagClass::Interrupt.is_help());
+        assert!(FlagClass::Help.is_help());
+        assert!(FlagClass::HelpNoExit.is_help());
+    }
+
+    #[test]
+    fn flag_class_is_exit() {
+        assert!(!FlagClass::Normal.is_exit());
+        assert!(!FlagClass::Interrupt.is_exit());
+        assert!(FlagClass::Help.is_exit());
+        assert!(!FlagClass::HelpNoExit.is_exit());
+    }
+
+    #[test]
+    fn flag_argument_ref() {
+        const SHORT_NAME: Option<&str> = Some("t");
+        const LONG_NAME: Option<&str> = Some("test");
+        const COUNT: usize = 1;
+        const GROUP: Option<&str> = Some("EXAMPLE");
+        const HINT: Option<&dyn std::fmt::Display> = Some(&"VAL");
+        const DESCRIPTION: Option<&[&dyn std::fmt::Display]> = Some(&[&"Example"]);
+
+        struct ExampleFlagArgument;
+
+        impl<'a, Options: 'a> FlagArgument<'a, Options> for ExampleFlagArgument {
+            fn short_name(&self) -> Option<&str> {
+                SHORT_NAME
+            }
+
+            fn long_name(&self) -> Option<&str> {
+                LONG_NAME
+            }
+
+            fn count(&self) -> usize {
+                COUNT
+            }
+
+            fn action(&self, _: &mut Options, parameters: Vec<OsString>) -> Result<()> {
+                if parameters.len() == COUNT {
+                    Ok(())
+                } else {
+                    Err(Error::custom(""))
+                }
+            }
+
+            fn group(&self) -> Option<&str> {
+                GROUP
+            }
+
+            fn hint(&self) -> Option<&dyn std::fmt::Display> {
+                HINT
+            }
+
+            fn description(&self) -> Option<&[&dyn std::fmt::Display]> {
+                DESCRIPTION
+            }
+        }
+
+        let example = ExampleFlagArgument;
+        let example_ref = &example;
+
+        assert_eq!(FlagArgument::<()>::short_name(&example_ref), SHORT_NAME);
+        assert_eq!(FlagArgument::<()>::long_name(&example_ref), LONG_NAME);
+        assert_eq!(FlagArgument::<()>::group(&example_ref), GROUP);
+        assert_eq!(FlagArgument::<()>::repeatable(&example_ref), false);
+        assert!(FlagArgument::<()>::hint(&example_ref).is_some());
+        assert!(FlagArgument::<()>::description(&example_ref).is_some());
+        assert_eq!(FlagArgument::<()>::class(&example_ref), FlagClass::Normal);
+        assert_eq!(FlagArgument::<()>::count(&example_ref), 1);
+
+        assert!(FlagArgument::<()>::action(&example_ref, &mut (), Vec::new()).is_err());
+        assert!(
+            FlagArgument::<()>::action(&example_ref, &mut (), vec![OsString::from("abc")]).is_ok()
+        );
+
+        assert!(FlagArgument::<()>::finalize(&example_ref, false).is_ok());
+        assert!(FlagArgument::<()>::finalize(&example_ref, true).is_ok());
     }
 }
