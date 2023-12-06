@@ -182,3 +182,78 @@ impl<
         self.description
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{FlagArgument, FlagClass, ParsingFlagArgument};
+    use std::ffi::OsString;
+
+    #[test]
+    fn parsing_flag() {
+        const SHORT_NAME: &str = "t";
+        const LONG_NAME: &str = "test";
+        const GROUP: &str = "EXAMPLE";
+        const HINT: &str = "VALUE";
+        const DESCRIPTION: &str = "Example";
+
+        let mut parsing_flag =
+            ParsingFlagArgument::<(), usize, _, _, &str>::new(&"", |_, value| {
+                if value == 123 {
+                    Ok(())
+                } else {
+                    Err("invalid number")
+                }
+            });
+
+        assert_eq!(FlagArgument::<()>::short_name(&parsing_flag), None);
+        assert_eq!(FlagArgument::<()>::long_name(&parsing_flag), None);
+        assert_eq!(FlagArgument::<()>::group(&parsing_flag), None);
+        assert_eq!(FlagArgument::<()>::repeatable(&parsing_flag), false);
+        assert!(FlagArgument::<()>::hint(&parsing_flag).is_none());
+        assert!(FlagArgument::<()>::description(&parsing_flag).is_none());
+
+        assert_eq!(FlagArgument::<()>::class(&parsing_flag), FlagClass::Normal);
+        assert_eq!(FlagArgument::<()>::count(&parsing_flag), 1);
+
+        assert!(FlagArgument::<()>::action(&parsing_flag, &mut (), Vec::new()).is_err());
+        assert!(
+            FlagArgument::<()>::action(&parsing_flag, &mut (), vec![OsString::from("test")])
+                .is_err()
+        );
+        assert!(
+            FlagArgument::<()>::action(&parsing_flag, &mut (), vec![OsString::from("256")])
+                .is_err()
+        );
+        assert!(
+            FlagArgument::<()>::action(&parsing_flag, &mut (), vec![OsString::from("123")]).is_ok()
+        );
+
+        assert!(FlagArgument::<()>::finalize(&parsing_flag, false).is_ok());
+        assert!(FlagArgument::<()>::finalize(&parsing_flag, true).is_ok());
+
+        parsing_flag = parsing_flag
+            .short_name(&SHORT_NAME)
+            .long_name(&LONG_NAME)
+            .repeatable(true)
+            .required(Some(&"required"))
+            .group(GROUP)
+            .hint(&HINT)
+            .description(&[&DESCRIPTION]);
+
+        assert_eq!(
+            FlagArgument::<()>::short_name(&parsing_flag),
+            Some(SHORT_NAME)
+        );
+        assert_eq!(
+            FlagArgument::<()>::long_name(&parsing_flag),
+            Some(LONG_NAME)
+        );
+        assert_eq!(FlagArgument::<()>::group(&parsing_flag), Some(GROUP));
+        assert_eq!(FlagArgument::<()>::repeatable(&parsing_flag), true);
+        assert!(FlagArgument::<()>::hint(&parsing_flag).is_some());
+        assert!(FlagArgument::<()>::description(&parsing_flag).is_some());
+
+        assert!(FlagArgument::<()>::finalize(&parsing_flag, false).is_err());
+        assert!(FlagArgument::<()>::finalize(&parsing_flag, true).is_ok());
+    }
+}
