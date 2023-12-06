@@ -100,7 +100,7 @@ mod tests {
     use crate::{FlagArgument, FlagClass, HelpFlagArgument};
 
     #[test]
-    fn create() {
+    fn help_flag() {
         const SHORT_NAME: &str = "t";
         const LONG_NAME: &str = "test";
         const GROUP: &str = "EXAMPLE";

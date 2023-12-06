@@ -119,7 +119,7 @@ mod tests {
     use crate::{FlagArgument, FlagClass, VersionFlagArgument};
 
     #[test]
-    fn create_default() {
+    fn version_flag() {
         const SHORT_NAME: &str = "t";
         const LONG_NAME: &str = "test";
         const GROUP: &str = "EXAMPLE";
