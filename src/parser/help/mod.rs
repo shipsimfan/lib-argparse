@@ -1,9 +1,14 @@
 use crate::FlagArgument;
-use std::ffi::OsString;
+use std::{
+    ffi::OsString,
+    io::{StdoutLock, Write},
+};
 
 mod flags;
 mod header;
 mod usage;
+
+struct StdOut<'a>(StdoutLock<'a>);
 
 pub(super) fn generate<'a, Options>(
     name: Option<&dyn std::fmt::Display>,
@@ -30,10 +35,26 @@ pub(super) fn generate<'a, Options>(
 
     // TODO: terminal::generate
 
-    flags::generate(header, flags, short_prefix, long_prefix);
+    flags::generate(header, flags, short_prefix, long_prefix, &mut StdOut::new()).unwrap();
 
     if let Some(epilogue) = epilogue {
         println!();
         println!("{}", epilogue);
+    }
+}
+
+impl<'a> StdOut<'a> {
+    pub(self) fn new() -> Self {
+        StdOut(std::io::stdout().lock())
+    }
+}
+
+impl<'a> std::fmt::Write for StdOut<'a> {
+    fn write_fmt(&mut self, args: std::fmt::Arguments<'_>) -> std::fmt::Result {
+        self.0.write_fmt(args).map_err(|_| std::fmt::Error)
+    }
+
+    fn write_str(&mut self, s: &str) -> std::fmt::Result {
+        self.0.write_all(s.as_bytes()).map_err(|_| std::fmt::Error)
     }
 }
