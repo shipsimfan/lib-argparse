@@ -38,6 +38,7 @@ impl<'a> ArgumentStream<'a> {
     /// ## Return Value
     /// Returns the next [`String`] in the stream if it exists, or an error if it contains invalid
     /// UTF-8.
+    #[allow(unused)]
     pub(super) fn next(&mut self) -> Result<Option<String>> {
         match self {
             ArgumentStream::OsString(iter) => match iter.next() {
@@ -63,6 +64,7 @@ impl<'a> ArgumentStream<'a> {
     ///
     /// ## Return Value
     /// Returns true if the source is [`OsString`]s
+    #[allow(unused)]
     pub(super) fn is_os(&self) -> bool {
         match self {
             ArgumentStream::OsString(_) => true,

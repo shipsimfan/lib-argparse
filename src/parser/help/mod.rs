@@ -1,14 +1,11 @@
 use crate::FlagArgument;
-use std::{
-    ffi::OsString,
-    io::{StdoutLock, Write},
-};
+use std::{ffi::OsString, io::StdoutLock};
 
 mod flags;
 mod header;
 mod usage;
 
-struct StdOut<'a>(StdoutLock<'a>);
+pub(super) struct StdOut<'a>(StdoutLock<'a>);
 
 pub(super) fn generate<'a, Options>(
     name: Option<&dyn std::fmt::Display>,
@@ -21,40 +18,45 @@ pub(super) fn generate<'a, Options>(
     epilogue: Option<&dyn std::fmt::Display>,
     short_prefix: &str,
     long_prefix: &str,
-) {
-    if header::generate(name, description) {
-        println!();
+    output: &mut dyn std::fmt::Write,
+) -> std::fmt::Result {
+    if header::generate(name, description, output)? {
+        writeln!(output)?;
     }
 
-    usage::generate(usage, command_list);
+    usage::generate(usage, command_list, output)?;
 
     if let Some(prologue) = prologue {
-        println!();
-        println!("{}", prologue);
+        writeln!(output)?;
+        writeln!(output, "{}", prologue)?;
     }
 
     // TODO: terminal::generate
 
-    flags::generate(header, flags, short_prefix, long_prefix, &mut StdOut::new()).unwrap();
+    flags::generate(header, flags, short_prefix, long_prefix, output)?;
 
     if let Some(epilogue) = epilogue {
-        println!();
-        println!("{}", epilogue);
+        writeln!(output)?;
+        writeln!(output, "{}", epilogue)?;
     }
+
+    Ok(())
 }
 
 impl<'a> StdOut<'a> {
-    pub(self) fn new() -> Self {
+    pub(super) fn new() -> Self {
         StdOut(std::io::stdout().lock())
     }
 }
 
 impl<'a> std::fmt::Write for StdOut<'a> {
     fn write_fmt(&mut self, args: std::fmt::Arguments<'_>) -> std::fmt::Result {
+        use std::io::Write;
         self.0.write_fmt(args).map_err(|_| std::fmt::Error)
     }
 
     fn write_str(&mut self, s: &str) -> std::fmt::Result {
+        use std::io::Write;
         self.0.write_all(s.as_bytes()).map_err(|_| std::fmt::Error)
     }
 }

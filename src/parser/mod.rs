@@ -1,4 +1,5 @@
 use crate::{Error, FlagArgument, FlagClass, Result};
+use help::StdOut;
 use std::ffi::OsString;
 use stream::ArgumentStream;
 
@@ -354,7 +355,9 @@ impl<'a, Options> Parser<'a, Options> {
                     self.epilogue,
                     self.short_prefix,
                     self.long_prefix,
-                );
+                    &mut StdOut::new(),
+                )
+                .unwrap();
 
                 if flag_argument.class() == FlagClass::Help {
                     std::process::exit(0);
