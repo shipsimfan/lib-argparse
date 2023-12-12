@@ -23,6 +23,33 @@ pub(super) fn generate(
 
 #[cfg(test)]
 mod tests {
+    use super::generate;
+
     #[test]
-    fn header_empty() {}
+    fn header_empty() {
+        let mut output = String::new();
+        generate(None, None, &mut output).unwrap();
+        assert_eq!(output, "");
+    }
+
+    #[test]
+    fn header_name() {
+        let mut output = String::new();
+        generate(Some(&"Name"), None, &mut output).unwrap();
+        assert_eq!(output, "Name\n");
+    }
+
+    #[test]
+    fn header_description() {
+        let mut output = String::new();
+        generate(None, Some(&"A description"), &mut output).unwrap();
+        assert_eq!(output, "A description\n");
+    }
+
+    #[test]
+    fn header_both() {
+        let mut output = String::new();
+        generate(Some(&"Name"), Some(&"A description"), &mut output).unwrap();
+        assert_eq!(output, "Name\nA description\n");
+    }
 }
