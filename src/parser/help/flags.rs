@@ -147,7 +147,7 @@ fn display_group<'a, Options: 'a>(
 mod tests {
     use crate::{FlagArgument, HelpFlagArgument};
 
-    use super::partition_flags;
+    use super::{generate, partition_flags};
 
     #[test]
     fn partition_flags_empty() {
@@ -282,5 +282,39 @@ mod tests {
         assert_eq!(partitions[2].1.len(), 2);
         assert_eq!(partitions[2].1[0].short_name(), Some("c"));
         assert_eq!(partitions[2].1[1].short_name(), Some("f"));
+    }
+
+    #[test]
+    fn help_flag_empty() {
+        let mut output = String::new();
+        generate::<()>(None, &[], "", "", &mut output).unwrap();
+
+        assert_eq!(output, "");
+    }
+
+    #[test]
+    fn help_flag_header_empty() {
+        let mut output = String::new();
+        generate::<()>(Some(&"TEST"), &[], "", "", &mut output).unwrap();
+
+        assert_eq!(output, "");
+    }
+
+    #[test]
+    fn help_flag_default_header_one_group() {
+        let mut output = String::new();
+        generate::<()>(
+            None,
+            &[
+                &HelpFlagArgument::new().short_name("a").long_name("along"),
+                &HelpFlagArgument::new().short_name("b").long_name("blong"),
+            ],
+            "-",
+            "--",
+            &mut output,
+        )
+        .unwrap();
+
+        assert_eq!(output, "\nFLAGS:\n  -a, --along  Displays this help message\n  -b, --blong  Displays this help message\n");
     }
 }
