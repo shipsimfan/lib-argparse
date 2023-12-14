@@ -1,4 +1,3 @@
-use crate::Result;
 use std::ffi::OsString;
 
 /// A stream of arguments
