@@ -29,10 +29,14 @@ impl<'a> Parse<'a> for Flags<'a> {
         let mut flags = Punctuated::new();
         let mut parser = group.tokens();
         while !parser.empty() {
-            flags.push_element(parser.parse()?);
+            flags.push_element(
+                parser
+                    .parse()
+                    .map_err(|error| error.append("expected a flag"))?,
+            );
 
             if parser.peek::<Token![,]>() {
-                flags.push_seperator(parser.parse()?);
+                flags.push_seperator(parser.parse().unwrap());
             } else {
                 break;
             }

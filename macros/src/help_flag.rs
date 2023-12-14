@@ -7,7 +7,9 @@ pub struct HelpFlag {
 
 impl<'a> Parse<'a> for HelpFlag {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
-        let flag_name = parser.parse()?;
+        let flag_name = parser
+            .parse()
+            .map_err(|error| error.append("expected the flag name"))?;
 
         Ok(HelpFlag { flag_name })
     }

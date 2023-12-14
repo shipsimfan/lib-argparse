@@ -23,20 +23,28 @@ impl<'a> Parse<'a> for Description<'a> {
 
             let mut parser = group.tokens();
             while !parser.empty() {
-                lines.push_element(parser.parse()?);
+                lines.push_element(
+                    parser
+                        .parse()
+                        .map_err(|error| error.append("expected a line of description"))?,
+                );
 
                 if !parser.peek::<Token![,]>() {
                     break;
                 }
 
-                lines.push_seperator(parser.parse()?);
+                lines.push_seperator(parser.parse().unwrap());
             }
 
             if !parser.empty() {
                 return Err(parser.error("unexpected token"));
             }
         } else {
-            lines.push_element(parser.parse()?);
+            lines.push_element(
+                parser
+                    .parse()
+                    .map_err(|error| error.append("expected the description"))?,
+            );
         }
 
         Ok(Description { lines })

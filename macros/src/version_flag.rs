@@ -8,8 +8,12 @@ pub struct VersionFlag<'a> {
 
 impl<'a> Parse<'a> for VersionFlag<'a> {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
-        let flag_name = parser.parse()?;
-        let display = parser.parse()?;
+        let flag_name = parser
+            .parse()
+            .map_err(|error| error.append("expected the flag name"))?;
+        let display = parser
+            .parse()
+            .map_err(|error| error.append("expected the version display"))?;
 
         Ok(VersionFlag { flag_name, display })
     }

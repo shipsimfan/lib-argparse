@@ -9,11 +9,17 @@ pub(crate) struct FlagName {
 
 impl<'a> Parse<'a> for FlagName {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
-        let short_name: Option<Literal> = parser.parse()?;
+        let short_name: Option<Literal> = parser
+            .parse()
+            .map_err(|error| error.append("expected the short name"))?;
 
         let long_name = if parser.peek::<Token![,]>() {
             parser.parse::<Token![,]>()?;
-            Some(parser.parse()?)
+            Some(
+                parser
+                    .parse()
+                    .map_err(|error| error.append("expected the long name"))?,
+            )
         } else {
             None
         };

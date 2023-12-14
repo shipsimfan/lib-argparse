@@ -30,7 +30,9 @@ impl<'a> Parse<'a> for Parser<'a> {
         let description = parser
             .parse()
             .map_err(|error| error.append("expected a description or the end"))?;
-        let flags = parser.parse()?;
+        let flags = parser
+            .parse()
+            .map_err(|error| error.append("expected flags"))?;
 
         Ok(Parser {
             variable_name,

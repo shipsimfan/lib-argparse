@@ -27,24 +27,44 @@ pub struct SimpleFlag<'a> {
 
 impl<'a> Parse<'a> for SimpleFlag<'a> {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
-        let flag_name = parser.parse()?;
-        let parameter_info = parser.parse()?;
-        let description = parser.parse()?;
+        let flag_name = parser
+            .parse()
+            .map_err(|error| error.append("expected the flag name"))?;
+        let parameter_info = parser
+            .parse()
+            .map_err(|error| error.append("expected the paramter info"))?;
+        let description = parser
+            .parse()
+            .map_err(|error| error.append("expected the description"))?;
 
-        parser.parse::<Token![|]>()?;
-        let options = parser.parse()?;
+        parser
+            .parse::<Token![|]>()
+            .map_err(|error| error.append("expected the action closure"))?;
+        let options = parser
+            .parse()
+            .map_err(|error| error.append("expected the options variable"))?;
 
-        let options_type = parser.parse()?;
+        let options_type = parser
+            .parse()
+            .map_err(|error| error.append("expected the options type"))?;
 
         parser.parse::<Token![,]>()?;
 
         let parameters_mut = parser.parse()?;
-        let parameters = parser.parse()?;
-        parser.parse::<Token![|]>()?;
+        let parameters = parser
+            .parse()
+            .map_err(|error| error.append("expected the parameters"))?;
+        parser
+            .parse::<Token![|]>()
+            .map_err(|error| error.append("expected the end of the parameters"))?;
 
-        let error_indicator = parser.parse()?;
+        let error_indicator = parser
+            .parse()
+            .map_err(|error| error.append("expected the error indicator"))?;
 
-        let action = parser.parse()?;
+        let action = parser
+            .parse()
+            .map_err(|error| error.append("expected the action"))?;
 
         Ok(SimpleFlag {
             flag_name,

@@ -30,28 +30,50 @@ enum ErrorIndicator {
 
 impl<'a> Parse<'a> for ParsingFlag<'a> {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
-        let flag_name = parser.parse()?;
-        let hint = parser.parse()?;
-        let missing = parser.parse()?;
-        let description = parser.parse()?;
+        let flag_name = parser
+            .parse()
+            .map_err(|error| error.append("expected the flag name"))?;
+        let hint = parser
+            .parse()
+            .map_err(|error| error.append("expected the hint"))?;
+        let missing = parser
+            .parse()
+            .map_err(|error| error.append("expected the missing error message"))?;
+        let description = parser
+            .parse()
+            .map_err(|error| error.append("expected the description"))?;
 
-        parser.parse::<Token![|]>()?;
+        parser
+            .parse::<Token![|]>()
+            .map_err(|error| error.append("expected the action closure"))?;
 
-        let options = parser.parse()?;
-        let options_type = parser.parse()?;
+        let options = parser
+            .parse()
+            .map_err(|error| error.append("expected the options name"))?;
+        let options_type = parser
+            .parse()
+            .map_err(|error| error.append("expected the options type"))?;
 
         parser.parse::<Token![,]>()?;
 
         let item_mut = parser.parse()?;
-        let item = parser.parse()?;
-        parser.parse::<Token![:]>()?;
-        let item_type = parser.parse()?;
+        let item = parser
+            .parse()
+            .map_err(|error| error.append("expected the item name"))?;
+        parser
+            .parse::<Token![:]>()
+            .map_err(|error| error.append("expected the item type"))?;
+        let item_type = parser
+            .parse()
+            .map_err(|error| error.append("expected the item type"))?;
 
         parser.parse::<Token![|]>()?;
 
         let error_indicator = parser.parse()?;
 
-        let action = parser.parse()?;
+        let action = parser
+            .parse()
+            .map_err(|error| error.append("expected the action"))?;
 
         Ok(ParsingFlag {
             flag_name,

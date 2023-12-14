@@ -22,11 +22,17 @@ impl<'a> ParameterInfo<'a> {
 
 impl<'a> Parse<'a> for ParameterInfo<'a> {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
-        let count = parser.parse()?;
+        let count = parser
+            .parse()
+            .map_err(|error| error.append("expected the count"))?;
         parser.parse::<Token![*]>()?;
-        let hint = parser.parse()?;
+        let hint = parser
+            .parse()
+            .map_err(|error| error.append("expected the hint"))?;
 
-        let missing = parser.parse()?;
+        let missing = parser
+            .parse()
+            .map_err(|error| error.append("expected the missing error message"))?;
 
         Ok(ParameterInfo {
             count,

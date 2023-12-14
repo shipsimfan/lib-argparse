@@ -1,9 +1,8 @@
 # ToDo List
- 1. Improve error messages
- 2. Add tests
+ 1. Add tests
      1. Unit tests
      2. Integration tests
- 3. Add terminal arguments
+ 2. Add terminal arguments
      1. Add terminal argument trait
      2. Add terminal argument to help generation
      3. Add terminal argument parsing
