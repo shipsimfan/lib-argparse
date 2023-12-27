@@ -1,8 +1,8 @@
 use flags::Flags;
 use proc_macro_util::{
-    ast::Type,
+    ast::{Expression, Type},
     to_tokens,
-    tokens::{Identifier, Literal},
+    tokens::{Group, Identifier, Literal},
     Generator, Parse, Result, ToTokens, Token,
 };
 
@@ -13,6 +13,7 @@ pub struct Parser<'a> {
     options_type: Type,
     name: Literal,
     description: Option<Literal>,
+    terminal: Option<Expression<'a>>,
     flags: Flags<'a>,
 }
 
@@ -30,6 +31,13 @@ impl<'a> Parse<'a> for Parser<'a> {
         let description = parser
             .parse()
             .map_err(|error| error.append("expected a description or the end"))?;
+
+        let terminal = if !parser.peek::<Group>() {
+            Some(parser.parse()?)
+        } else {
+            None
+        };
+
         let flags = parser
             .parse()
             .map_err(|error| error.append("expected flags"))?;
@@ -39,6 +47,7 @@ impl<'a> Parse<'a> for Parser<'a> {
             options_type,
             name,
             description,
+            terminal,
             flags,
         })
     }
@@ -51,17 +60,24 @@ impl<'a> ToTokens for Parser<'a> {
             options_type,
             name,
             description,
+            terminal,
             flags,
         } = self;
 
-        to_tokens!(generator
+        to_tokens! { generator
             const #variable_name: ::argparse::Parser<#options_type> = ::argparse::Parser::new().name(&#name)
-        );
+        }
 
         if let Some(description) = description {
-            to_tokens!(generator
+            to_tokens! { generator
                 .description(&#description)
-            );
+            }
+        }
+
+        if let Some(terminal) = terminal {
+            to_tokens! { generator
+                .terminal(&#terminal)
+            }
         }
 
         flags.to_tokens(generator);

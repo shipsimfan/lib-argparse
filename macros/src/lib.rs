@@ -13,6 +13,7 @@ proc_macro_function!(
     /// parser! { PARSER_NAME -> OptionsType
     ///     name
     ///     description
+    ///     terminal
     ///     [
     ///         flags,*
     ///     ]
@@ -23,6 +24,7 @@ proc_macro_function!(
     ///  - `OptionsType` is the type options type the parser modifies
     ///  - `name` is a literal representing the name of the program
     ///  - `description` is an optional literal describing the use of the program
+    ///  - `terminal` is an optional expression which is the terminal argument of the parser
     ///  - `flags` is the optional list of flags, each one as an expression
     parser::Parser
 );

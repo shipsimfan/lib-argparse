@@ -3,15 +3,14 @@
      1. Unit tests
      2. Integration tests
  2. Add terminal arguments
-     1. Add terminal arguments to parser macro
-     2. Add commands
+     1. Add commands
          1. Add command struct
          2. Add commands struct (List of command that implements terminal argument)
-     3. Add commands macro
-     4. Add positionals
+     2. Add commands macro
+     3. Add positionals
          1. Add positional trait
          2. Add simple positional (one or more arguments -> action)
          3. Add parsing positional (one argument -> FromStr/From<String>/From<&str>/From<OsString>/From<&OsStr> -> action | error_map)
-     5. Add positional macros
+     4. Add positional macros
          1. Add simple positional macro
          2. Add parsing positional macro
