@@ -139,7 +139,7 @@ impl<
         self.repeatable
     }
 
-    fn action(&self, options: &mut Options, parameters: Vec<String>) -> crate::Result<()> {
+    fn action(&self, options: &mut Options, parameters: Vec<String>) -> crate::Result<'a, ()> {
         self.action_os(
             options,
             parameters
@@ -149,7 +149,7 @@ impl<
         )
     }
 
-    fn action_os(&self, options: &mut Options, parameters: Vec<OsString>) -> crate::Result<()> {
+    fn action_os(&self, options: &mut Options, parameters: Vec<OsString>) -> crate::Result<'a, ()> {
         if parameters.len() != self.count {
             return Err(crate::Error::missing_parameters(
                 self.missing_parameters.to_string(),

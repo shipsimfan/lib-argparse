@@ -137,7 +137,7 @@ impl<
         1
     }
 
-    fn action(&self, options: &mut Options, mut parameters: Vec<String>) -> crate::Result<()> {
+    fn action(&self, options: &mut Options, mut parameters: Vec<String>) -> crate::Result<'a, ()> {
         if parameters.len() != 1 {
             return Err(crate::Error::missing_parameters(
                 self.missing_parameter.to_string(),

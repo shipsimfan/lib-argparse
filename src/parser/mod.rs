@@ -1,6 +1,6 @@
-use crate::{Error, FlagArgument, FlagClass, Result};
+use crate::{terminal_argument::TerminalArgument, Error, FlagArgument, FlagClass, Result};
 use help::StdOut;
-use std::ffi::OsString;
+use std::{ffi::OsString, sync::Mutex};
 use stream::ArgumentStream;
 
 enum FlagArgumentResult {
@@ -45,6 +45,9 @@ pub struct Parser<'a, Options: 'a> {
 
     /// The list of flag arguments
     flags: &'a [&'a dyn FlagArgument<'a, Options>],
+
+    /// The terminal argument
+    terminal: Option<&'a Mutex<dyn TerminalArgument<'a, Options>>>,
 }
 
 const DEFAULT_SHORT_PREFIX: &str = "-";
@@ -69,6 +72,7 @@ impl<'a, Options> Parser<'a, Options> {
             short_prefix: DEFAULT_SHORT_PREFIX,
             long_prefix: DEFAULT_LONG_PREFIX,
             flags: &[],
+            terminal: None,
         }
     }
 
@@ -176,6 +180,14 @@ impl<'a, Options> Parser<'a, Options> {
         self
     }
 
+    /// Sets the terminal argument
+    pub const fn terminal(
+        mut self,
+        terminal: &'a Mutex<dyn TerminalArgument<'a, Options>>,
+    ) -> Self {
+        self.terminal = Some(terminal);
+        self
+    }
     /// Parses arguments from an iterator of [`String`]s
     ///
     /// ## Parameters
@@ -190,7 +202,7 @@ impl<'a, Options> Parser<'a, Options> {
         options: Options,
         arguments: I,
         prefix_argument: Option<OsString>,
-    ) -> Result<Option<Options>> {
+    ) -> Result<'a, Option<Options>> {
         self.do_parse(
             options,
             &mut ArgumentStream::new(&mut arguments.into_iter()),
@@ -214,7 +226,7 @@ impl<'a, Options> Parser<'a, Options> {
         options: Options,
         arguments: I,
         prefix_argument: Option<OsString>,
-    ) -> Result<Option<Options>> {
+    ) -> Result<'a, Option<Options>> {
         self.do_parse(
             options,
             &mut ArgumentStream::new_os(&mut arguments.into_iter()),
@@ -232,7 +244,7 @@ impl<'a, Options> Parser<'a, Options> {
     /// ## Return Value
     /// Returns the changed options if parsing is successful and no help flag was matched, returns
     /// the error otherwise.
-    pub fn parse_env(&self, options: Options) -> Result<Option<Options>> {
+    pub fn parse_env(&self, options: Options) -> Result<'a, Option<Options>> {
         let mut args = std::env::args_os();
         let prefix = args.next().unwrap();
 
@@ -252,10 +264,13 @@ impl<'a, Options> Parser<'a, Options> {
         &self,
         mut options: Options,
         stream: &mut ArgumentStream,
-        command_list: Vec<OsString>,
-    ) -> Result<Option<Options>> {
+        mut command_list: Vec<OsString>,
+    ) -> Result<'a, Option<Options>> {
         // Mark all flags as not ran
         let mut flags_ran = vec![false; self.flags.len()];
+
+        // Lock the terminal if there is one
+        let mut terminal = self.terminal.map(|terminal| terminal.lock().unwrap());
 
         while let Some(argument) = stream.next_os() {
             let argument = match self.handle_flag_argument(
@@ -270,10 +285,22 @@ impl<'a, Options> Parser<'a, Options> {
                 FlagArgumentResult::Help => return Ok(None),
             };
 
-            return Err(Error::unexpected_argument(format!(
-                "unexpected argument \"{}\"",
-                argument.to_string_lossy()
-            )));
+            if let Some(terminal) = &mut terminal {
+                if let Some(parser) = terminal.action(&mut options, argument.clone())? {
+                    command_list.push(argument);
+                    return parser.do_parse(options, stream, command_list);
+                }
+            } else {
+                return Err(Error::unexpected_argument(format!(
+                    "unexpected argument \"{}\"",
+                    argument.to_string_lossy()
+                )));
+            }
+        }
+
+        // Finalize terminal
+        if let Some(mut terminal) = terminal {
+            terminal.finalize()?;
         }
 
         // Finalize flags
@@ -303,7 +330,7 @@ impl<'a, Options> Parser<'a, Options> {
         stream: &mut ArgumentStream,
         flags_ran: &mut [bool],
         command_list: &[OsString],
-    ) -> Result<FlagArgumentResult> {
+    ) -> Result<'a, FlagArgumentResult> {
         // Check for long or short prefix
         let is_long = argument
             .as_encoded_bytes()

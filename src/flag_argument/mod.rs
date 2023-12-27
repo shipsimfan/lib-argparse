@@ -64,7 +64,7 @@ pub trait FlagArgument<'a, Options: 'a> {
     ///
     /// ## Return Value
     /// Can return an error if there is a problem with the parameters
-    fn action(&self, options: &mut Options, parameters: Vec<String>) -> Result<()>;
+    fn action(&self, options: &mut Options, parameters: Vec<String>) -> Result<'a, ()>;
 
     /// The action called upon matching this flag
     ///
@@ -75,7 +75,7 @@ pub trait FlagArgument<'a, Options: 'a> {
     ///
     /// ## Return Value
     /// Can return an error if there is a problem with the parameters
-    fn action_os(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<()> {
+    fn action_os(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<'a, ()> {
         self.action(
             options,
             parameters
@@ -150,11 +150,11 @@ impl<'a, Options: 'a, T: FlagArgument<'a, Options>> FlagArgument<'a, Options> fo
         T::repeatable(self)
     }
 
-    fn action(&self, options: &mut Options, parameters: Vec<String>) -> Result<()> {
+    fn action(&self, options: &mut Options, parameters: Vec<String>) -> Result<'a, ()> {
         T::action(self, options, parameters)
     }
 
-    fn action_os(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<()> {
+    fn action_os(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<'a, ()> {
         T::action_os(self, options, parameters)
     }
 
@@ -248,7 +248,7 @@ mod tests {
                 COUNT
             }
 
-            fn action(&self, _: &mut Options, parameters: Vec<String>) -> Result<()> {
+            fn action(&self, _: &mut Options, parameters: Vec<String>) -> Result<'a, ()> {
                 if parameters.len() == COUNT {
                     Ok(())
                 } else {
@@ -256,7 +256,7 @@ mod tests {
                 }
             }
 
-            fn action_os(&self, _: &mut Options, _: Vec<OsString>) -> Result<()> {
+            fn action_os(&self, _: &mut Options, _: Vec<OsString>) -> Result<'a, ()> {
                 panic!("Should not be called")
             }
 

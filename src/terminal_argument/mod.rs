@@ -7,16 +7,14 @@ pub trait TerminalArgument<'a, Options: 'a> {
     /// If the action returns a [`Parser`], then the remaining arguments will be parsed with that
     /// parser instead of the current one
     fn action(
-        &self,
+        &mut self,
         options: &mut Options,
         parameter: OsString,
-    ) -> Result<Option<&Parser<'a, Options>>>;
+    ) -> Result<'a, Option<&Parser<'a, Options>>>;
 
     /// Called for only the current parser's terminal argument when the end of arguments are
     /// reached
-    ///
-    /// `count` is the number of times the "action" was called
-    fn finalize(&self, count: usize) -> Result<()>;
+    fn finalize(&mut self) -> Result<'a, ()>;
 
     /// Gets the hint for displaying in the help
     fn hint(&self) -> Option<&dyn std::fmt::Display>;

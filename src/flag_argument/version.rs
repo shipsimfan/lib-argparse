@@ -83,11 +83,11 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for VersionFlagArgument<'a> {
         0
     }
 
-    fn action(&self, options: &mut Options, _: Vec<String>) -> crate::Result<()> {
+    fn action(&self, options: &mut Options, _: Vec<String>) -> crate::Result<'a, ()> {
         self.action_os(options, Vec::new())
     }
 
-    fn action_os(&self, _: &mut Options, _: Vec<std::ffi::OsString>) -> crate::Result<()> {
+    fn action_os(&self, _: &mut Options, _: Vec<std::ffi::OsString>) -> crate::Result<'a, ()> {
         println!("{}", self.version);
 
         if self.exit {
