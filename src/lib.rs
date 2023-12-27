@@ -13,6 +13,7 @@
 mod error;
 mod flag_argument;
 mod parser;
+mod terminal_argument;
 
 pub use error::{Error, Result};
 pub use flag_argument::{
