@@ -1,3 +1,4 @@
+use crate::Result;
 use std::ffi::OsString;
 
 /// A stream of arguments
@@ -32,6 +33,22 @@ impl<'a> ArgumentStream<'a> {
         ArgumentStream::OsString(iter)
     }
 
+    /// Gets the next [`String`] in the stream
+    ///
+    /// ## Return Value
+    /// Returns the next [`String`] in the stream if it exists, or an error if it contains invalid
+    /// UTF-8.
+    #[allow(unused)]
+    pub(super) fn next(&mut self) -> Result<'static, Option<String>> {
+        match self {
+            ArgumentStream::OsString(iter) => match iter.next() {
+                Some(os_string) => os_string.into_string().map(Some).map_err(Into::into),
+                None => Ok(None),
+            },
+            ArgumentStream::String(iter) => Ok(iter.next()),
+        }
+    }
+
     /// Gets the next [`OsString`] in the stream
     ///
     /// ## Return Value
@@ -40,6 +57,18 @@ impl<'a> ArgumentStream<'a> {
         match self {
             ArgumentStream::OsString(iter) => iter.next(),
             ArgumentStream::String(iter) => iter.next().map(OsString::from),
+        }
+    }
+
+    /// Is the source a stream of [`OsString`]s
+    ///
+    /// ## Return Value
+    /// Returns true if the source is [`OsString`]s
+    #[allow(unused)]
+    pub(super) fn is_os(&self) -> bool {
+        match self {
+            ArgumentStream::OsString(_) => true,
+            ArgumentStream::String(_) => false,
         }
     }
 }

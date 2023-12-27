@@ -1,4 +1,4 @@
-use crate::Result;
+use crate::{Error, Result};
 use std::ffi::OsString;
 
 /// The class of flag that a flag argument is
@@ -64,7 +64,26 @@ pub trait FlagArgument<'a, Options: 'a> {
     ///
     /// ## Return Value
     /// Can return an error if there is a problem with the parameters
-    fn action(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<()>;
+    fn action(&self, options: &mut Options, parameters: Vec<String>) -> Result<()>;
+
+    /// The action called upon matching this flag
+    ///
+    /// ## Parameters
+    ///  * `options` - The developer provided options that can be modified by this action
+    ///  * `parameters` - The parameters of length at most the amount returned by `count`, may be
+    ///                   less.
+    ///
+    /// ## Return Value
+    /// Can return an error if there is a problem with the parameters
+    fn action_os(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<()> {
+        self.action(
+            options,
+            parameters
+                .into_iter()
+                .map(|parameter| parameter.into_string().map_err(|_| Error::invalid_utf8()))
+                .collect::<Result<_>>()?,
+        )
+    }
 
     /// Called for every flag in the current parsing upon completion of the parsing
     ///
@@ -131,8 +150,12 @@ impl<'a, Options: 'a, T: FlagArgument<'a, Options>> FlagArgument<'a, Options> fo
         T::repeatable(self)
     }
 
-    fn action(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<()> {
+    fn action(&self, options: &mut Options, parameters: Vec<String>) -> Result<()> {
         T::action(self, options, parameters)
+    }
+
+    fn action_os(&self, options: &mut Options, parameters: Vec<OsString>) -> Result<()> {
+        T::action_os(self, options, parameters)
     }
 
     fn finalize(&self, ran: bool) -> Result<()> {
@@ -225,12 +248,16 @@ mod tests {
                 COUNT
             }
 
-            fn action(&self, _: &mut Options, parameters: Vec<OsString>) -> Result<()> {
+            fn action(&self, _: &mut Options, parameters: Vec<String>) -> Result<()> {
                 if parameters.len() == COUNT {
                     Ok(())
                 } else {
                     Err(Error::custom(""))
                 }
+            }
+
+            fn action_os(&self, _: &mut Options, _: Vec<OsString>) -> Result<()> {
+                panic!("Should not be called")
             }
 
             fn group(&self) -> Option<&str> {
@@ -259,9 +286,7 @@ mod tests {
         assert_eq!(FlagArgument::<()>::count(&example_ref), 1);
 
         assert!(FlagArgument::<()>::action(&example_ref, &mut (), Vec::new()).is_err());
-        assert!(
-            FlagArgument::<()>::action(&example_ref, &mut (), vec![OsString::from("abc")]).is_ok()
-        );
+        assert!(FlagArgument::<()>::action(&example_ref, &mut (), vec!["abc".to_owned()]).is_ok());
 
         assert!(FlagArgument::<()>::finalize(&example_ref, false).is_ok());
         assert!(FlagArgument::<()>::finalize(&example_ref, true).is_ok());

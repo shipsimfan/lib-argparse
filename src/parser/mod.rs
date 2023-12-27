@@ -366,18 +366,32 @@ impl<'a, Options> Parser<'a, Options> {
                 }
             }
 
-            // Parse the parameters from the stream
             let count = flag_argument.count();
-            let mut parameters = Vec::with_capacity(count);
-            for _ in 0..count {
-                match stream.next_os() {
-                    Some(parameter) => parameters.push(parameter),
-                    None => break,
+            if stream.is_os() {
+                // Parse the parameters from the stream as `OsString`s
+                let mut parameters = Vec::with_capacity(count);
+                for _ in 0..count {
+                    match stream.next_os() {
+                        Some(parameter) => parameters.push(parameter),
+                        None => break,
+                    }
                 }
-            }
 
-            // Call the action
-            flag_argument.action(options, parameters)?;
+                // Call the action
+                flag_argument.action_os(options, parameters)?;
+            } else {
+                // Parse the parameters from the stream as `String`s
+                let mut parameters = Vec::with_capacity(count);
+                for _ in 0..count {
+                    match stream.next()? {
+                        Some(parameter) => parameters.push(parameter),
+                        None => break,
+                    }
+                }
+
+                // Call the action
+                flag_argument.action(options, parameters)?;
+            }
 
             if flag_argument.class() == FlagClass::Interrupt {
                 Ok(FlagArgumentResult::Help)

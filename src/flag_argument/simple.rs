@@ -139,7 +139,17 @@ impl<
         self.repeatable
     }
 
-    fn action(&self, options: &mut Options, parameters: Vec<OsString>) -> crate::Result<()> {
+    fn action(&self, options: &mut Options, parameters: Vec<String>) -> crate::Result<()> {
+        self.action_os(
+            options,
+            parameters
+                .into_iter()
+                .map(|parameter| OsString::from(parameter))
+                .collect(),
+        )
+    }
+
+    fn action_os(&self, options: &mut Options, parameters: Vec<OsString>) -> crate::Result<()> {
         if parameters.len() != self.count {
             return Err(crate::Error::missing_parameters(
                 self.missing_parameters.to_string(),
@@ -174,8 +184,6 @@ impl<
 
 #[cfg(test)]
 mod tests {
-    use std::ffi::OsString;
-
     use crate::{FlagArgument, FlagClass, SimpleFlagArgument};
 
     #[test]
@@ -208,7 +216,7 @@ mod tests {
         let mut parameters = Vec::new();
         for _ in 0..COUNT {
             assert!(FlagArgument::<()>::action(&simple_flag, &mut (), parameters.clone()).is_err());
-            parameters.push(OsString::new());
+            parameters.push(String::new());
         }
         assert!(FlagArgument::<()>::action(&simple_flag, &mut (), parameters.clone()).is_ok());
 

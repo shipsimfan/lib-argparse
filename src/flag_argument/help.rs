@@ -74,7 +74,11 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for HelpFlagArgument<'a> {
         true
     }
 
-    fn action(&self, _: &mut Options, _: Vec<std::ffi::OsString>) -> Result<()> {
+    fn action(&self, _: &mut Options, _: Vec<String>) -> Result<()> {
+        Ok(())
+    }
+
+    fn action_os(&self, _: &mut Options, _: Vec<std::ffi::OsString>) -> Result<()> {
         Ok(())
     }
 

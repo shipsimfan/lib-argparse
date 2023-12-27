@@ -137,11 +137,7 @@ impl<
         1
     }
 
-    fn action(
-        &self,
-        options: &mut Options,
-        mut parameters: Vec<std::ffi::OsString>,
-    ) -> crate::Result<()> {
+    fn action(&self, options: &mut Options, mut parameters: Vec<String>) -> crate::Result<()> {
         if parameters.len() != 1 {
             return Err(crate::Error::missing_parameters(
                 self.missing_parameter.to_string(),
@@ -150,7 +146,7 @@ impl<
 
         (self.action)(
             options,
-            T::from_str(&parameters.swap_remove(0).into_string()?)
+            T::from_str(&parameters.swap_remove(0))
                 .map_err(|error| crate::Error::custom(error.to_string()))?,
         )
         .map_err(|error| crate::Error::custom(error.to_string()))
@@ -186,7 +182,6 @@ impl<
 #[cfg(test)]
 mod tests {
     use crate::{FlagArgument, FlagClass, ParsingFlagArgument};
-    use std::ffi::OsString;
 
     #[test]
     fn parsing_flag() {
@@ -217,16 +212,12 @@ mod tests {
 
         assert!(FlagArgument::<()>::action(&parsing_flag, &mut (), Vec::new()).is_err());
         assert!(
-            FlagArgument::<()>::action(&parsing_flag, &mut (), vec![OsString::from("test")])
-                .is_err()
+            FlagArgument::<()>::action(&parsing_flag, &mut (), vec!["test".to_owned()]).is_err()
         );
         assert!(
-            FlagArgument::<()>::action(&parsing_flag, &mut (), vec![OsString::from("256")])
-                .is_err()
+            FlagArgument::<()>::action(&parsing_flag, &mut (), vec!["256".to_owned()]).is_err()
         );
-        assert!(
-            FlagArgument::<()>::action(&parsing_flag, &mut (), vec![OsString::from("123")]).is_ok()
-        );
+        assert!(FlagArgument::<()>::action(&parsing_flag, &mut (), vec!["123".to_owned()]).is_ok());
 
         assert!(FlagArgument::<()>::finalize(&parsing_flag, false).is_ok());
         assert!(FlagArgument::<()>::finalize(&parsing_flag, true).is_ok());
