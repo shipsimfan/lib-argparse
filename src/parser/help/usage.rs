@@ -5,11 +5,13 @@ const DEFAULT_USAGE: &str = "USAGE:\n    %c %t";
 /// Generates the usage based on the provided usage string
 pub(super) fn generate(
     usage: Option<&str>,
+    terminal_usage: Option<&dyn std::fmt::Display>,
     command_list: &[OsString],
     output: &mut dyn std::fmt::Write,
 ) -> std::fmt::Result {
     parse_usage(
         usage.unwrap_or(DEFAULT_USAGE).chars().peekable(),
+        terminal_usage,
         command_list,
         output,
     )
@@ -17,6 +19,7 @@ pub(super) fn generate(
 
 fn parse_usage(
     mut usage: Peekable<Chars>,
+    terminal_usage: Option<&dyn std::fmt::Display>,
     command_list: &[OsString],
     output: &mut dyn std::fmt::Write,
 ) -> std::fmt::Result {
@@ -34,7 +37,13 @@ fn parse_usage(
             };
 
             match c {
-                't' => Ok(()), // TODO: Terminal Usage,
+                't' => {
+                    if let Some(terminal) = terminal_usage {
+                        write!(output, "{}", terminal)
+                    } else {
+                        Ok(())
+                    }
+                }
                 'c' => display_command_list(command_list, output),
                 x if x.is_digit(10) => {
                     let mut value = x.to_digit(10).unwrap() as usize;

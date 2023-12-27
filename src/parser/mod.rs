@@ -1,6 +1,6 @@
 use crate::{terminal_argument::TerminalArgument, Error, FlagArgument, FlagClass, Result};
 use help::StdOut;
-use std::{ffi::OsString, sync::Mutex};
+use std::{ffi::OsString, ops::Deref, sync::Mutex};
 use stream::ArgumentStream;
 
 enum FlagArgumentResult {
@@ -279,6 +279,7 @@ impl<'a, Options> Parser<'a, Options> {
                 stream,
                 &mut flags_ran,
                 &command_list,
+                terminal.as_ref().map(|terminal| terminal.deref()),
             )? {
                 FlagArgumentResult::NotFlag(argument) => argument,
                 FlagArgumentResult::Handled => continue,
@@ -323,13 +324,14 @@ impl<'a, Options> Parser<'a, Options> {
     /// ## Return Value
     /// Returns the argument if it is not a flag argument. Returns `Ok(None)` on successful parsing
     /// of the flag argument or the error if it is unsuccessful.
-    fn handle_flag_argument(
+    fn handle_flag_argument<'b>(
         &self,
         argument: OsString,
         options: &mut Options,
         stream: &mut ArgumentStream,
         flags_ran: &mut [bool],
         command_list: &[OsString],
+        terminal: Option<&dyn TerminalArgument<'a, Options>>,
     ) -> Result<'a, FlagArgumentResult> {
         // Check for long or short prefix
         let is_long = argument
@@ -382,6 +384,7 @@ impl<'a, Options> Parser<'a, Options> {
                     self.epilogue,
                     self.short_prefix,
                     self.long_prefix,
+                    terminal,
                     &mut StdOut::new(),
                 )
                 .unwrap();

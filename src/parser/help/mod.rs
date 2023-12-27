@@ -1,4 +1,4 @@
-use crate::FlagArgument;
+use crate::{terminal_argument::TerminalArgument, FlagArgument};
 use std::{ffi::OsString, io::StdoutLock};
 
 mod flags;
@@ -18,20 +18,29 @@ pub(super) fn generate<'a, Options>(
     epilogue: Option<&dyn std::fmt::Display>,
     short_prefix: &str,
     long_prefix: &str,
+    terminal: Option<&dyn TerminalArgument<'a, Options>>,
     output: &mut dyn std::fmt::Write,
 ) -> std::fmt::Result {
     if header::generate(name, description, output)? {
         writeln!(output)?;
     }
 
-    usage::generate(usage, command_list, output)?;
+    usage::generate(
+        usage,
+        terminal.map(|terminal| terminal.hint()),
+        command_list,
+        output,
+    )?;
 
     if let Some(prologue) = prologue {
         writeln!(output)?;
         writeln!(output, "{}", prologue)?;
     }
 
-    // TODO: terminal::generate
+    if let Some(terminal) = terminal {
+        writeln!(output)?;
+        terminal.help(output)?;
+    }
 
     flags::generate(header, flags, short_prefix, long_prefix, output)?;
 

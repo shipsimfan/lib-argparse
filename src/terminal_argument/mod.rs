@@ -17,8 +17,8 @@ pub trait TerminalArgument<'a, Options: 'a> {
     fn finalize(&mut self) -> Result<'a, ()>;
 
     /// Gets the hint for displaying in the help
-    fn hint(&self) -> Option<&dyn std::fmt::Display>;
+    fn hint(&self) -> &dyn std::fmt::Display;
 
     /// Writes the help for this terminal argument to `f`
-    fn help(&self, f: std::fmt::Formatter<'_>) -> std::fmt::Result;
+    fn help(&self, f: &mut dyn std::fmt::Write) -> std::fmt::Result;
 }
