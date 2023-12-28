@@ -9,6 +9,7 @@
 
 #![deny(missing_docs)]
 #![feature(const_trait_impl)]
+#![feature(const_mut_refs)]
 
 mod error;
 mod flag_argument;
@@ -22,3 +23,4 @@ pub use flag_argument::{
 };
 pub use macros::{help_flag, parser, parsing_flag, simple_flag, version_flag};
 pub use parser::Parser;
+pub use terminal_argument::{Command, Commands, TerminalArgument};

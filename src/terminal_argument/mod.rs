@@ -1,6 +1,11 @@
 use crate::{Parser, Result};
 use std::ffi::OsString;
 
+mod commands;
+
+pub use commands::{Command, Commands};
+
+/// An argument that consumes all non-flag arguments
 pub trait TerminalArgument<'a, Options: 'a> {
     /// The action called when an non-flag argument is encountered
     ///
