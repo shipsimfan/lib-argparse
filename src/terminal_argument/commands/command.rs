@@ -6,18 +6,22 @@ pub struct Command<'a, Options: 'a> {
     name: &'a str,
     description: Option<&'a [&'a dyn std::fmt::Display]>,
     action: &'a dyn Fn(&mut Options) -> Result<'a, ()>,
-    parser: Option<&'a Parser<'a, Options>>,
+    parser: &'a Parser<'a, Options>,
     phantom: PhantomData<Options>,
 }
 
 impl<'a, Options: 'a> Command<'a, Options> {
     /// Creates a new [`Command`]
-    pub const fn new(name: &'a str, action: &'a dyn Fn(&mut Options) -> Result<'a, ()>) -> Self {
+    pub const fn new(
+        name: &'a str,
+        action: &'a dyn Fn(&mut Options) -> Result<'a, ()>,
+        parser: &'a Parser<'a, Options>,
+    ) -> Self {
         Command {
             name,
             description: None,
             action,
-            parser: None,
+            parser,
             phantom: PhantomData,
         }
     }
@@ -42,7 +46,7 @@ impl<'a, Options: 'a> Command<'a, Options> {
 
     /// Sets the parser for a command
     pub const fn parser(mut self, parser: &'a Parser<'a, Options>) -> Self {
-        self.parser = Some(parser);
+        self.parser = parser;
         self
     }
 
@@ -61,6 +65,6 @@ impl<'a, Options: 'a> Command<'a, Options> {
         &self,
         options: &mut Options,
     ) -> Result<'a, Option<&Parser<'a, Options>>> {
-        (self.action)(options).map(|_| self.parser)
+        (self.action)(options).map(|_| Some(self.parser))
     }
 }

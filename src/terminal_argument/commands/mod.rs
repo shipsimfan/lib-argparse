@@ -9,8 +9,6 @@ pub struct Commands<'a, Options: 'a> {
     name: Option<&'a dyn std::fmt::Display>,
     required: Option<&'a dyn std::fmt::Display>,
     commands: &'a [Command<'a, Options>],
-
-    run: bool,
 }
 
 impl<'a, Options: 'a> Commands<'a, Options> {
@@ -20,8 +18,6 @@ impl<'a, Options: 'a> Commands<'a, Options> {
             name: None,
             required: None,
             commands,
-
-            run: false,
         }
     }
 
@@ -50,13 +46,12 @@ impl<'a, Options: 'a> Commands<'a, Options> {
 
 impl<'a, Options: 'a> TerminalArgument<'a, Options> for Commands<'a, Options> {
     fn action(
-        &mut self,
+        &self,
         options: &mut Options,
+        _: usize,
         parameter: std::ffi::OsString,
     ) -> Result<'a, Option<&Parser<'a, Options>>> {
         let parameter = parameter.into_string()?;
-
-        self.run = true;
 
         for command in self.commands {
             if command.get_name() == parameter {
@@ -70,9 +65,9 @@ impl<'a, Options: 'a> TerminalArgument<'a, Options> for Commands<'a, Options> {
         )))
     }
 
-    fn finalize(&mut self) -> Result<'a, ()> {
+    fn finalize(&self, count: usize) -> Result<'a, ()> {
         if let Some(missing) = self.required {
-            if !self.run {
+            if count == 0 {
                 return Err(Error::missing_required(missing.to_string()));
             }
         }

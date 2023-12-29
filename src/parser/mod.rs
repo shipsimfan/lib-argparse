@@ -1,6 +1,6 @@
 use crate::{terminal_argument::TerminalArgument, Error, FlagArgument, FlagClass, Result};
 use help::StdOut;
-use std::{ffi::OsString, ops::Deref, sync::Mutex};
+use std::ffi::OsString;
 use stream::ArgumentStream;
 
 enum FlagArgumentResult {
@@ -47,7 +47,7 @@ pub struct Parser<'a, Options: 'a> {
     flags: &'a [&'a dyn FlagArgument<'a, Options>],
 
     /// The terminal argument
-    terminal: Option<&'a Mutex<dyn TerminalArgument<'a, Options>>>,
+    terminal: Option<&'a dyn TerminalArgument<'a, Options>>,
 }
 
 const DEFAULT_SHORT_PREFIX: &str = "-";
@@ -181,10 +181,7 @@ impl<'a, Options> Parser<'a, Options> {
     }
 
     /// Sets the terminal argument
-    pub const fn terminal(
-        mut self,
-        terminal: &'a Mutex<dyn TerminalArgument<'a, Options>>,
-    ) -> Self {
+    pub const fn terminal(mut self, terminal: &'a dyn TerminalArgument<'a, Options>) -> Self {
         self.terminal = Some(terminal);
         self
     }
@@ -268,9 +265,7 @@ impl<'a, Options> Parser<'a, Options> {
     ) -> Result<'a, Option<Options>> {
         // Mark all flags as not ran
         let mut flags_ran = vec![false; self.flags.len()];
-
-        // Lock the terminal if there is one
-        let mut terminal = self.terminal.map(|terminal| terminal.lock().unwrap());
+        let mut terminal_index = 0;
 
         while let Some(argument) = stream.next_os() {
             let argument = match self.handle_flag_argument(
@@ -279,18 +274,22 @@ impl<'a, Options> Parser<'a, Options> {
                 stream,
                 &mut flags_ran,
                 &command_list,
-                terminal.as_ref().map(|terminal| terminal.deref()),
+                self.terminal,
             )? {
                 FlagArgumentResult::NotFlag(argument) => argument,
                 FlagArgumentResult::Handled => continue,
                 FlagArgumentResult::Help => return Ok(None),
             };
 
-            if let Some(terminal) = &mut terminal {
-                if let Some(parser) = terminal.action(&mut options, argument.clone())? {
+            if let Some(terminal) = self.terminal {
+                if let Some(parser) =
+                    terminal.action(&mut options, terminal_index, argument.clone())?
+                {
                     command_list.push(argument);
                     return parser.do_parse(options, stream, command_list);
                 }
+
+                terminal_index += 1;
             } else {
                 return Err(Error::unexpected_argument(format!(
                     "unexpected argument \"{}\"",
@@ -300,8 +299,8 @@ impl<'a, Options> Parser<'a, Options> {
         }
 
         // Finalize terminal
-        if let Some(mut terminal) = terminal {
-            terminal.finalize()?;
+        if let Some(terminal) = self.terminal {
+            terminal.finalize(terminal_index)?;
         }
 
         // Finalize flags
