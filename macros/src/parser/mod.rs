@@ -32,7 +32,7 @@ impl<'a> Parse<'a> for Parser<'a> {
             .parse()
             .map_err(|error| error.append("expected a description or the end"))?;
 
-        let terminal = if !parser.peek::<Group>() {
+        let terminal = if !parser.empty() && !parser.peek::<Group>() {
             Some(parser.parse()?)
         } else {
             None
