@@ -2,7 +2,7 @@
  1. Add tests (42/90%)
      1. Unit tests
      2. Integration tests
- 2. Add terminal arguments
+ 3. Add terminal arguments
      1. Add commands macro
      2. Add positionals
          1. Add positional trait

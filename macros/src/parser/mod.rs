@@ -1,6 +1,6 @@
 use flags::Flags;
 use proc_macro_util::{
-    ast::{Expression, Type},
+    ast::{Expression, Type, Visibility},
     to_tokens,
     tokens::{Group, Identifier, Literal},
     Generator, Parse, Result, ToTokens, Token,
@@ -9,6 +9,7 @@ use proc_macro_util::{
 mod flags;
 
 pub struct Parser<'a> {
+    visibility: Option<Visibility<'a>>,
     variable_name: Identifier,
     options_type: Type,
     name: Literal,
@@ -19,6 +20,7 @@ pub struct Parser<'a> {
 
 impl<'a> Parse<'a> for Parser<'a> {
     fn parse(parser: &mut proc_macro_util::Parser<'a>) -> Result<Self> {
+        let visibility = parser.parse()?;
         let variable_name = parser
             .parse()
             .map_err(|error| error.append("expected a variable name for the parser"))?;
@@ -43,6 +45,7 @@ impl<'a> Parse<'a> for Parser<'a> {
             .map_err(|error| error.append("expected flags"))?;
 
         Ok(Parser {
+            visibility,
             variable_name,
             options_type,
             name,
@@ -56,6 +59,7 @@ impl<'a> Parse<'a> for Parser<'a> {
 impl<'a> ToTokens for Parser<'a> {
     fn to_tokens(&self, generator: &mut Generator) {
         let Parser {
+            visibility,
             variable_name,
             options_type,
             name,
@@ -65,7 +69,7 @@ impl<'a> ToTokens for Parser<'a> {
         } = self;
 
         to_tokens! { generator
-            const #variable_name: ::argparse::Parser<#options_type> = ::argparse::Parser::new().name(&#name)
+            #visibility const #variable_name: ::argparse::Parser<#options_type> = ::argparse::Parser::new().name(&#name)
         }
 
         if let Some(description) = description {
