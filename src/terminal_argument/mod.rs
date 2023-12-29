@@ -2,8 +2,10 @@ use crate::{Parser, Result};
 use std::ffi::OsString;
 
 mod commands;
+mod positional;
 
 pub use commands::{Command, Commands};
+pub use positional::{PositionalArgument, PositionalTerminalArgument};
 
 /// An argument that consumes all non-flag arguments
 pub trait TerminalArgument<'a, Options: 'a> {
