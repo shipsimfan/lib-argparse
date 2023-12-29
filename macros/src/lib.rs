@@ -98,7 +98,7 @@ proc_macro_function!(
 );
 
 proc_macro_function!(
-    /// Creates a simple flag
+    /// Creates a parsing flag
     ///
     /// The format for this macro is as follows:
     /// ```
@@ -125,4 +125,53 @@ proc_macro_function!(
     ///     [`Infallible`].
     ///  - `action` is an expression which is the action itself.
     parsing_flag::ParsingFlag
+);
+
+proc_macro_function!(
+    /// Creates a list of commands
+    ///
+    /// The format for this macro is as follows:
+    /// ```
+    /// commands! [
+    ///     commands,*
+    /// ]
+    /// ```
+    /// where:
+    ///  - `commands` is the optional list of commands, each one as an expression
+    commands::Commands
+);
+
+proc_macro_function!(
+    /// Creates a command
+    ///
+    /// The format for this macro is as follows:
+    /// ```
+    /// command! {
+    ///     name
+    ///     description
+    ///     |options: Options|? action
+    ///     {
+    ///         parser_name
+    ///         terminal
+    ///         [
+    ///             flags,*
+    ///         ]
+    ///     }
+    /// }
+    /// ```
+    /// where:
+    ///  - `name` is a literal which is the name of the command
+    ///  - `description` is a literal which is the description of the command
+    ///  - `options` is an identifier for the developer provided options variable in the action
+    ///  - `Options` is an optional type that specifies the options type when it is ambiguous to
+    ///     the compiler. The preceding colon indicates the presence of this field. A `&mut` is not
+    ///     nescessary and is added by the macro.
+    ///  - `?` is optional and if present, indicates that the action might return an error,
+    ///     otherwise the action return is wrapped in [`Result::Ok`] and the return type is set to
+    ///     [`Infallible`].
+    ///  - `action` is an expression which is the action itself.
+    ///  - `parser_name` is a literal which is the name of the resulting parser for this command
+    ///  - `terminal` is an optional expression which is the terminal argument of the resulting parser
+    ///  - `flags` is the optional list of flags for the resulting parser, each one as an expression
+    command::Command
 );
