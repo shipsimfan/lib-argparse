@@ -12,7 +12,7 @@ proc_macro_function!(
     /// ```
     /// parser! { PARSER_NAME -> OptionsType
     ///     name
-    ///     description
+    ///     description,
     ///     terminal
     ///     [
     ///         flags,*
