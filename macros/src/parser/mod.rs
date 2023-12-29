@@ -1,3 +1,4 @@
+use crate::description::Description;
 use proc_macro_util::{
     ast::{Expression, Type, Visibility},
     to_tokens,
@@ -14,7 +15,7 @@ pub struct Parser<'a> {
     variable_name: Identifier,
     options_type: Type,
     name: Literal,
-    description: Option<Literal>,
+    description: Option<Description<'a>>,
     terminal: Option<Expression<'a>>,
     flags: Flags<'a>,
 }

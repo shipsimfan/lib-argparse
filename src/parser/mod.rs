@@ -15,7 +15,7 @@ pub struct Parser<'a, Options: 'a> {
     name: Option<&'a dyn std::fmt::Display>,
 
     /// Program description displayed in the help
-    description: Option<&'a dyn std::fmt::Display>,
+    description: &'a [&'a dyn std::fmt::Display],
 
     /// The usage description of the program
     ///
@@ -64,7 +64,7 @@ impl<'a, Options> Parser<'a, Options> {
     pub const fn new() -> Self {
         Parser {
             name: None,
-            description: None,
+            description: &[],
             usage: None,
             prologue: None,
             flag_header: None,
@@ -95,8 +95,8 @@ impl<'a, Options> Parser<'a, Options> {
     ///
     /// ## Return Value
     /// Returns this [`Parser`] with the modified description
-    pub const fn description<S: std::fmt::Display>(mut self, description: &'a S) -> Self {
-        self.description = Some(description);
+    pub const fn description(mut self, description: &'a [&'a dyn std::fmt::Display]) -> Self {
+        self.description = description;
         self
     }
 

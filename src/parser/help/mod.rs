@@ -9,7 +9,7 @@ pub(super) struct StdOut<'a>(StdoutLock<'a>);
 
 pub(super) fn generate<'a, Options>(
     name: Option<&dyn std::fmt::Display>,
-    description: Option<&dyn std::fmt::Display>,
+    description: &[&dyn std::fmt::Display],
     usage: Option<&str>,
     command_list: &[OsString],
     prologue: Option<&dyn std::fmt::Display>,

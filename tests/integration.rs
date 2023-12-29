@@ -48,7 +48,7 @@ fn integration() {
 
     let parser = Parser::new()
         .name(&"Test")
-        .description(&"A test program")
+        .description(&[&"A test program"])
         .flags(flags);
 
     assert!(parser
