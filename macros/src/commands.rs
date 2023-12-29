@@ -11,7 +11,11 @@ impl<'a> Parse<'a> for Commands<'a> {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
         let mut commands = Punctuated::new();
         while !parser.empty() {
-            commands.push_element(parser.parse()?);
+            commands.push_element(
+                parser
+                    .parse()
+                    .map_err(|error| error.append("expected a command"))?,
+            );
 
             if parser.peek::<Token![,]>() {
                 commands.push_seperator(parser.parse()?);

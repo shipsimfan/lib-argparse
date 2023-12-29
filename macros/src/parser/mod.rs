@@ -1,4 +1,3 @@
-use flags::Flags;
 use proc_macro_util::{
     ast::{Expression, Type, Visibility},
     to_tokens,
@@ -7,6 +6,8 @@ use proc_macro_util::{
 };
 
 mod flags;
+
+pub use flags::Flags;
 
 pub struct Parser<'a> {
     visibility: Option<Visibility<'a>>,
@@ -35,7 +36,11 @@ impl<'a> Parse<'a> for Parser<'a> {
             .map_err(|error| error.append("expected a description or the end"))?;
 
         let terminal = if !parser.empty() && !parser.peek::<Group>() {
-            Some(parser.parse()?)
+            Some(
+                parser
+                    .parse()
+                    .map_err(|error| error.append("expected the terminal argument"))?,
+            )
         } else {
             None
         };
