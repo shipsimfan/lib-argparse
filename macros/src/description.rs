@@ -4,10 +4,12 @@ use proc_macro_util::{
     to_tokens, Generator, Parse, Parser, Result, ToTokens, Token,
 };
 
+#[derive(Clone)]
 pub struct Description<'a> {
     lines: Punctuated<DescriptionLine<'a>, Token![,]>,
 }
 
+#[derive(Clone)]
 struct DescriptionLine<'a> {
     line: Expression<'a>,
 }

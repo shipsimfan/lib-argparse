@@ -17,6 +17,11 @@ pub struct Command<'a> {
     options_type: Option<OptionsType>,
     error_indicator: Option<Token![?]>,
     action: Expression<'a>,
+    command_parser: CommandParser<'a>,
+}
+
+struct CommandParser<'a> {
+    description: Option<Description<'a>>,
     parser_name: Literal,
     terminal: Option<Expression<'a>>,
     flags: Flags<'a>,
@@ -27,7 +32,7 @@ impl<'a> Parse<'a> for Command<'a> {
         let name = parser
             .parse()
             .map_err(|error| error.append("expected the command name"))?;
-        let description = parser
+        let description: Description = parser
             .parse()
             .map_err(|error| error.append("expected the description"))?;
 
@@ -46,6 +51,51 @@ impl<'a> Parse<'a> for Command<'a> {
             .parse()
             .map_err(|error| error.append("expected the action"))?;
 
+        let mut command_parser: CommandParser = parser.parse()?;
+        command_parser.description = Some(description.clone());
+
+        Ok(Command {
+            name,
+            description,
+            options,
+            options_type,
+            error_indicator,
+            action,
+            command_parser,
+        })
+    }
+}
+
+impl<'a> ToTokens for Command<'a> {
+    fn to_tokens(&self, generator: &mut Generator) {
+        let Command {
+            name,
+            description,
+            options,
+            options_type,
+            error_indicator,
+            action,
+            command_parser,
+        } = self;
+
+        let action = if error_indicator.is_some() {
+            ActionWrapper::NoWrap(action)
+        } else {
+            ActionWrapper::Wrap(action)
+        };
+
+        to_tokens! { generator
+            ::argparse::Command::new(
+                #name,
+                |#options #options_type| #action,
+                #command_parser
+            ).description(#description)
+        }
+    }
+}
+
+impl<'a> Parse<'a> for CommandParser<'a> {
+    fn parse(parser: &mut Parser<'a>) -> Result<Self> {
         let group = parser
             .parse::<Group>()
             .map_err(|error| error.append("expected the parser info"))?;
@@ -70,13 +120,8 @@ impl<'a> Parse<'a> for Command<'a> {
             .parse()
             .map_err(|error| error.append("expected the flags"))?;
 
-        Ok(Command {
-            name,
-            description,
-            options,
-            options_type,
-            error_indicator,
-            action,
+        Ok(CommandParser {
+            description: None,
             parser_name,
             terminal,
             flags,
@@ -84,36 +129,32 @@ impl<'a> Parse<'a> for Command<'a> {
     }
 }
 
-impl<'a> ToTokens for Command<'a> {
+impl<'a> ToTokens for CommandParser<'a> {
     fn to_tokens(&self, generator: &mut Generator) {
-        let Command {
-            name,
+        let CommandParser {
             description,
-            options,
-            options_type,
-            error_indicator,
-            action,
             parser_name,
             terminal,
             flags,
         } = self;
 
-        let action = if error_indicator.is_some() {
-            ActionWrapper::NoWrap(action)
-        } else {
-            ActionWrapper::Wrap(action)
-        };
-
         to_tokens! { generator
-            ::argparse::Command::new(
-                #name,
-                |#options #options_type| #action,
-                ::argparse::Parser::new()
+            ::argparse::Parser::new()
                     .name(&#parser_name)
-                    .description(&#description)
-                    .flags(#flags)
-                    .terminal(&#terminal)
-            ).description(&#description)
         }
+
+        if let Some(description) = description {
+            to_tokens! { generator
+                .description(#description)
+            }
+        }
+
+        if let Some(terminal) = terminal {
+            to_tokens! { generator
+                .terminal(&#terminal)
+            }
+        }
+
+        flags.to_tokens(generator);
     }
 }
