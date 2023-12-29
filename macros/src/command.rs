@@ -87,8 +87,8 @@ impl<'a> ToTokens for Command<'a> {
         to_tokens! { generator
             ::argparse::Command::new(
                 #name,
-                |#options #options_type| #action,
-                #command_parser
+                &|#options #options_type| #action,
+                &#command_parser
             ).description(#description)
         }
     }
