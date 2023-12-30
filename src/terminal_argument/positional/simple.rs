@@ -1,11 +1,12 @@
-use crate::{Error, PositionalArgument, Result};
+use crate::PositionalArgument;
 use std::{ffi::OsString, marker::PhantomData, num::NonZeroUsize};
 
 /// A positional argument that takes upto a fixed number of arguments and passes them to an action
 pub struct SimplePositionalArgument<
     'a,
     Options: 'a,
-    Action: Fn(&mut Options, usize, OsString) -> Result<'a, ()>,
+    Error: std::fmt::Display + 'a,
+    Action: Fn(&mut Options, usize, OsString) -> Result<(), Error>,
 > {
     name: &'a dyn std::fmt::Display,
     description: &'a [&'a dyn std::fmt::Display],
@@ -20,8 +21,12 @@ pub struct SimplePositionalArgument<
     phantom: PhantomData<Options>,
 }
 
-impl<'a, Options: 'a, Action: Fn(&mut Options, usize, OsString) -> Result<'a, ()>>
-    SimplePositionalArgument<'a, Options, Action>
+impl<
+        'a,
+        Options: 'a,
+        Error: std::fmt::Display + 'a,
+        Action: Fn(&mut Options, usize, OsString) -> Result<(), Error>,
+    > SimplePositionalArgument<'a, Options, Error, Action>
 {
     /// Creates a new [`SimplePositionalArgument`]
     pub const fn new(name: &'a dyn std::fmt::Display, count: NonZeroUsize, action: Action) -> Self {
@@ -82,8 +87,12 @@ impl<'a, Options: 'a, Action: Fn(&mut Options, usize, OsString) -> Result<'a, ()
     }
 }
 
-impl<'a, Options: 'a, Action: Fn(&mut Options, usize, OsString) -> Result<'a, ()>>
-    PositionalArgument<'a, Options> for SimplePositionalArgument<'a, Options, Action>
+impl<
+        'a,
+        Options: 'a,
+        Error: std::fmt::Display + 'a,
+        Action: Fn(&mut Options, usize, OsString) -> Result<(), Error>,
+    > PositionalArgument<'a, Options> for SimplePositionalArgument<'a, Options, Error, Action>
 {
     fn name(&self) -> &dyn std::fmt::Display {
         self.name
@@ -101,14 +110,20 @@ impl<'a, Options: 'a, Action: Fn(&mut Options, usize, OsString) -> Result<'a, ()
         self.count
     }
 
-    fn action(&self, options: &mut Options, index: usize, parameter: OsString) -> Result<'a, ()> {
+    fn action(
+        &self,
+        options: &mut Options,
+        index: usize,
+        parameter: OsString,
+    ) -> crate::Result<'a, ()> {
         (self.action)(options, index, parameter)
+            .map_err(|error| crate::Error::custom(error.to_string()))
     }
 
-    fn finalize(&self, count: usize) -> Result<'a, ()> {
+    fn finalize(&self, count: usize) -> crate::Result<'a, ()> {
         if let Some((minimum, missing)) = self.minimum {
             if count < minimum.get() {
-                return Err(Error::missing_required(missing.to_string()));
+                return Err(crate::Error::missing_required(missing.to_string()));
             }
         }
 
