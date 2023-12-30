@@ -103,7 +103,7 @@ impl<'a, Options> TerminalArgument<'a, Options> for PositionalTerminalArgument<'
             }
         }
 
-        write!(f, "{}:", self.header.unwrap_or(&"ARGUMENTS"))?;
+        writeln!(f, "{}:", self.header.unwrap_or(&"ARGUMENTS"))?;
         for positional in self.positionals {
             write!(f, "  {}", positional.name())?;
 
