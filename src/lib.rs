@@ -24,6 +24,6 @@ pub use flag_argument::{
 pub use macros::{command, commands, help_flag, parser, parsing_flag, simple_flag, version_flag};
 pub use parser::Parser;
 pub use terminal_argument::{
-    Command, Commands, PositionalArgument, PositionalTerminalArgument, SimplePositionalArgument,
-    TerminalArgument,
+    Command, Commands, ParsingPositionalArgument, PositionalArgument, PositionalTerminalArgument,
+    SimplePositionalArgument, TerminalArgument,
 };

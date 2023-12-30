@@ -5,7 +5,10 @@ mod commands;
 mod positional;
 
 pub use commands::{Command, Commands};
-pub use positional::{PositionalArgument, PositionalTerminalArgument, SimplePositionalArgument};
+pub use positional::{
+    ParsingPositionalArgument, PositionalArgument, PositionalTerminalArgument,
+    SimplePositionalArgument,
+};
 
 /// An argument that consumes all non-flag arguments
 pub trait TerminalArgument<'a, Options: 'a> {
