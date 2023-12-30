@@ -18,7 +18,7 @@ pub trait PositionalArgument<'a, Options: 'a> {
     fn count(&self) -> NonZeroUsize;
 
     /// The action called when this positional is reached with an argument
-    fn action(&self, index: usize, options: &mut Options, parameter: OsString) -> Result<'a, ()>;
+    fn action(&self, options: &mut Options, index: usize, parameter: OsString) -> Result<'a, ()>;
 
     /// Called for all positionals at the end of parsing
     fn finalize(&self, count: usize) -> Result<'a, ()>;

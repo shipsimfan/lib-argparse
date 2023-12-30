@@ -50,14 +50,14 @@ impl<'a, Options> TerminalArgument<'a, Options> for PositionalTerminalArgument<'
     ) -> crate::Result<'a, Option<&crate::Parser<'a, Options>>> {
         for positional in self.positionals {
             if positional.count().get() > index {
-                return positional.action(index, options, parameter).map(|_| None);
+                return positional.action(options, index, parameter).map(|_| None);
             } else {
                 index -= positional.count().get();
             }
         }
 
         if let Some(collecting) = self.collecting {
-            collecting.action(index, options, parameter).map(|_| None)
+            collecting.action(options, index, parameter).map(|_| None)
         } else {
             Err(Error::unexpected_argument(format!(
                 "unexpected argument \"{}\"",
