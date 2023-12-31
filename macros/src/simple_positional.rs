@@ -120,7 +120,7 @@ impl<'a> ToTokens for SimplePositional<'a> {
         }
 
         to_tokens! { generator
-            ::new(#name, #count, |#options #options_type, #index, #parameters_mut #parameters| #action).description(#description).hint(#hint)
+            ::new(&#name, unsafe { ::std::num::NonZeroUsize::new_unchecked(#count) }, |#options #options_type, #index, #parameters_mut #parameters| #action).description(#description).hint(&#hint)
         }
     }
 }
