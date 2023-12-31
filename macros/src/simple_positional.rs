@@ -1,9 +1,4 @@
-use crate::{
-    action_wrapper::ActionWrapper, description::Description, flag_name::FlagName,
-    options_type::OptionsType,
-};
-use parameter_info::ParameterInfo;
-use proc_macro::Span;
+use crate::{action_wrapper::ActionWrapper, description::Description, options_type::OptionsType};
 use proc_macro_util::{
     ast::{Expression, VariableName},
     to_tokens,
@@ -11,28 +6,32 @@ use proc_macro_util::{
     Generator, Parse, Parser, Result, ToTokens, Token,
 };
 
-mod parameter_info;
-
-pub struct SimpleFlag<'a> {
-    flag_name: FlagName,
-    parameter_info: Option<ParameterInfo<'a>>,
+pub struct SimplePositional<'a> {
+    name: Literal,
+    count: Literal,
+    hint: Literal,
     description: Description<'a>,
     options: VariableName,
     options_type: Option<OptionsType>,
+    index: VariableName,
     parameters_mut: Option<Token![mut]>,
     parameters: VariableName,
     error_indicator: Option<Token![?]>,
     action: Expression<'a>,
 }
 
-impl<'a> Parse<'a> for SimpleFlag<'a> {
+impl<'a> Parse<'a> for SimplePositional<'a> {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
-        let flag_name = parser
+        let name = parser
             .parse()
-            .map_err(|error| error.append("expected the flag name"))?;
-        let parameter_info = parser
+            .map_err(|error| error.append("expected the name"))?;
+        let count = parser
             .parse()
-            .map_err(|error| error.append("expected the paramter info"))?;
+            .map_err(|error| error.append("expected the count"))?;
+        parser.parse::<Token![*]>()?;
+        let hint = parser
+            .parse()
+            .map_err(|error| error.append("expected the hint"))?;
         let description = parser
             .parse()
             .map_err(|error| error.append("expected the description"))?;
@@ -47,6 +46,12 @@ impl<'a> Parse<'a> for SimpleFlag<'a> {
         let options_type = parser
             .parse()
             .map_err(|error| error.append("expected the options type"))?;
+
+        parser.parse::<Token![,]>()?;
+
+        let index = parser
+            .parse()
+            .map_err(|error| error.append("expected the index variable"))?;
 
         parser.parse::<Token![,]>()?;
 
@@ -66,12 +71,14 @@ impl<'a> Parse<'a> for SimpleFlag<'a> {
             .parse()
             .map_err(|error| error.append("expected the action"))?;
 
-        Ok(SimpleFlag {
-            flag_name,
-            parameter_info,
+        Ok(SimplePositional {
+            name,
+            count,
+            hint,
             description,
             options,
             options_type,
+            index,
             parameters,
             parameters_mut,
             action,
@@ -80,16 +87,18 @@ impl<'a> Parse<'a> for SimpleFlag<'a> {
     }
 }
 
-impl<'a> ToTokens for SimpleFlag<'a> {
+impl<'a> ToTokens for SimplePositional<'a> {
     fn to_tokens(&self, generator: &mut Generator) {
-        let SimpleFlag {
-            flag_name,
-            parameter_info,
+        let SimplePositional {
+            name,
+            count,
+            hint,
             description,
             options,
             options_type,
-            parameters,
+            index,
             parameters_mut,
+            parameters,
             error_indicator,
             action,
         } = self;
@@ -100,20 +109,8 @@ impl<'a> ToTokens for SimpleFlag<'a> {
             ActionWrapper::Wrap(action)
         };
 
-        let hint = parameter_info
-            .as_ref()
-            .map(|parameter_info| parameter_info.hint());
-
-        let zero_count = Literal::new_usize_unsuffixed(0, Span::call_site());
-        let zero_string = Expression::Literal(Literal::new_string("", Span::call_site()));
-
-        let (count, missing) = parameter_info
-            .as_ref()
-            .map(|parameter_info| (parameter_info.count(), parameter_info.missing()))
-            .unwrap_or((&zero_count, &zero_string));
-
         to_tokens! { generator
-            ::argparse::SimpleFlagArgument
+            ::argparse::SimplePositionalArgument
         }
 
         if error_indicator.is_none() {
@@ -123,13 +120,7 @@ impl<'a> ToTokens for SimpleFlag<'a> {
         }
 
         to_tokens! { generator
-            ::new(#count, &#missing, |#options #options_type, #parameters_mut #parameters| #action)#flag_name.description(#description)
-        }
-
-        if let Some(hint) = hint {
-            to_tokens! { generator
-                .hint(&#hint)
-            }
+            ::new(#name, #count, |#options #options_type, #index, #parameters_mut #parameters| #action).description(#description).hint(#hint)
         }
     }
 }

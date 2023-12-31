@@ -189,3 +189,29 @@ proc_macro_function!(
     ///  - `positionals` is the optional list of positionals, each one as an expression
     positionals::Positionals
 );
+
+proc_macro_function!(
+    /// Creates a simple positional argument
+    ///
+    /// The format for this macro is as follows:
+    /// ```
+    /// simple_positional!(name count*hint description |options: Options, index, mut parameters|? action)
+    /// ```    
+    /// where:
+    ///  - `name` is a literal which is the name of this positional argument.
+    ///  - `count` is a literal which is the number of parameters to accept.
+    ///  - `hint` is a literal which is the hint displayed in the help.
+    ///  - `description` is a literal which is the description displayed in the help.
+    ///  - `options` is an identifier for the developer provided options variable in the action.
+    ///  - `Options` is an optional type that specifies the options type when it is ambiguous to
+    ///     the compiler. The preceding colon indicates the presence of this field. A `&mut` is not
+    ///     nescessary and is added by the macro.
+    ///  - `index` is an identifier for the index of the parameter.
+    ///  - `mut` is an optional `mut` keyword to make the parameters mutable.
+    ///  - `parameters` is an identifier for the parameters variable in the action.
+    ///  - `?` is optional and if present, indicates that the action might return an error,
+    ///     otherwise the action return is wrapped in [`Result::Ok`] and the return type is set to
+    ///     [`Infallible`].
+    ///  - `action` is an expression which is the action itself.
+    simple_positional::SimplePositional
+);
