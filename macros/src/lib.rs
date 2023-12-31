@@ -175,3 +175,17 @@ proc_macro_function!(
     ///  - `flags` is the optional list of flags for the resulting parser, each one as an expression
     command::Command
 );
+
+proc_macro_function!(
+    /// Creates a list of positional arguments
+    ///
+    /// The format for this macro is as follows:
+    /// ```
+    /// positionals! [
+    ///     positionals,*
+    /// ]
+    /// ```
+    /// where:
+    ///  - `positionals` is the optional list of positionals, each one as an expression
+    positionals::Positionals
+);
