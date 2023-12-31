@@ -1,12 +1,12 @@
 use crate::{action_wrapper::ActionWrapper, description::Description, options_type::OptionsType};
 use proc_macro_util::{
-    ast::{Expression, VariableName},
+    ast::{Expression, Type, VariableName},
     to_tokens,
     tokens::Literal,
     Generator, Parse, Parser, Result, ToTokens, Token,
 };
 
-pub struct SimplePositional<'a> {
+pub struct ParsingPositional<'a> {
     name: Literal,
     count: Literal,
     hint: Literal,
@@ -14,13 +14,14 @@ pub struct SimplePositional<'a> {
     options: VariableName,
     options_type: Option<OptionsType>,
     index: VariableName,
-    parameter_mut: Option<Token![mut]>,
-    parameter: VariableName,
+    item_mut: Option<Token![mut]>,
+    item: VariableName,
+    item_type: Type,
     error_indicator: Option<Token![?]>,
     action: Expression<'a>,
 }
 
-impl<'a> Parse<'a> for SimplePositional<'a> {
+impl<'a> Parse<'a> for ParsingPositional<'a> {
     fn parse(parser: &mut Parser<'a>) -> Result<Self> {
         let name = parser
             .parse()
@@ -55,10 +56,16 @@ impl<'a> Parse<'a> for SimplePositional<'a> {
 
         parser.parse::<Token![,]>()?;
 
-        let parameter_mut = parser.parse()?;
-        let parameter = parser
+        let item_mut = parser.parse()?;
+        let item = parser
             .parse()
-            .map_err(|error| error.append("expected the parameters"))?;
+            .map_err(|error| error.append("expected the item"))?;
+        parser
+            .parse::<Token![:]>()
+            .map_err(|error| error.append("expected the item type"))?;
+        let item_type = parser
+            .parse()
+            .map_err(|error| error.append("expected the item type"))?;
         parser
             .parse::<Token![|]>()
             .map_err(|error| error.append("expected the end of the parameters"))?;
@@ -71,7 +78,7 @@ impl<'a> Parse<'a> for SimplePositional<'a> {
             .parse()
             .map_err(|error| error.append("expected the action"))?;
 
-        Ok(SimplePositional {
+        Ok(ParsingPositional {
             name,
             count,
             hint,
@@ -79,17 +86,18 @@ impl<'a> Parse<'a> for SimplePositional<'a> {
             options,
             options_type,
             index,
-            parameter,
-            parameter_mut,
+            item_mut,
+            item,
+            item_type,
             action,
             error_indicator,
         })
     }
 }
 
-impl<'a> ToTokens for SimplePositional<'a> {
+impl<'a> ToTokens for ParsingPositional<'a> {
     fn to_tokens(&self, generator: &mut Generator) {
-        let SimplePositional {
+        let ParsingPositional {
             name,
             count,
             hint,
@@ -97,8 +105,9 @@ impl<'a> ToTokens for SimplePositional<'a> {
             options,
             options_type,
             index,
-            parameter_mut,
-            parameter,
+            item_mut,
+            item,
+            item_type,
             error_indicator,
             action,
         } = self;
@@ -110,17 +119,17 @@ impl<'a> ToTokens for SimplePositional<'a> {
         };
 
         to_tokens! { generator
-            ::argparse::SimplePositionalArgument
+            ::argparse::ParsingPositionalArgument
         }
 
         if error_indicator.is_none() {
             to_tokens! { generator
-                ::<_, ::core::convert::Infallible, _>
+                ::<_, _, _, _, ::core::convert::Infallible>
             }
         }
 
         to_tokens! { generator
-            ::new(&#name, unsafe { ::std::num::NonZeroUsize::new_unchecked(#count) }, |#options #options_type, #index, #parameter_mut #parameter| #action).description(#description).hint(&#hint)
+            ::new(&#name, unsafe { ::std::num::NonZeroUsize::new_unchecked(#count) }, |#options #options_type, #index, #item_mut #item: #item_type| #action).description(#description).hint(&#hint)
         }
     }
 }
