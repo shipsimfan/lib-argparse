@@ -82,7 +82,7 @@ impl<'a> ToTokens for Parser<'a> {
 
         if let Some(description) = description {
             to_tokens! { generator
-                .description(&#description)
+                .description(#description)
             }
         }
 
