@@ -57,6 +57,8 @@ impl<'a> IOArgumentParser<'a> {
             if c == '"' {
                 return Ok(string);
             }
+
+            string.push(c);
         }
 
         Err(Error::unexpected_end_of_stream())
