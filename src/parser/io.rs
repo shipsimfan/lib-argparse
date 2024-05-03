@@ -34,7 +34,7 @@ impl<'a> IOArgumentParser<'a> {
         // Check if starts with '"'
         let mut quoted = first_char == '"';
 
-        let mut string = if quoted {
+        let mut string = if !quoted {
             first_char.to_string()
         } else {
             String::new()
