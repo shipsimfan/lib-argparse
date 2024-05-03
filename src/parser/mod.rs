@@ -210,6 +210,8 @@ impl<'a, Options> Parser<'a, Options> {
             &mut prefix_argument
                 .map(|prefix_argument| vec![prefix_argument])
                 .unwrap_or(Vec::new()),
+            self.long_prefix.as_bytes(),
+            self.short_prefix.as_bytes(),
         )
     }
 
@@ -235,6 +237,8 @@ impl<'a, Options> Parser<'a, Options> {
             &mut prefix_argument
                 .map(|prefix_argument| vec![prefix_argument])
                 .unwrap_or(Vec::new()),
+            self.long_prefix.as_bytes(),
+            self.short_prefix.as_bytes(),
         )
     }
 
@@ -275,6 +279,8 @@ impl<'a, Options> Parser<'a, Options> {
             &mut prefix_argument
                 .map(|prefix_argument| vec![prefix_argument])
                 .unwrap_or(Vec::new()),
+            self.short_prefix.as_bytes(),
+            self.long_prefix.as_bytes(),
         )
     }
 
@@ -293,6 +299,8 @@ impl<'a, Options> Parser<'a, Options> {
         mut options: Options,
         stream: &mut ArgumentStream,
         command_list: &mut Vec<OsString>,
+        long_prefix: &[u8],
+        short_prefix: &[u8],
     ) -> Result<'a, Option<Options>> {
         // Mark all flags as not ran
         let mut flags_ran = vec![false; self.flags.len()];
@@ -306,6 +314,8 @@ impl<'a, Options> Parser<'a, Options> {
                 &mut flags_ran,
                 &command_list,
                 self.terminal,
+                long_prefix,
+                short_prefix,
             )? {
                 FlagArgumentResult::NotFlag(argument) => argument,
                 FlagArgumentResult::Read(path) => {
@@ -319,6 +329,8 @@ impl<'a, Options> Parser<'a, Options> {
                         options,
                         &mut ArgumentStream::IO(IOArgumentParser::new(&mut file)),
                         command_list,
+                        b"",
+                        b"",
                     )? {
                         Some(new_options) => {
                             options = new_options;
@@ -336,7 +348,13 @@ impl<'a, Options> Parser<'a, Options> {
                     terminal.action(&mut options, terminal_index, argument.clone())?
                 {
                     command_list.push(argument);
-                    return parser.do_parse(options, stream, command_list);
+                    return parser.do_parse(
+                        options,
+                        stream,
+                        command_list,
+                        long_prefix,
+                        short_prefix,
+                    );
                 }
 
                 terminal_index += 1;
@@ -381,15 +399,12 @@ impl<'a, Options> Parser<'a, Options> {
         flags_ran: &mut [bool],
         command_list: &[OsString],
         terminal: Option<&dyn TerminalArgument<'a, Options>>,
+        long_prefix: &[u8],
+        short_prefix: &[u8],
     ) -> Result<'a, FlagArgumentResult> {
         // Check for long or short prefix
-        let is_long = argument
-            .as_encoded_bytes()
-            .starts_with(self.long_prefix.as_bytes());
-        let is_short = argument
-            .as_encoded_bytes()
-            .starts_with(self.short_prefix.as_bytes())
-            && !is_long;
+        let is_long = argument.as_encoded_bytes().starts_with(long_prefix);
+        let is_short = argument.as_encoded_bytes().starts_with(short_prefix) && !is_long;
 
         if is_long || is_short {
             // Convert to UTF-8
