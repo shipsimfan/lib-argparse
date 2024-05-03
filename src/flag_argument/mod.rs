@@ -1,5 +1,5 @@
 use crate::{Error, Result};
-use std::{ffi::OsString, path::PathBuf};
+use std::ffi::OsString;
 
 /// The class of flag that a flag argument is
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -135,16 +135,6 @@ pub trait FlagArgument<'a, Options: 'a> {
     /// parsing parameters and running the action but instead runs the help generator to print out the help to `stdout`.
     fn class(&self) -> FlagClass {
         FlagClass::Normal
-    }
-
-    /// Gets the path to read for flags with class [`FlagClass::Config`]
-    ///
-    /// This function is not called for flags which do not return a class of [`FlagClass::Config`]
-    ///
-    /// ## Return Value
-    /// The path of a configuration file to read
-    fn path(&self) -> PathBuf {
-        unimplemented!()
     }
 }
 

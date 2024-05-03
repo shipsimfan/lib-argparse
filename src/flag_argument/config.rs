@@ -1,5 +1,4 @@
 use crate::{FlagArgument, FlagClass, Result};
-use std::{cell::RefCell, path::PathBuf};
 
 /// A flag which reads a configuration file
 pub struct ConfigFlagArgument<'a> {
@@ -11,9 +10,6 @@ pub struct ConfigFlagArgument<'a> {
 
     /// The flag group this flag belongs to
     group: Option<&'a str>,
-
-    /// The path the user entered for the configuration file
-    path: RefCell<Option<PathBuf>>,
 }
 
 impl<'a> ConfigFlagArgument<'a> {
@@ -23,7 +19,6 @@ impl<'a> ConfigFlagArgument<'a> {
             short_name: None,
             long_name: None,
             group: None,
-            path: RefCell::new(None),
         }
     }
 
@@ -63,13 +58,11 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for ConfigFlagArgument<'a> {
         true
     }
 
-    fn action(&self, _: &mut Options, mut path: Vec<String>) -> Result<'a, ()> {
-        *self.path.borrow_mut() = Some(path.pop().unwrap().into());
+    fn action(&self, _: &mut Options, _: Vec<String>) -> Result<'a, ()> {
         Ok(())
     }
 
-    fn action_os(&self, _: &mut Options, mut path: Vec<std::ffi::OsString>) -> Result<'a, ()> {
-        *self.path.borrow_mut() = Some(path.pop().unwrap().into());
+    fn action_os(&self, _: &mut Options, _: Vec<std::ffi::OsString>) -> Result<'a, ()> {
         Ok(())
     }
 
@@ -87,10 +80,6 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for ConfigFlagArgument<'a> {
 
     fn class(&self) -> FlagClass {
         FlagClass::Config
-    }
-
-    fn path(&self) -> PathBuf {
-        self.path.borrow_mut().take().unwrap()
     }
 }
 

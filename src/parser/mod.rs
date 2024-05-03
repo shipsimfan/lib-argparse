@@ -446,7 +446,7 @@ impl<'a, Options> Parser<'a, Options> {
             }
 
             let count = flag_argument.count();
-            if stream.is_os() {
+            let path = if stream.is_os() {
                 // Parse the parameters from the stream as `OsString`s
                 let mut parameters = Vec::with_capacity(count);
                 for _ in 0..count {
@@ -457,7 +457,13 @@ impl<'a, Options> Parser<'a, Options> {
                 }
 
                 // Call the action
-                flag_argument.action_os(options, parameters)?;
+                if flag_argument.class() != FlagClass::Config {
+                    flag_argument.action_os(options, parameters)?;
+                    None
+                } else {
+                    assert_eq!(count, 1);
+                    Some(PathBuf::from(parameters.pop().unwrap()))
+                }
             } else {
                 // Parse the parameters from the stream as `String`s
                 let mut parameters = Vec::with_capacity(count);
@@ -469,12 +475,18 @@ impl<'a, Options> Parser<'a, Options> {
                 }
 
                 // Call the action
-                flag_argument.action(options, parameters)?;
-            }
+                if flag_argument.class() != FlagClass::Config {
+                    flag_argument.action(options, parameters)?;
+                    None
+                } else {
+                    assert_eq!(count, 1);
+                    Some(PathBuf::from(parameters.pop().unwrap()))
+                }
+            };
 
             Ok(match flag_argument.class() {
                 FlagClass::Interrupt => FlagArgumentResult::Help,
-                FlagClass::Config => FlagArgumentResult::Read(flag_argument.path()),
+                FlagClass::Config => FlagArgumentResult::Read(path.unwrap()),
                 _ => FlagArgumentResult::Handled,
             })
         } else {
