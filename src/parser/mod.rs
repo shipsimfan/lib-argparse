@@ -414,12 +414,12 @@ impl<'a, Options> Parser<'a, Options> {
             let (flag_argument, flag_index) = self
                 .get_flag_argument(
                     if is_short {
-                        Some(&argument[self.short_prefix.len()..])
+                        Some(&argument[short_prefix.len()..])
                     } else {
                         None
                     },
                     if is_long {
-                        Some(&argument[self.long_prefix.len()..])
+                        Some(&argument[long_prefix.len()..])
                     } else {
                         None
                     },
