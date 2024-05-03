@@ -32,53 +32,45 @@ impl<'a> IOArgumentParser<'a> {
         };
 
         // Check if starts with '"'
-        if first_char == '"' {
-            self.collect_quoted_argument()
+        let mut quoted = first_char == '"';
+
+        let mut string = if quoted {
+            first_char.to_string()
         } else {
-            self.collect_unquoted_argument(first_char)
-        }
-        .map(|string| Some(string))
-    }
+            String::new()
+        };
 
-    /// Collects the characters until an unescaped quote is found, erroring if none are found
-    fn collect_quoted_argument(&mut self) -> Result<'static, String> {
-        let mut string = String::new();
-
+        // Parse the stream
         while let Some(c) = self.next_char()? {
-            if c == '\\' {
-                let c = match self.next_char()? {
-                    Some(c) => c,
-                    None => return Err(Error::unexpected_end_of_stream()),
-                };
+            if quoted {
+                if c == '\\' {
+                    let c = match self.next_char()? {
+                        Some(c) => c,
+                        None => return Err(Error::unexpected_end_of_stream()),
+                    };
+
+                    if c != '"' {
+                        string.push('\\');
+                    }
+
+                    string.push(c);
+                    continue;
+                } else if c == '"' {
+                    quoted = false;
+                    continue;
+                }
 
                 string.push(c);
+            } else {
+                if c.is_whitespace() {
+                    break;
+                }
 
-                continue;
+                string.push(c);
             }
-
-            if c == '"' {
-                return Ok(string);
-            }
-
-            string.push(c);
         }
 
-        Err(Error::unexpected_end_of_stream())
-    }
-
-    /// Collects the characters until a whitespace or the end of the stream is found
-    fn collect_unquoted_argument(&mut self, first_char: char) -> Result<'static, String> {
-        let mut string = first_char.to_string();
-
-        while let Some(c) = self.next_char()? {
-            if c.is_whitespace() {
-                break;
-            }
-
-            string.push(c);
-        }
-
-        Ok(string)
+        Ok(Some(string))
     }
 
     /// Gets the next character in the stream
