@@ -462,7 +462,9 @@ impl<'a, Options> Parser<'a, Options> {
                     None
                 } else {
                     assert_eq!(count, 1);
-                    Some(PathBuf::from(parameters.pop().unwrap()))
+                    Some(PathBuf::from(parameters.pop().ok_or(
+                        Error::missing_parameters("missing PATH for configuration flag"),
+                    )?))
                 }
             } else {
                 // Parse the parameters from the stream as `String`s
@@ -480,7 +482,9 @@ impl<'a, Options> Parser<'a, Options> {
                     None
                 } else {
                     assert_eq!(count, 1);
-                    Some(PathBuf::from(parameters.pop().unwrap()))
+                    Some(PathBuf::from(parameters.pop().ok_or(
+                        Error::missing_parameters("missing PATH for configuration flag"),
+                    )?))
                 }
             };
 

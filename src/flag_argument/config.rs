@@ -71,11 +71,11 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for ConfigFlagArgument<'a> {
     }
 
     fn hint(&self) -> Option<&dyn std::fmt::Display> {
-        None
+        Some(&"PATH")
     }
 
     fn description(&self) -> Option<&[&dyn std::fmt::Display]> {
-        Some(&[&"Displays this help message"])
+        Some(&[&"Reads arguments from a file"])
     }
 
     fn class(&self) -> FlagClass {
