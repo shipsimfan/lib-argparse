@@ -52,6 +52,8 @@ impl<'a> IOArgumentParser<'a> {
                 };
 
                 string.push(c);
+
+                continue;
             }
 
             if c == '"' {
