@@ -1,5 +1,5 @@
 use crate::{Error, Result};
-use std::ffi::OsString;
+use std::{ffi::OsString, path::PathBuf};
 
 /// The class of flag that a flag argument is
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -15,13 +15,18 @@ pub enum FlagClass {
 
     /// A flag that should display help and stop parsing
     HelpNoExit,
+
+    /// This flag reads a configuration file
+    Config,
 }
 
+mod config;
 mod help;
 mod parsing;
 mod simple;
 mod version;
 
+pub use config::ConfigFlagArgument;
 pub use help::HelpFlagArgument;
 pub use parsing::ParsingFlagArgument;
 pub use simple::SimpleFlagArgument;
@@ -131,6 +136,16 @@ pub trait FlagArgument<'a, Options: 'a> {
     fn class(&self) -> FlagClass {
         FlagClass::Normal
     }
+
+    /// Gets the path to read for flags with class [`FlagClass::Config`]
+    ///
+    /// This function is not called for flags which do not return a class of [`FlagClass::Config`]
+    ///
+    /// ## Return Value
+    /// The path of a configuration file to read
+    fn path(&self) -> PathBuf {
+        unimplemented!()
+    }
 }
 
 impl<'a, Options: 'a, T: FlagArgument<'a, Options>> FlagArgument<'a, Options> for &T {
@@ -186,7 +201,7 @@ impl FlagClass {
     /// Returns `true` if this flag should display the help
     pub const fn is_help(&self) -> bool {
         match self {
-            FlagClass::Normal | FlagClass::Interrupt => false,
+            FlagClass::Normal | FlagClass::Interrupt | FlagClass::Config => false,
             FlagClass::Help | FlagClass::HelpNoExit => true,
         }
     }
@@ -197,7 +212,10 @@ impl FlagClass {
     /// Returns `true` if this flag should exit after running
     pub const fn is_exit(&self) -> bool {
         match self {
-            FlagClass::Normal | FlagClass::HelpNoExit | FlagClass::Interrupt => false,
+            FlagClass::Normal
+            | FlagClass::HelpNoExit
+            | FlagClass::Interrupt
+            | FlagClass::Config => false,
             FlagClass::Help => true,
         }
     }

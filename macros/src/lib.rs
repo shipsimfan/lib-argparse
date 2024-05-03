@@ -46,6 +46,22 @@ proc_macro_function!(
 );
 
 proc_macro_function!(
+    /// Creates a configuration flag
+    ///
+    /// The format for this macro is as follows:
+    /// ```
+    /// config_flag!(short_name, long_name)
+    /// ```    
+    /// where:
+    ///  - `short_name` is an optional literal which is the name following the short prefix
+    ///  - `long_name` is an optional literal which is the name following the long prefix. The
+    ///     preceding comma is treated as part of the literal for identifying if there is a long
+    ///     name. In order to specify just a long name use `config_flag!(, long_name)` and to
+    ///     specify just a short name use `config_flag!(short_name)`.
+    config_flag::ConfigFlag
+);
+
+proc_macro_function!(
     /// Creates a version flag
     ///
     /// The format for this macro is as follows:

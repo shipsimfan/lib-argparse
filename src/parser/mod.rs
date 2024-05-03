@@ -1,7 +1,7 @@
 use crate::{terminal_argument::TerminalArgument, Error, FlagArgument, FlagClass, Result};
 use help::StdOut;
 use io::IOArgumentParser;
-use std::{ffi::OsString, io::Read};
+use std::{ffi::OsString, fs::File, io::Read, path::PathBuf};
 use stream::ArgumentStream;
 
 mod help;
@@ -11,6 +11,7 @@ mod stream;
 enum FlagArgumentResult {
     Handled,
     Help,
+    Read(PathBuf),
     NotFlag(OsString),
 }
 
@@ -206,7 +207,7 @@ impl<'a, Options> Parser<'a, Options> {
         self.do_parse(
             options,
             &mut ArgumentStream::new(&mut arguments.into_iter()),
-            prefix_argument
+            &mut prefix_argument
                 .map(|prefix_argument| vec![prefix_argument])
                 .unwrap_or(Vec::new()),
         )
@@ -231,7 +232,7 @@ impl<'a, Options> Parser<'a, Options> {
         self.do_parse(
             options,
             &mut ArgumentStream::new_os(&mut arguments.into_iter()),
-            prefix_argument
+            &mut prefix_argument
                 .map(|prefix_argument| vec![prefix_argument])
                 .unwrap_or(Vec::new()),
         )
@@ -271,7 +272,7 @@ impl<'a, Options> Parser<'a, Options> {
         self.do_parse(
             options,
             &mut ArgumentStream::IO(IOArgumentParser::new(source)),
-            prefix_argument
+            &mut prefix_argument
                 .map(|prefix_argument| vec![prefix_argument])
                 .unwrap_or(Vec::new()),
         )
@@ -291,7 +292,7 @@ impl<'a, Options> Parser<'a, Options> {
         &self,
         mut options: Options,
         stream: &mut ArgumentStream,
-        mut command_list: Vec<OsString>,
+        command_list: &mut Vec<OsString>,
     ) -> Result<'a, Option<Options>> {
         // Mark all flags as not ran
         let mut flags_ran = vec![false; self.flags.len()];
@@ -307,6 +308,25 @@ impl<'a, Options> Parser<'a, Options> {
                 self.terminal,
             )? {
                 FlagArgumentResult::NotFlag(argument) => argument,
+                FlagArgumentResult::Read(path) => {
+                    assert!(self.terminal.is_none());
+
+                    let mut file = File::open(&path).map_err(|error| {
+                        Error::io(format!("unable to read \"{}\" - {}", path.display(), error))
+                    })?;
+
+                    match self.do_parse(
+                        options,
+                        &mut ArgumentStream::IO(IOArgumentParser::new(&mut file)),
+                        command_list,
+                    )? {
+                        Some(new_options) => {
+                            options = new_options;
+                            continue;
+                        }
+                        None => return Ok(None),
+                    }
+                }
                 FlagArgumentResult::Handled => continue,
                 FlagArgumentResult::Help => return Ok(None),
             };
@@ -452,11 +472,11 @@ impl<'a, Options> Parser<'a, Options> {
                 flag_argument.action(options, parameters)?;
             }
 
-            if flag_argument.class() == FlagClass::Interrupt {
-                Ok(FlagArgumentResult::Help)
-            } else {
-                Ok(FlagArgumentResult::Handled)
-            }
+            Ok(match flag_argument.class() {
+                FlagClass::Interrupt => FlagArgumentResult::Help,
+                FlagClass::Config => FlagArgumentResult::Read(flag_argument.path()),
+                _ => FlagArgumentResult::Handled,
+            })
         } else {
             Ok(FlagArgumentResult::NotFlag(argument))
         }

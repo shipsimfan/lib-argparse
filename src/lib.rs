@@ -18,8 +18,8 @@ mod terminal_argument;
 
 pub use error::{Error, Result};
 pub use flag_argument::{
-    FlagArgument, FlagClass, HelpFlagArgument, ParsingFlagArgument, SimpleFlagArgument,
-    VersionFlagArgument,
+    ConfigFlagArgument, FlagArgument, FlagClass, HelpFlagArgument, ParsingFlagArgument,
+    SimpleFlagArgument, VersionFlagArgument,
 };
 pub use macros::{
     command, commands, help_flag, parser, parsing_flag, parsing_positional, positionals,

@@ -1,7 +1,8 @@
 use crate::{FlagArgument, FlagClass, Result};
+use std::{cell::RefCell, path::PathBuf};
 
-/// A flag which displays a help message
-pub struct HelpFlagArgument<'a> {
+/// A flag which reads a configuration file
+pub struct ConfigFlagArgument<'a> {
     /// The name to follow the short prefix
     short_name: Option<&'a str>,
 
@@ -11,18 +12,18 @@ pub struct HelpFlagArgument<'a> {
     /// The flag group this flag belongs to
     group: Option<&'a str>,
 
-    /// Should the program after displaying the help?
-    exit: FlagClass,
+    /// The path the user entered for the configuration file
+    path: RefCell<Option<PathBuf>>,
 }
 
-impl<'a> HelpFlagArgument<'a> {
-    /// Creates a new [`HelpFlagArgument`]
+impl<'a> ConfigFlagArgument<'a> {
+    /// Creates a new [`ConfigFlagArgument`]
     pub const fn new() -> Self {
-        HelpFlagArgument {
+        ConfigFlagArgument {
             short_name: None,
             long_name: None,
             group: None,
-            exit: FlagClass::Help,
+            path: RefCell::new(None),
         }
     }
 
@@ -43,21 +44,9 @@ impl<'a> HelpFlagArgument<'a> {
         self.group = Some(group);
         self
     }
-
-    /// Sets the program to exit after displaying the help
-    pub const fn set_exit(mut self) -> Self {
-        self.exit = FlagClass::Help;
-        self
-    }
-
-    /// Sets the program to not exit after displaying the help
-    pub const fn set_no_exit(mut self) -> Self {
-        self.exit = FlagClass::HelpNoExit;
-        self
-    }
 }
 
-impl<'a, Options: 'a> FlagArgument<'a, Options> for HelpFlagArgument<'a> {
+impl<'a, Options: 'a> FlagArgument<'a, Options> for ConfigFlagArgument<'a> {
     fn short_name(&self) -> Option<&str> {
         self.short_name
     }
@@ -67,18 +56,20 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for HelpFlagArgument<'a> {
     }
 
     fn count(&self) -> usize {
-        0
+        1
     }
 
     fn repeatable(&self) -> bool {
         true
     }
 
-    fn action(&self, _: &mut Options, _: Vec<String>) -> Result<'a, ()> {
+    fn action(&self, _: &mut Options, mut path: Vec<String>) -> Result<'a, ()> {
+        *self.path.borrow_mut() = Some(path.pop().unwrap().into());
         Ok(())
     }
 
-    fn action_os(&self, _: &mut Options, _: Vec<std::ffi::OsString>) -> Result<'a, ()> {
+    fn action_os(&self, _: &mut Options, mut path: Vec<std::ffi::OsString>) -> Result<'a, ()> {
+        *self.path.borrow_mut() = Some(path.pop().unwrap().into());
         Ok(())
     }
 
@@ -95,7 +86,11 @@ impl<'a, Options: 'a> FlagArgument<'a, Options> for HelpFlagArgument<'a> {
     }
 
     fn class(&self) -> FlagClass {
-        self.exit
+        FlagClass::Config
+    }
+
+    fn path(&self) -> PathBuf {
+        self.path.borrow_mut().take().unwrap()
     }
 }
 
