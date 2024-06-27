@@ -15,13 +15,18 @@ pub enum FlagClass {
 
     /// A flag that should display help and stop parsing
     HelpNoExit,
+
+    /// This flag reads a configuration file
+    Config,
 }
 
+mod config;
 mod help;
 mod parsing;
 mod simple;
 mod version;
 
+pub use config::ConfigFlagArgument;
 pub use help::HelpFlagArgument;
 pub use parsing::ParsingFlagArgument;
 pub use simple::SimpleFlagArgument;
@@ -186,7 +191,7 @@ impl FlagClass {
     /// Returns `true` if this flag should display the help
     pub const fn is_help(&self) -> bool {
         match self {
-            FlagClass::Normal | FlagClass::Interrupt => false,
+            FlagClass::Normal | FlagClass::Interrupt | FlagClass::Config => false,
             FlagClass::Help | FlagClass::HelpNoExit => true,
         }
     }
@@ -197,7 +202,10 @@ impl FlagClass {
     /// Returns `true` if this flag should exit after running
     pub const fn is_exit(&self) -> bool {
         match self {
-            FlagClass::Normal | FlagClass::HelpNoExit | FlagClass::Interrupt => false,
+            FlagClass::Normal
+            | FlagClass::HelpNoExit
+            | FlagClass::Interrupt
+            | FlagClass::Config => false,
             FlagClass::Help => true,
         }
     }

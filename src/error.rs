@@ -25,6 +25,12 @@ pub enum ErrorKind {
     /// A flag was repeated that cannot be
     RepeatedFlag,
 
+    /// An I/O error ocurred while reading an I/O source
+    IO,
+
+    /// The end of the input stream was reached when it shouldn't
+    UnexpectedEndOfStream,
+
     /// Another error
     Custom,
 }
@@ -131,6 +137,28 @@ impl<'a> Error<'a> {
         Error::new(ErrorKind::RepeatedFlag, message)
     }
 
+    /// Creates a new [`Error`] with [`ErrorKind::IO`]
+    ///
+    /// ## Parameters
+    ///  * `message` - The message to be displayed for the new [`Error`]
+    ///
+    /// ## Return Value
+    /// Returns the newly created [`Error`]
+    pub fn io<S: Into<ErrorMessage<'a>>>(message: S) -> Self {
+        Error::new(ErrorKind::IO, message)
+    }
+
+    /// Creates a new [`Error`] with [`ErrorKind::UnexpectedEndOfStream`]
+    ///
+    /// ## Return Value
+    /// Returns the newly created [`Error`]
+    pub fn unexpected_end_of_stream() -> Self {
+        Error::new(
+            ErrorKind::UnexpectedEndOfStream,
+            "reached the end of the stream unexpectedly",
+        )
+    }
+
     /// Creates a new [`Error`] with [`ErrorKind::Custom`]
     ///
     /// ## Parameters
@@ -214,13 +242,19 @@ impl<'a, T: std::fmt::Display> From<&'a T> for ErrorMessage<'a> {
 }
 
 impl<'a> From<&'a str> for ErrorMessage<'a> {
-    fn from(value: &'a str) -> Self {
-        ErrorMessage::Str(value)
+    fn from(string: &'a str) -> Self {
+        ErrorMessage::Str(string)
     }
 }
 
 impl<'a> From<String> for ErrorMessage<'a> {
     fn from(string: String) -> Self {
         ErrorMessage::Owned(string)
+    }
+}
+
+impl From<std::io::Error> for Error<'static> {
+    fn from(error: std::io::Error) -> Self {
+        Error::io(error.to_string())
     }
 }

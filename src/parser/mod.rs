@@ -1,11 +1,17 @@
 use crate::{terminal_argument::TerminalArgument, Error, FlagArgument, FlagClass, Result};
 use help::StdOut;
-use std::ffi::OsString;
+use io::IOArgumentParser;
+use std::{ffi::OsString, fs::File, io::Read, path::PathBuf};
 use stream::ArgumentStream;
+
+mod help;
+mod io;
+mod stream;
 
 enum FlagArgumentResult {
     Handled,
     Help,
+    Read(PathBuf),
     NotFlag(OsString),
 }
 
@@ -52,9 +58,6 @@ pub struct Parser<'a, Options: 'a> {
 
 const DEFAULT_SHORT_PREFIX: &str = "-";
 const DEFAULT_LONG_PREFIX: &str = "--";
-
-mod help;
-mod stream;
 
 impl<'a, Options> Parser<'a, Options> {
     /// Creates a new [`Parser`]
@@ -190,6 +193,7 @@ impl<'a, Options> Parser<'a, Options> {
     /// ## Parameters
     ///  * `options` - The options to modified by the parser
     ///  * `arguments` - The list of arguments to be parsed
+    ///  * `prefix_argument` - The argument to be provided to the usage displayed in a help message
     ///
     /// ## Return Value
     /// Returns the changed options if parsing is successful and no help flag was matched, returns
@@ -203,9 +207,11 @@ impl<'a, Options> Parser<'a, Options> {
         self.do_parse(
             options,
             &mut ArgumentStream::new(&mut arguments.into_iter()),
-            prefix_argument
+            &mut prefix_argument
                 .map(|prefix_argument| vec![prefix_argument])
                 .unwrap_or(Vec::new()),
+            self.long_prefix.as_bytes(),
+            self.short_prefix.as_bytes(),
         )
     }
 
@@ -214,6 +220,7 @@ impl<'a, Options> Parser<'a, Options> {
     /// ## Parameters
     ///  * `options` - The options to modified by the parser
     ///  * `arguments` - The list of arguments to be parsed
+    ///  * `prefix_argument` - The argument to be provided to the usage displayed in a help message
     ///
     /// ## Return Value
     /// Returns the changed options if parsing is successful and no help flag was matched, returns
@@ -227,9 +234,11 @@ impl<'a, Options> Parser<'a, Options> {
         self.do_parse(
             options,
             &mut ArgumentStream::new_os(&mut arguments.into_iter()),
-            prefix_argument
+            &mut prefix_argument
                 .map(|prefix_argument| vec![prefix_argument])
                 .unwrap_or(Vec::new()),
+            self.long_prefix.as_bytes(),
+            self.short_prefix.as_bytes(),
         )
     }
 
@@ -248,11 +257,39 @@ impl<'a, Options> Parser<'a, Options> {
         self.parse_os(options, args, Some(prefix))
     }
 
+    /// Parses arguments from `source`
+    ///
+    /// ## Parameters
+    ///  * `options` - The options to modified by the parser
+    ///  * `source` - The source of arguments to parse
+    ///  * `prefix_argument` - The argument to be provided to the usage displayed in a help message
+    ///
+    /// ## Return Value
+    /// Returns the changed options if parsing is successful and no help flag was matched, returns
+    /// the error otherwise.
+    pub fn parse_read(
+        &self,
+        options: Options,
+        source: &mut dyn Read,
+        prefix_argument: Option<OsString>,
+    ) -> Result<'a, Option<Options>> {
+        self.do_parse(
+            options,
+            &mut ArgumentStream::IO(IOArgumentParser::new(source)),
+            &mut prefix_argument
+                .map(|prefix_argument| vec![prefix_argument])
+                .unwrap_or(Vec::new()),
+            self.short_prefix.as_bytes(),
+            self.long_prefix.as_bytes(),
+        )
+    }
+
     /// Parse arguments from an [`ArgumentStream`]
     ///
     /// ## Parameters
     ///  * `options` - The options to modified by the parser
     ///  * `stream` - The stream of arguments to be parsed
+    ///  * `command_list` - The list of commands that have been seen already
     ///
     /// ## Return Value
     /// Returns the changed options if parsing is successful and no help flag was matched, returns
@@ -261,13 +298,15 @@ impl<'a, Options> Parser<'a, Options> {
         &self,
         mut options: Options,
         stream: &mut ArgumentStream,
-        mut command_list: Vec<OsString>,
+        command_list: &mut Vec<OsString>,
+        long_prefix: &[u8],
+        short_prefix: &[u8],
     ) -> Result<'a, Option<Options>> {
         // Mark all flags as not ran
         let mut flags_ran = vec![false; self.flags.len()];
         let mut terminal_index = 0;
 
-        while let Some(argument) = stream.next_os() {
+        while let Some(argument) = stream.next_os()? {
             let argument = match self.handle_flag_argument(
                 argument,
                 &mut options,
@@ -275,8 +314,31 @@ impl<'a, Options> Parser<'a, Options> {
                 &mut flags_ran,
                 &command_list,
                 self.terminal,
+                long_prefix,
+                short_prefix,
             )? {
                 FlagArgumentResult::NotFlag(argument) => argument,
+                FlagArgumentResult::Read(path) => {
+                    assert!(self.terminal.is_none());
+
+                    let mut file = File::open(&path).map_err(|error| {
+                        Error::io(format!("unable to read \"{}\" - {}", path.display(), error))
+                    })?;
+
+                    match self.do_parse(
+                        options,
+                        &mut ArgumentStream::IO(IOArgumentParser::new(&mut file)),
+                        command_list,
+                        b"",
+                        b"",
+                    )? {
+                        Some(new_options) => {
+                            options = new_options;
+                            continue;
+                        }
+                        None => return Ok(None),
+                    }
+                }
                 FlagArgumentResult::Handled => continue,
                 FlagArgumentResult::Help => return Ok(None),
             };
@@ -286,7 +348,13 @@ impl<'a, Options> Parser<'a, Options> {
                     terminal.action(&mut options, terminal_index, argument.clone())?
                 {
                     command_list.push(argument);
-                    return parser.do_parse(options, stream, command_list);
+                    return parser.do_parse(
+                        options,
+                        stream,
+                        command_list,
+                        long_prefix,
+                        short_prefix,
+                    );
                 }
 
                 terminal_index += 1;
@@ -331,15 +399,12 @@ impl<'a, Options> Parser<'a, Options> {
         flags_ran: &mut [bool],
         command_list: &[OsString],
         terminal: Option<&dyn TerminalArgument<'a, Options>>,
+        long_prefix: &[u8],
+        short_prefix: &[u8],
     ) -> Result<'a, FlagArgumentResult> {
         // Check for long or short prefix
-        let is_long = argument
-            .as_encoded_bytes()
-            .starts_with(self.long_prefix.as_bytes());
-        let is_short = argument
-            .as_encoded_bytes()
-            .starts_with(self.short_prefix.as_bytes())
-            && !is_long;
+        let is_long = argument.as_encoded_bytes().starts_with(long_prefix);
+        let is_short = argument.as_encoded_bytes().starts_with(short_prefix) && !is_long;
 
         if is_long || is_short {
             // Convert to UTF-8
@@ -349,12 +414,12 @@ impl<'a, Options> Parser<'a, Options> {
             let (flag_argument, flag_index) = self
                 .get_flag_argument(
                     if is_short {
-                        Some(&argument[self.short_prefix.len()..])
+                        Some(&argument[short_prefix.len()..])
                     } else {
                         None
                     },
                     if is_long {
-                        Some(&argument[self.long_prefix.len()..])
+                        Some(&argument[long_prefix.len()..])
                     } else {
                         None
                     },
@@ -396,18 +461,26 @@ impl<'a, Options> Parser<'a, Options> {
             }
 
             let count = flag_argument.count();
-            if stream.is_os() {
+            let path = if stream.is_os() {
                 // Parse the parameters from the stream as `OsString`s
                 let mut parameters = Vec::with_capacity(count);
                 for _ in 0..count {
-                    match stream.next_os() {
+                    match stream.next_os()? {
                         Some(parameter) => parameters.push(parameter),
                         None => break,
                     }
                 }
 
                 // Call the action
-                flag_argument.action_os(options, parameters)?;
+                if flag_argument.class() != FlagClass::Config {
+                    flag_argument.action_os(options, parameters)?;
+                    None
+                } else {
+                    assert_eq!(count, 1);
+                    Some(PathBuf::from(parameters.pop().ok_or(
+                        Error::missing_parameters("missing PATH for configuration flag"),
+                    )?))
+                }
             } else {
                 // Parse the parameters from the stream as `String`s
                 let mut parameters = Vec::with_capacity(count);
@@ -419,14 +492,22 @@ impl<'a, Options> Parser<'a, Options> {
                 }
 
                 // Call the action
-                flag_argument.action(options, parameters)?;
-            }
+                if flag_argument.class() != FlagClass::Config {
+                    flag_argument.action(options, parameters)?;
+                    None
+                } else {
+                    assert_eq!(count, 1);
+                    Some(PathBuf::from(parameters.pop().ok_or(
+                        Error::missing_parameters("missing PATH for configuration flag"),
+                    )?))
+                }
+            };
 
-            if flag_argument.class() == FlagClass::Interrupt {
-                Ok(FlagArgumentResult::Help)
-            } else {
-                Ok(FlagArgumentResult::Handled)
-            }
+            Ok(match flag_argument.class() {
+                FlagClass::Interrupt => FlagArgumentResult::Help,
+                FlagClass::Config => FlagArgumentResult::Read(path.unwrap()),
+                _ => FlagArgumentResult::Handled,
+            })
         } else {
             Ok(FlagArgumentResult::NotFlag(argument))
         }

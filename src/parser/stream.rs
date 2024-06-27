@@ -1,3 +1,4 @@
+use super::IOArgumentParser;
 use crate::Result;
 use std::ffi::OsString;
 
@@ -8,6 +9,9 @@ pub(super) enum ArgumentStream<'a> {
 
     /// The stream is a source of [`OsString`]s
     OsString(&'a mut dyn Iterator<Item = OsString>),
+
+    /// The stream is a source of [`String`]s from a [`std::io::Read`]
+    IO(IOArgumentParser<'a>),
 }
 
 impl<'a> ArgumentStream<'a> {
@@ -46,6 +50,7 @@ impl<'a> ArgumentStream<'a> {
                 None => Ok(None),
             },
             ArgumentStream::String(iter) => Ok(iter.next()),
+            ArgumentStream::IO(io) => io.next(),
         }
     }
 
@@ -53,10 +58,11 @@ impl<'a> ArgumentStream<'a> {
     ///
     /// ## Return Value
     /// Returns the next [`OsString`] in the stream if it exists.
-    pub(super) fn next_os(&mut self) -> Option<OsString> {
+    pub(super) fn next_os(&mut self) -> Result<'static, Option<OsString>> {
         match self {
-            ArgumentStream::OsString(iter) => iter.next(),
-            ArgumentStream::String(iter) => iter.next().map(OsString::from),
+            ArgumentStream::OsString(iter) => Ok(iter.next()),
+            ArgumentStream::String(iter) => Ok(iter.next().map(OsString::from)),
+            ArgumentStream::IO(io) => io.next().map(|string| string.map(OsString::from)),
         }
     }
 
@@ -69,6 +75,7 @@ impl<'a> ArgumentStream<'a> {
         match self {
             ArgumentStream::OsString(_) => true,
             ArgumentStream::String(_) => false,
+            ArgumentStream::IO(_) => false,
         }
     }
 }
