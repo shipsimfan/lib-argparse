@@ -20,7 +20,7 @@ impl<'a> Parse<'a> for Positionals<'a> {
             );
 
             if parser.peek::<Token![,]>() {
-                positionals.push_seperator(parser.parse()?);
+                positionals.push_separator(parser.parse()?);
             }
         }
 

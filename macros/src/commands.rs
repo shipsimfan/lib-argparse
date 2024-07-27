@@ -18,7 +18,7 @@ impl<'a> Parse<'a> for Commands<'a> {
             );
 
             if parser.peek::<Token![,]>() {
-                commands.push_seperator(parser.parse()?);
+                commands.push_separator(parser.parse()?);
             }
         }
 

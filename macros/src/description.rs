@@ -35,7 +35,7 @@ impl<'a> Parse<'a> for Description<'a> {
                     break;
                 }
 
-                lines.push_seperator(parser.parse().unwrap());
+                lines.push_separator(parser.parse().unwrap());
             }
 
             if !parser.empty() {

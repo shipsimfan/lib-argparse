@@ -36,7 +36,7 @@ impl<'a> Parse<'a> for Flags<'a> {
             );
 
             if parser.peek::<Token![,]>() {
-                flags.push_seperator(parser.parse().unwrap());
+                flags.push_separator(parser.parse().unwrap());
             } else {
                 break;
             }
