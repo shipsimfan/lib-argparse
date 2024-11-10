@@ -15,6 +15,7 @@ publish = false
 [workspace.dependencies]
 macros.path = "macros"
 
+i18n.git = "https://github.com/shipsimfan/lib-i18n"
 proc-macro-util.git = "https://github.com/shipsimfan/lib-proc-macro-util"
 
 [package]
@@ -31,3 +32,4 @@ publish.workspace = true
 
 [dependencies]
 macros.workspace = true
+i18n.workspace = true

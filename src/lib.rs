@@ -7,5 +7,11 @@
 #![warn(rustdoc::broken_intra_doc_links)]
 
 mod argument;
+mod error;
+
+mod messages {
+    i18n::include_fluent!("fluent");
+}
 
 pub use argument::{Argument, OsStrArgument, StrArgument};
+pub use error::Error;
