@@ -9,9 +9,7 @@
 mod argument;
 mod error;
 
-mod messages {
-    i18n::include_fluent!("fluent");
-}
+mod messages;
 
 pub use argument::{Argument, OsStrArgument, StrArgument};
 pub use error::Error;

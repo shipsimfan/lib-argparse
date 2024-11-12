@@ -1,6 +1,7 @@
-use crate::OsStrArgument;
+use crate::{Error, OsStrArgument};
 
 impl<'a> OsStrArgument<'a> {
+    /// Converts this argument to a string, returning an error if it contains invalid UTF-8
     pub fn to_str(&self) -> Result<&str, Error> {
         match self {
             OsStrArgument::Borrowed(borrowed) => borrowed,
