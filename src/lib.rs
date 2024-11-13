@@ -9,7 +9,10 @@
 mod argument;
 mod error;
 
-mod messages;
-
 pub use argument::{Argument, OsStrArgument, StrArgument};
 pub use error::Error;
+
+mod messages {
+    #![allow(missing_docs)]
+    i18n::include_fluent!("fluent");
+}

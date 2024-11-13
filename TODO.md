@@ -3,7 +3,6 @@
    1. Arguments and argument sources
      1. Implement `Argument`
        1. Implement `StrArgument`
-       2. Implement `OsStrArgument`
      2. Implement `ArgumentSource`
    2. Errors
    3. Commands and basic parsing
