@@ -1,5 +1,3 @@
-use std::ffi::OsString;
-
 mod display;
 mod error;
 
@@ -7,5 +5,5 @@ mod error;
 #[derive(Debug)]
 pub enum Error {
     /// Invalid string with invalid UTF-8 was passed
-    InvalidUTF8(OsString),
+    InvalidUTF8(String),
 }

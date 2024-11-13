@@ -1,1 +1,1 @@
-INVALID_UTF8 = UTF-8 invalide "{ $string }"
+InvalidUTF8 = UTF-8 invalide "{ $string }"
