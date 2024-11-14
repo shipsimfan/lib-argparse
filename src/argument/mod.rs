@@ -1,4 +1,5 @@
 mod os_str;
+mod source;
 mod str;
 
 mod as_str;
@@ -6,6 +7,7 @@ mod display;
 mod from;
 
 pub use os_str::OsStrArgument;
+pub use source::ArgumentSource;
 pub use str::StrArgument;
 
 /// An arugment from an argument source
