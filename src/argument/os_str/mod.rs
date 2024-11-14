@@ -1,11 +1,11 @@
 use std::ffi::{OsStr, OsString};
 
+mod as_str;
 mod deref;
 mod display;
 mod from;
 mod into;
 mod to_owned;
-mod to_str;
 
 /// An argument which natively is an [`OsStr`]
 #[derive(Debug, Clone)]
