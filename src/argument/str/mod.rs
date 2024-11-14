@@ -1,5 +1,11 @@
+mod deref;
+mod display;
+mod from;
+mod into;
+mod to_owned;
+
 /// An argument which natively is a [`str`]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum StrArgument<'a> {
     /// This is from a larger source and is borrowed
     Borrowed(&'a str),

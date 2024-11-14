@@ -8,7 +8,7 @@ mod to_owned;
 mod to_str;
 
 /// An argument which natively is an [`OsStr`]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum OsStrArgument<'a> {
     /// This is from a larger source and is borrowed
     Borrowed(&'a OsStr),

@@ -6,7 +6,7 @@ use std::{
 
 impl<'a> Into<OsString> for OsStrArgument<'a> {
     fn into(self) -> OsString {
-        self.to_owned()
+        self.into_owned()
     }
 }
 
