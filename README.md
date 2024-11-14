@@ -8,7 +8,7 @@ Place the following into your `Cargo.toml`:
 
 ```toml
 [dependencies]
-argparse = {git = "https://github.com/shipsimfan/lib-argparse", branch = "static"}
+argparse.git = "https://github.com/shipsimfan/lib-argparse"
 ```
 
 See the documentation on in [lib.rs](./src/lib.rs).

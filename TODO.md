@@ -1,10 +1,9 @@
 # ToDo
  1. Implement basic building blocks
    1. Arguments and argument sources
-     1. Add `FromArgument` trait
-     2. Implement `FromArgument`
-     3. Add `ArgumentSource` trait
-     4. Implement `ArgumentSource`
+     1. Implement `FromArgument`
+     2. Add `ArgumentSource` trait
+     3. Implement `ArgumentSource`
    2. Errors
    3. Commands and basic parsing
      1. Positionals
