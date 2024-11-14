@@ -2,6 +2,9 @@ mod display;
 mod error;
 mod new;
 
+/// A result of an argparse operation
+pub type Result<T> = core::result::Result<T, Error>;
+
 /// An error that can occur while parsing arguments
 #[derive(Debug)]
 pub enum Error {

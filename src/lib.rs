@@ -7,10 +7,12 @@
 #![warn(rustdoc::broken_intra_doc_links)]
 
 mod argument;
+mod command;
 mod error;
 
 pub use argument::{Argument, ArgumentSource, OsStrArgument, StrArgument};
-pub use error::Error;
+pub use command::Command;
+pub use error::{Error, Result};
 
 mod messages {
     #![allow(missing_docs)]
