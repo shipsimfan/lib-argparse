@@ -9,7 +9,7 @@
 mod argument;
 mod error;
 
-pub use argument::{Argument, FromArgument, OsStrArgument, StrArgument};
+pub use argument::{Argument, OsStrArgument, StrArgument};
 pub use error::Error;
 
 mod messages {

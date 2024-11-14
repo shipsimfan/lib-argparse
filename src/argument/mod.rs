@@ -1,4 +1,3 @@
-mod from_argument;
 mod os_str;
 mod str;
 
@@ -6,7 +5,6 @@ mod as_str;
 mod display;
 mod from;
 
-pub use from_argument::FromArgument;
 pub use os_str::OsStrArgument;
 pub use str::StrArgument;
 
