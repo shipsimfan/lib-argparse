@@ -1,5 +1,7 @@
 use crate::Argument;
 
+mod env;
+
 /// A source of arguments
 pub trait ArgumentSource<'a> {
     /// Get the next argument from the source

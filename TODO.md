@@ -1,12 +1,10 @@
 # ToDo
  1. Implement basic building blocks
-   1. Arguments and argument sources
-     1. Implement `ArgumentSource`
-   2. Errors
-   3. Commands and basic parsing
-     1. Positionals
-     2. Flags
-     3. Sub-commands
-   4. Version flag
-   5. Help flag
+   1. Commands and basic parsing
+     1. Add `Command` trait
+     2. Positionals
+     3. Flags
+     4. Sub-commands
+   2. Version flag
+   3. Help flag
  2. Add macros
