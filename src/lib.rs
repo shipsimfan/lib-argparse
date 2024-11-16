@@ -14,6 +14,7 @@ mod flag;
 pub use argument::{Argument, ArgumentSource, OsStrArgument, StrArgument};
 pub use command::Command;
 pub use error::{Error, Result};
+pub use flag::{Flag, FlagInfo};
 
 mod messages {
     #![allow(missing_docs)]
