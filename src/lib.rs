@@ -9,6 +9,7 @@
 mod argument;
 mod command;
 mod error;
+mod flag;
 
 pub use argument::{Argument, ArgumentSource, OsStrArgument, StrArgument};
 pub use command::Command;
