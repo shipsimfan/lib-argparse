@@ -10,11 +10,13 @@ mod argument;
 mod command;
 mod error;
 mod flag;
+mod positional;
 
 pub use argument::{Argument, ArgumentSource, OsStrArgument, StrArgument};
 pub use command::Command;
 pub use error::{Error, Result};
 pub use flag::{Flag, FlagInfo};
+pub use positional::{Positional, PositionalInfo, PositionalResult};
 
 mod messages {
     #![allow(missing_docs)]

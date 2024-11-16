@@ -14,11 +14,17 @@ pub enum Error {
     /// A required argument is missing
     MissingArgument(&'static str),
 
-    /// A required value for an argument is missing
-    MissingValue(&'static str, &'static str),
+    /// A required value for a positional is missing
+    MissingPositionalValue(&'static str),
 
-    /// An invalid value was given for an argument
-    InvalidValue(&'static str, &'static str, Box<dyn std::error::Error>),
+    /// An invalid value was given for a positional
+    InvalidPositionalValue(&'static str, Box<dyn std::error::Error>),
+
+    /// A required value for a flag is missing
+    MissingFlagValue(&'static str, &'static str),
+
+    /// An invalid value was given for a flag
+    InvalidFlagValue(&'static str, &'static str, Box<dyn std::error::Error>),
 
     /// An unknown argument was passed
     UnknownArgument(String),

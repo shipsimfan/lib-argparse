@@ -6,9 +6,15 @@ impl std::fmt::Display for Error {
         match self {
             Error::InvalidUTF8(string) => m!(InvalidUTF8, string).fmt(f),
             Error::MissingArgument(argument) => m!(MissingArgument, argument).fmt(f),
-            Error::MissingValue(argument, value) => m!(MissingValue, argument, value).fmt(f),
-            Error::InvalidValue(argument, value, error) => {
-                m!(InvalidValue, argument, value, error).fmt(f)
+            Error::MissingPositionalValue(value) => m!(MissingPositionalValue, value).fmt(f),
+            Error::InvalidPositionalValue(value, error) => {
+                m!(InvalidPositionalValue, value, error).fmt(f)
+            }
+            Error::MissingFlagValue(argument, value) => {
+                m!(MissingFlagValue, argument, value).fmt(f)
+            }
+            Error::InvalidFlagValue(argument, value, error) => {
+                m!(InvalidFlagValue, argument, value, error).fmt(f)
             }
             Error::UnknownArgument(argument) => m!(UnknownArgument, argument).fmt(f),
             Error::Custom(message) => message.fmt(f),

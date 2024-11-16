@@ -16,18 +16,31 @@ impl Error {
         Error::MissingArgument(argument)
     }
 
-    /// Create an [`Error::MissingValue`] for `value` of `argument`
-    pub fn missing_value(argument: &'static str, value: &'static str) -> Self {
-        Error::MissingValue(argument, value)
+    /// Create an [`Error::MissingPositionalValue`] for `value`
+    pub fn missing_positional_value(value: &'static str) -> Self {
+        Error::MissingPositionalValue(value)
     }
 
-    /// Create an [`Error::InvalidValue`] for `value` of `argument`
-    pub fn invalid_value<T: 'static + std::error::Error>(
+    /// Create an [`Error::InvalidPositionalValue`] for `value`
+    pub fn invalid_positional_value<T: 'static + std::error::Error>(
+        value: &'static str,
+        error: T,
+    ) -> Self {
+        Error::InvalidPositionalValue(value, Box::new(error))
+    }
+
+    /// Create an [`Error::MissingFlagValue`] for `value` of `argument`
+    pub fn missing_flag_value(argument: &'static str, value: &'static str) -> Self {
+        Error::MissingFlagValue(argument, value)
+    }
+
+    /// Create an [`Error::InvalidFlagValue`] for `value` of `argument`
+    pub fn invalid_flag_value<T: 'static + std::error::Error>(
         argument: &'static str,
         value: &'static str,
         error: T,
     ) -> Self {
-        Error::InvalidValue(argument, value, Box::new(error))
+        Error::InvalidFlagValue(argument, value, Box::new(error))
     }
 
     /// Create an [`Error::UnknownArgument`] for `argument`
