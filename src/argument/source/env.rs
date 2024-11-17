@@ -9,6 +9,10 @@ impl<'a> ArgumentSource<'a> for Args {
     fn empty(&self) -> bool {
         self.len() == 0
     }
+
+    fn first_is_program(&self) -> bool {
+        true
+    }
 }
 
 impl<'a> ArgumentSource<'a> for ArgsOs {
@@ -18,5 +22,9 @@ impl<'a> ArgumentSource<'a> for ArgsOs {
 
     fn empty(&self) -> bool {
         self.len() == 0
+    }
+
+    fn first_is_program(&self) -> bool {
+        true
     }
 }

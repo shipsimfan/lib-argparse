@@ -9,4 +9,7 @@ pub trait ArgumentSource<'a> {
 
     /// Are there no more arguments?
     fn empty(&self) -> bool;
+
+    /// Is the first argument from this source the name of the program?
+    fn first_is_program(&self) -> bool;
 }
