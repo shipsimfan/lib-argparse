@@ -8,7 +8,7 @@ pub struct FlagInfo<T> {
     /// The long name of the flag argument
     pub long_name: Option<&'static str>,
 
-    /// The long name of the flag argument
+    /// The short name of the flag argument
     pub short_name: Option<&'static str>,
 
     /// The name of the value for this flag
