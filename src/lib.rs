@@ -12,7 +12,9 @@ mod error;
 mod flag;
 mod positional;
 
-pub use argument::{Argument, ArgumentSource, OsStrArgument, StrArgument};
+pub use argument::{
+    ArgsOsSource, ArgsSource, Argument, ArgumentSource, OsStrArgument, StrArgument,
+};
 pub use command::Command;
 pub use error::{Error, Result};
 pub use flag::{Flag, FlagInfo};

@@ -1,4 +1,4 @@
-use crate::{ArgumentSource, Result};
+use crate::{ArgsOsSource, ArgumentSource, Result};
 
 /// A command which can be parsed from an [`ArgumentSource`]
 pub trait Command: Sized {
@@ -7,6 +7,6 @@ pub trait Command: Sized {
 
     /// Parse this command from the environment arguments
     fn parse_env() -> Result<Self> {
-        Self::parse(&mut std::env::args_os())
+        Self::parse(&mut ArgsOsSource::new())
     }
 }

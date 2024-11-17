@@ -1,6 +1,10 @@
 use crate::Argument;
 
-mod env;
+mod args;
+mod args_os;
+
+pub use args::ArgsSource;
+pub use args_os::ArgsOsSource;
 
 /// A source of arguments
 pub trait ArgumentSource<'a> {
@@ -10,6 +14,6 @@ pub trait ArgumentSource<'a> {
     /// Are there no more arguments?
     fn empty(&self) -> bool;
 
-    /// Is the first argument from this source the name of the program?
-    fn first_is_program(&self) -> bool;
+    /// Return the name of the program, if this source provides one
+    fn program_name(&self) -> Option<&Argument<'a>>;
 }
