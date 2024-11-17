@@ -1,7 +1,7 @@
 use crate::{ArgumentSource, Flag, FlagInfo, Result};
 
 impl Flag for bool {
-    fn parse(_: &mut dyn ArgumentSource, _: &FlagInfo<Self>) -> Result<Self> {
+    fn parse(_: &mut dyn ArgumentSource, _: &FlagInfo<Self>, _: bool) -> Result<Self> {
         Ok(true)
     }
 
