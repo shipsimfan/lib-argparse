@@ -3,6 +3,7 @@ use crate::{Argument, Error, Result};
 mod info;
 mod result;
 
+mod collections;
 mod path;
 mod string;
 
