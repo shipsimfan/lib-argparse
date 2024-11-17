@@ -3,6 +3,9 @@ use crate::{Argument, Error, Result};
 mod info;
 mod result;
 
+mod path;
+mod string;
+
 pub use info::PositionalInfo;
 pub use result::PositionalResult;
 

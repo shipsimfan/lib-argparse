@@ -2,6 +2,8 @@ use crate::{ArgumentSource, Error, Result};
 
 mod info;
 
+mod bool;
+
 pub use info::FlagInfo;
 
 /// A type which can parsed from a flag
