@@ -10,8 +10,17 @@ impl FromResidual for PositionalResult {
 impl<T> FromResidual<Result<T, Error>> for PositionalResult {
     fn from_residual(residual: Result<T, Error>) -> Self {
         match residual {
-            Ok(_) => PositionalResult::Next,
+            Ok(_) => unimplemented!(),
             Err(error) => PositionalResult::Error(error),
+        }
+    }
+}
+
+impl<T> FromResidual<PositionalResult> for Result<T, Error> {
+    fn from_residual(residual: PositionalResult) -> Self {
+        match residual {
+            PositionalResult::Error(error) => Err(error),
+            _ => unimplemented!(),
         }
     }
 }
