@@ -6,6 +6,7 @@ mod bool;
 mod number;
 
 pub use info::FlagInfo;
+pub use number::InvalidNumberError;
 
 /// A type which can parsed from a flag
 pub trait Flag: Sized {

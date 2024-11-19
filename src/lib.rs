@@ -18,7 +18,7 @@ pub use argument::{
 };
 pub use command::Command;
 pub use error::{Error, Result};
-pub use flag::{Flag, FlagInfo};
+pub use flag::{Flag, FlagInfo, InvalidNumberError};
 pub use positional::{Positional, PositionalInfo, PositionalResult};
 
 mod messages {

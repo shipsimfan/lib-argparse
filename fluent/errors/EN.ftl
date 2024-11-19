@@ -5,3 +5,8 @@ InvalidPositionalValue = invalid "{ $value }" - { $error }
 MissingFlagValue = missing "{ $value }" for "{ $argument }"
 InvalidFlagValue = invalid "{ $value }" for "{ $argument }" - { $error }
 UnknownArgument = unknown argument "{ $argument }"
+
+NumberInvalid = invalid number provided
+NumberPosOverflow = provided number is too large
+NumberNegOverflow = provided number is too small
+NumberZero = value cannot be zero
