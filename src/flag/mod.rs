@@ -3,6 +3,7 @@ use crate::{ArgumentSource, Error, Result};
 mod info;
 
 mod bool;
+mod number;
 
 pub use info::FlagInfo;
 

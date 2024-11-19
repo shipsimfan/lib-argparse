@@ -1,4 +1,4 @@
-use crate::Error;
+use crate::{Error, FlagInfo};
 
 impl Error {
     /// Create an [`Error::Custom`] containing `message`
@@ -30,17 +30,34 @@ impl Error {
     }
 
     /// Create an [`Error::MissingFlagValue`] for `value` of `argument`
-    pub fn missing_flag_value(argument: &'static str, value: &'static str) -> Self {
-        Error::MissingFlagValue(argument, value)
+    pub fn missing_flag_value<T>(info: &FlagInfo<T>, long: bool) -> Self {
+        Error::MissingFlagValue(
+            if long {
+                info.long_name
+            } else {
+                info.short_name
+            }
+            .unwrap(),
+            info.value.unwrap(),
+        )
     }
 
     /// Create an [`Error::InvalidFlagValue`] for `value` of `argument`
-    pub fn invalid_flag_value<T: 'static + std::error::Error>(
-        argument: &'static str,
-        value: &'static str,
-        error: T,
+    pub fn invalid_flag_value<T, E: 'static + std::error::Error>(
+        info: &FlagInfo<T>,
+        long: bool,
+        error: E,
     ) -> Self {
-        Error::InvalidFlagValue(argument, value, Box::new(error))
+        Error::InvalidFlagValue(
+            if long {
+                info.long_name
+            } else {
+                info.short_name
+            }
+            .unwrap(),
+            info.value.unwrap(),
+            Box::new(error),
+        )
     }
 
     /// Create an [`Error::UnknownArgument`] for `argument`
