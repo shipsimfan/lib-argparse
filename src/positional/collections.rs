@@ -15,7 +15,7 @@ impl<T: Positional> Positional for Vec<T> {
         };
 
         let mut value = None;
-        if let PositionalResult::Error(error) = T::parse(
+        T::parse(
             &mut value,
             argument,
             &PositionalInfo {
@@ -24,9 +24,7 @@ impl<T: Positional> Positional for Vec<T> {
                 max_count: 1,
                 default: None,
             },
-        ) {
-            return PositionalResult::Error(error);
-        }
+        )?;
 
         vec.push(value.unwrap());
 
