@@ -7,7 +7,7 @@ impl ToTokens for Output {
 
         to_tokens! { generator
             impl ::argparse::Command for #name {
-                fn parse(source: &mut dyn ::argparse::ArgumentSource) -> ::argparse::Result<Self> {
+                fn parse(__source: &mut dyn ::argparse::ArgumentSource) -> ::argparse::Result<Self> {
                     #kind
                 }
             }

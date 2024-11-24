@@ -1,10 +1,9 @@
 use super::{kind::OutputKind, Output, StructOutput};
-use proc_macro_util::tokens::Identifier;
 
 impl Output {
-    pub fn new_struct(name: Identifier, r#struct: StructOutput) -> Self {
+    pub fn new_struct(r#struct: StructOutput) -> Self {
         Output {
-            name,
+            name: r#struct.name.clone(),
             kind: OutputKind::Struct(r#struct),
         }
     }
