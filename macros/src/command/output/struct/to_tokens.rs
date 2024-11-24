@@ -1,12 +1,16 @@
 use super::StructOutput;
 use proc_macro_util::{to_tokens, Generator, ToTokens};
 
-impl ToTokens for StructOutput {
+impl<'a> ToTokens for StructOutput<'a> {
     fn to_tokens(self, generator: &mut Generator) {
-        let StructOutput { name } = self;
+        let StructOutput {
+            name,
+            positional_info,
+        } = self;
 
         to_tokens! { generator
             // Positional info
+            #positional_info
 
             // Flag info
 

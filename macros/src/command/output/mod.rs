@@ -7,13 +7,13 @@ mod r#struct;
 mod new;
 mod to_tokens;
 
-pub use r#struct::StructOutput;
+pub use r#struct::{DefaultValue, PositionalInfo, StructOutput};
 
 /// The output code from the Command derive macro
-pub struct Output {
+pub struct Output<'a> {
     /// The name of the input item
     name: Identifier,
 
     /// The kind of output to produce
-    kind: OutputKind,
+    kind: OutputKind<'a>,
 }

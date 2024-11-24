@@ -1,9 +1,12 @@
-use super::StructOutput;
+use super::{positional::PositionalInfo, StructOutput};
 use proc_macro_util::tokens::Identifier;
 
-impl StructOutput {
+impl<'a> StructOutput<'a> {
     /// Creates a new [`StructOutput`]
-    pub fn new(name: Identifier) -> Self {
-        StructOutput { name }
+    pub fn new(name: Identifier, positional_info: Vec<PositionalInfo<'a>>) -> Self {
+        StructOutput {
+            name,
+            positional_info,
+        }
     }
 }

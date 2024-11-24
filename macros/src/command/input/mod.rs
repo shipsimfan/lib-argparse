@@ -6,7 +6,7 @@ mod extract;
 mod into_output;
 
 /// The details extracted from the input item to the Command derive macro
-pub enum Input {
+pub enum Input<'a> {
     /// The input item is a struct
-    Struct(StructInput),
+    Struct(StructInput<'a>),
 }
