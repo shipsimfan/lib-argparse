@@ -28,7 +28,8 @@ pub trait Positional: Sized {
         }
     }
 
-    /// Continue parsing as a sub-command
+    /// Continue parsing as a sub-
+    #[allow(unused_variables)]
     fn sub(this: &mut Option<Self>, parser: &mut dyn ArgumentSource) -> Result<()> {
         unimplemented!()
     }
