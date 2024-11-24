@@ -1,4 +1,4 @@
-use crate::{Argument, Error, Result};
+use crate::{Argument, ArgumentSource, Error, Result};
 
 mod info;
 mod result;
@@ -26,5 +26,10 @@ pub trait Positional: Sized {
             (None, Some(default)) => Ok(default()),
             (None, None) => Err(Error::missing_positional_value(info.value)),
         }
+    }
+
+    /// Continue parsing as a sub-command
+    fn sub(this: &mut Option<Self>, parser: &mut dyn ArgumentSource) -> Result<()> {
+        unimplemented!()
     }
 }
