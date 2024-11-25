@@ -20,6 +20,7 @@ impl<'a> Positional<'a> {
             value,
             min_count: Literal::new(0),
             max_count: Literal::new(0),
+            default: None,
         }
     }
 }

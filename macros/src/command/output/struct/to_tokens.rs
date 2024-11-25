@@ -6,6 +6,7 @@ impl<'a> ToTokens for StructOutput<'a> {
         let StructOutput {
             name,
             positional_info,
+            flag_info,
         } = self;
 
         to_tokens! { generator
@@ -13,6 +14,7 @@ impl<'a> ToTokens for StructOutput<'a> {
             #positional_info
 
             // Flag info
+            #flag_info
 
             // Positional variables
 

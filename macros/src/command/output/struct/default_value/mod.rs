@@ -1,12 +1,10 @@
 use proc_macro_util::ast::Expression;
 
+mod new;
 mod to_tokens;
 
-/// A default value for a flag or positional
-pub enum DefaultValue<'a> {
-    /// There is no default value
-    None,
-
-    /// There is a default value
-    Some(Expression<'a>),
+/// The default value for a flag or positional
+pub struct DefaultValue<'a> {
+    /// The expression defining the default value
+    expression: Expression<'a>,
 }

@@ -1,5 +1,5 @@
 use super::PositionalInfo;
-use crate::command::output::r#struct::default_value::DefaultValue;
+use crate::command::output::r#struct::{DefaultValue, OptionalOutput};
 use proc_macro_util::{
     ast::Type,
     tokens::{Identifier, Literal},
@@ -13,7 +13,7 @@ impl<'a> PositionalInfo<'a> {
         value: Literal,
         min_count: Literal,
         max_count: Literal,
-        default: DefaultValue<'a>,
+        default: OptionalOutput<DefaultValue<'a>>,
     ) -> Self {
         PositionalInfo {
             info_name,

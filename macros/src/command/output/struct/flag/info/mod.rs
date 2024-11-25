@@ -1,0 +1,32 @@
+use crate::command::output::{r#struct::DefaultValue, OptionalOutput};
+use proc_macro_util::{
+    ast::Type,
+    tokens::{Identifier, Literal},
+};
+
+/// The description of a flag
+pub struct FlagInfo<'a> {
+    /// The name for the constant
+    info_name: Identifier,
+
+    /// The type of the flag
+    r#type: Type<'a>,
+
+    /// The long name for the flag
+    long_name: OptionalOutput<Literal>,
+
+    /// The short name for the flag
+    short_name: OptionalOutput<Literal>,
+
+    /// The name of the value
+    value: OptionalOutput<Literal>,
+
+    /// The minimum count of values
+    min_count: Literal,
+
+    /// The maximum count of values
+    max_count: Literal,
+
+    /// The default value
+    default: OptionalOutput<DefaultValue<'a>>,
+}

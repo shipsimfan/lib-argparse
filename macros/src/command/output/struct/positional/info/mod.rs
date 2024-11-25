@@ -1,4 +1,4 @@
-use crate::command::output::r#struct::DefaultValue;
+use crate::command::output::r#struct::{DefaultValue, OptionalOutput};
 use proc_macro_util::{
     ast::Type,
     tokens::{Identifier, Literal},
@@ -25,5 +25,5 @@ pub struct PositionalInfo<'a> {
     max_count: Literal,
 
     /// The default value
-    default: DefaultValue<'a>,
+    default: OptionalOutput<DefaultValue<'a>>,
 }

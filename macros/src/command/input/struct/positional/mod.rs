@@ -1,5 +1,5 @@
 use proc_macro_util::{
-    ast::Type,
+    ast::{Expression, Type},
     tokens::{Identifier, Literal},
 };
 
@@ -25,4 +25,7 @@ pub struct Positional<'a> {
 
     /// The maximum count
     max_count: Literal,
+
+    /// The default value
+    default: Option<Expression<'a>>,
 }
