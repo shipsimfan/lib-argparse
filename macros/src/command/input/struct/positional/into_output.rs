@@ -1,5 +1,5 @@
 use super::Positional;
-use crate::command::output::{DefaultValue, OptionalOutput, PositionalInfo};
+use crate::command::output::{DefaultValue, PositionalInfo};
 
 impl<'a> Positional<'a> {
     pub fn into_output(self) -> PositionalInfo<'a> {
@@ -9,10 +9,7 @@ impl<'a> Positional<'a> {
             self.value,
             self.min_count,
             self.max_count,
-            match self.default {
-                Some(default) => OptionalOutput::Some(DefaultValue::new(default)),
-                None => OptionalOutput::None,
-            },
+            self.default.map(DefaultValue::new).into(),
         )
     }
 }

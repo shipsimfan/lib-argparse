@@ -4,6 +4,9 @@ use proc_macro_util::{
     tokens::{Identifier, Literal},
 };
 
+mod new;
+mod to_tokens;
+
 /// The description of a flag
 pub struct FlagInfo<'a> {
     /// The name for the constant

@@ -38,7 +38,7 @@ impl Error {
                 info.short_name
             }
             .unwrap(),
-            info.value.unwrap(),
+            info.value.unwrap_or("VALUE"),
         )
     }
 
@@ -55,7 +55,7 @@ impl Error {
                 info.short_name
             }
             .unwrap(),
-            info.value.unwrap(),
+            info.value.unwrap_or("VALUE"),
             Box::new(error),
         )
     }

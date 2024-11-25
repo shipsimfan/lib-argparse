@@ -1,6 +1,8 @@
+use flag::Flag;
 use positional::Positional;
 use proc_macro_util::tokens::Identifier;
 
+mod flag;
 mod positional;
 
 mod extract;
@@ -11,6 +13,9 @@ pub struct StructInput<'a> {
     /// The name of the struct
     name: Identifier,
 
-    /// The positionals in this structs
+    /// The positionals in this struct
     positionals: Vec<Positional<'a>>,
+
+    /// The flags in this struct
+    flags: Vec<Flag<'a>>,
 }

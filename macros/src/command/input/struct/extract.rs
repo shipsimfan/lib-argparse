@@ -1,4 +1,4 @@
-use super::{positional::Positional, StructInput};
+use super::{Flag, Positional, StructInput};
 use proc_macro_util::ast::items::{Struct, StructBody};
 
 impl<'a> StructInput<'a> {
@@ -33,10 +33,18 @@ impl<'a> StructInput<'a> {
         };
 
         let mut positionals = Vec::new();
+        let mut flags = Vec::new();
         for field in fields {
-            positionals.push(Positional::extract(field));
+            match Flag::extract(field) {
+                Ok(flag) => flags.push(flag),
+                Err(field) => positionals.push(Positional::extract(field)),
+            };
         }
 
-        StructInput { name, positionals }
+        StructInput {
+            name,
+            positionals,
+            flags,
+        }
     }
 }

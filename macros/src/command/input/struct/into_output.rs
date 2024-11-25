@@ -1,4 +1,4 @@
-use super::Positional;
+use super::{Flag, Positional};
 use crate::command::{
     input::StructInput,
     output::{Output, StructOutput},
@@ -13,6 +13,8 @@ impl<'a> StructInput<'a> {
             .map(Positional::into_output)
             .collect();
 
-        Output::new_struct(StructOutput::new(self.name, positional_info))
+        let flag_info = self.flags.into_iter().map(Flag::into_output).collect();
+
+        Output::new_struct(StructOutput::new(self.name, positional_info, flag_info))
     }
 }
