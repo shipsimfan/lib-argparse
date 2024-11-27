@@ -7,6 +7,7 @@ impl<'a> ToTokens for StructOutput<'a> {
             name,
             positional_info,
             positional_declarations,
+            positional_matches,
             positional_unwraps,
             flag_info,
             flag_declarations,
@@ -59,6 +60,7 @@ impl<'a> ToTokens for StructOutput<'a> {
 
                 // Check positionals
                 let __result = match __current_positional {
+                    #positional_matches
                     _ => return Err(::argparse::Error::unknown_argument(__argument.to_string())),
                 };
 

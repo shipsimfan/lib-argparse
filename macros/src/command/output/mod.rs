@@ -9,7 +9,7 @@ mod to_tokens;
 
 pub use r#struct::{
     DefaultValue, FlagInfo, FlagLongName, FlagShortName, FlagUnwrap, OptionalOutput,
-    PositionalInfo, PositionalUnwrap, StructOutput, VariableDeclaration,
+    PositionalInfo, PositionalMatch, PositionalUnwrap, StructOutput, VariableDeclaration,
 };
 
 /// The output code from the Command derive macro

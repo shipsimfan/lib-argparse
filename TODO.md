@@ -4,8 +4,7 @@
    2. Help flag
  2. Add macros
   1. Finish required struct generation
-    1. Positional
-    2. Sub-command
+    1. Sub-command
   2. Add flag options
    1. Long name
    2. Short name

@@ -1,6 +1,6 @@
 use super::{
-    FlagInfo, FlagLongName, FlagShortName, FlagUnwrap, PositionalInfo, PositionalUnwrap,
-    StructOutput, VariableDeclaration,
+    FlagInfo, FlagLongName, FlagShortName, FlagUnwrap, PositionalInfo, PositionalMatch,
+    PositionalUnwrap, StructOutput, VariableDeclaration,
 };
 use proc_macro_util::tokens::Identifier;
 
@@ -10,6 +10,7 @@ impl<'a> StructOutput<'a> {
         name: Identifier,
         positional_info: Vec<PositionalInfo<'a>>,
         positional_declarations: Vec<VariableDeclaration>,
+        positional_matches: Vec<PositionalMatch>,
         positional_unwraps: Vec<PositionalUnwrap>,
         flag_info: Vec<FlagInfo<'a>>,
         flag_declarations: Vec<VariableDeclaration>,
@@ -21,6 +22,7 @@ impl<'a> StructOutput<'a> {
             name,
             positional_info,
             positional_declarations,
+            positional_matches,
             positional_unwraps,
             flag_info,
             flag_declarations,
