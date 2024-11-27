@@ -7,7 +7,10 @@ mod r#struct;
 mod new;
 mod to_tokens;
 
-pub use r#struct::{DefaultValue, FlagInfo, OptionalOutput, PositionalInfo, StructOutput};
+pub use r#struct::{
+    DefaultValue, FlagInfo, FlagUnwrap, OptionalOutput, PositionalInfo, PositionalUnwrap,
+    StructOutput, VariableDeclaration,
+};
 
 /// The output code from the Command derive macro
 pub struct Output<'a> {

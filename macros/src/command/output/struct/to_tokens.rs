@@ -6,7 +6,11 @@ impl<'a> ToTokens for StructOutput<'a> {
         let StructOutput {
             name,
             positional_info,
+            positional_declarations,
+            positional_unwraps,
             flag_info,
+            flag_declarations,
+            flag_unwraps,
         } = self;
 
         to_tokens! { generator
@@ -17,8 +21,10 @@ impl<'a> ToTokens for StructOutput<'a> {
             #flag_info
 
             // Positional variables
+            #positional_declarations
 
             // Flag variables
+            #flag_declarations
 
             // Accounting variables
             let mut __current_positional = 0;
@@ -60,7 +66,7 @@ impl<'a> ToTokens for StructOutput<'a> {
                     ::argparse::PositionalResult::Sub => {
                         match __current_positional {
                             _ => unreachable!(),
-                        }?;
+                        };
 
                         break;
                     }
@@ -68,12 +74,11 @@ impl<'a> ToTokens for StructOutput<'a> {
                 }
             }
 
-            // Unwrap positionals
-
-            // Unwrap flags
-
-            // Return result
-            Ok(#name {})
+            // Unwrap values and return result
+            Ok(#name {
+                #positional_unwraps
+                #flag_unwraps
+            })
         }
     }
 }

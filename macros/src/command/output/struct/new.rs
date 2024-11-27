@@ -1,4 +1,6 @@
-use super::{FlagInfo, PositionalInfo, StructOutput};
+use super::{
+    FlagInfo, FlagUnwrap, PositionalInfo, PositionalUnwrap, StructOutput, VariableDeclaration,
+};
 use proc_macro_util::tokens::Identifier;
 
 impl<'a> StructOutput<'a> {
@@ -6,12 +8,20 @@ impl<'a> StructOutput<'a> {
     pub fn new(
         name: Identifier,
         positional_info: Vec<PositionalInfo<'a>>,
+        positional_declarations: Vec<VariableDeclaration>,
+        positional_unwraps: Vec<PositionalUnwrap>,
         flag_info: Vec<FlagInfo<'a>>,
+        flag_declarations: Vec<VariableDeclaration>,
+        flag_unwraps: Vec<FlagUnwrap>,
     ) -> Self {
         StructOutput {
             name,
             positional_info,
+            positional_declarations,
+            positional_unwraps,
             flag_info,
+            flag_declarations,
+            flag_unwraps,
         }
     }
 }
