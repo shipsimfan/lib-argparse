@@ -9,12 +9,14 @@ impl<'a> StructInput<'a> {
         let mut positional_info = Vec::with_capacity(self.positionals.len());
         let mut positional_declarations = Vec::with_capacity(self.positionals.len());
         let mut positional_matches = Vec::with_capacity(self.positionals.len());
+        let mut positional_sub_commands = Vec::with_capacity(self.positionals.len());
         let mut positional_unwraps = Vec::with_capacity(self.positionals.len());
         for (index, positional) in self.positionals.into_iter().enumerate() {
-            let (info, declaration, r#match, unwrap) = positional.into_output(index);
+            let (info, declaration, r#match, sub_command, unwrap) = positional.into_output(index);
             positional_info.push(info);
             positional_declarations.push(declaration);
             positional_matches.push(r#match);
+            positional_sub_commands.push(sub_command);
             positional_unwraps.push(unwrap);
         }
 
@@ -40,6 +42,7 @@ impl<'a> StructInput<'a> {
             positional_info,
             positional_declarations,
             positional_matches,
+            positional_sub_commands,
             positional_unwraps,
             flag_info,
             flag_declarations,

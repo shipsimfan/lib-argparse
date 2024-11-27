@@ -12,7 +12,7 @@ mod to_tokens;
 pub use default_value::DefaultValue;
 pub use flag::{FlagInfo, FlagLongName, FlagShortName, FlagUnwrap};
 pub use optional_output::OptionalOutput;
-pub use positional::{PositionalInfo, PositionalMatch, PositionalUnwrap};
+pub use positional::{PositionalInfo, PositionalMatch, PositionalSubCommand, PositionalUnwrap};
 pub use variable_declaration::VariableDeclaration;
 
 /// The output code for a struct
@@ -28,6 +28,9 @@ pub struct StructOutput<'a> {
 
     /// The match arms for positionals
     positional_matches: Vec<PositionalMatch>,
+
+    /// The match arms for positional sub commands
+    positional_sub_commands: Vec<PositionalSubCommand>,
 
     /// Unwrapping of positional variables
     positional_unwraps: Vec<PositionalUnwrap>,

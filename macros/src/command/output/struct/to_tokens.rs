@@ -8,6 +8,7 @@ impl<'a> ToTokens for StructOutput<'a> {
             positional_info,
             positional_declarations,
             positional_matches,
+            positional_sub_commands,
             positional_unwraps,
             flag_info,
             flag_declarations,
@@ -71,6 +72,7 @@ impl<'a> ToTokens for StructOutput<'a> {
                     ::argparse::PositionalResult::Error(__error) => return Err(__error),
                     ::argparse::PositionalResult::Sub => {
                         match __current_positional {
+                            #positional_sub_commands
                             _ => unreachable!(),
                         };
 
