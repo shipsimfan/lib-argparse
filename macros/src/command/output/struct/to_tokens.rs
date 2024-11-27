@@ -10,6 +10,7 @@ impl<'a> ToTokens for StructOutput<'a> {
             positional_unwraps,
             flag_info,
             flag_declarations,
+            flag_long_names,
             flag_unwraps,
         } = self;
 
@@ -35,6 +36,7 @@ impl<'a> ToTokens for StructOutput<'a> {
                 if let Ok(__argument) = __argument.as_str() {
                     if __argument.len() > 2 && __argument.starts_with("--") {
                         match &__argument[2..] {
+                            #flag_long_names
                             _ => return Err(::argparse::Error::unknown_argument(__argument.to_string())),
                         }
 

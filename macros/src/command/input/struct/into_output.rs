@@ -18,11 +18,13 @@ impl<'a> StructInput<'a> {
 
         let mut flag_info = Vec::with_capacity(self.flags.len());
         let mut flag_declarations = Vec::with_capacity(self.flags.len());
+        let mut flag_long_names = Vec::with_capacity(self.flags.len());
         let mut flag_unwraps = Vec::with_capacity(self.flags.len());
         for flag in self.flags {
-            let (info, declaration, unwrap) = flag.into_output();
+            let (info, declaration, long_name, unwrap) = flag.into_output();
             flag_info.push(info);
             flag_declarations.push(declaration);
+            flag_long_names.push(long_name);
             flag_unwraps.push(unwrap);
         }
 
@@ -33,6 +35,7 @@ impl<'a> StructInput<'a> {
             positional_unwraps,
             flag_info,
             flag_declarations,
+            flag_long_names,
             flag_unwraps,
         ))
     }
