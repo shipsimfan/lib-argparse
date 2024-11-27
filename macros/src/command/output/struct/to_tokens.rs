@@ -11,6 +11,7 @@ impl<'a> ToTokens for StructOutput<'a> {
             flag_info,
             flag_declarations,
             flag_long_names,
+            flag_short_names,
             flag_unwraps,
         } = self;
 
@@ -47,6 +48,7 @@ impl<'a> ToTokens for StructOutput<'a> {
                         __chars.next();
                         for __c in __chars {
                             match __c {
+                                #flag_short_names
                                 _ => return Err(::argparse::Error::unknown_argument(::std::format!("-{}", __c))),
                             }
                         }

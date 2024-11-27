@@ -8,8 +8,8 @@ mod new;
 mod to_tokens;
 
 pub use r#struct::{
-    DefaultValue, FlagInfo, FlagLongName, FlagUnwrap, OptionalOutput, PositionalInfo,
-    PositionalUnwrap, StructOutput, VariableDeclaration,
+    DefaultValue, FlagInfo, FlagLongName, FlagShortName, FlagUnwrap, OptionalOutput,
+    PositionalInfo, PositionalUnwrap, StructOutput, VariableDeclaration,
 };
 
 /// The output code from the Command derive macro

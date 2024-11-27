@@ -10,7 +10,7 @@ mod new;
 mod to_tokens;
 
 pub use default_value::DefaultValue;
-pub use flag::{FlagInfo, FlagLongName, FlagUnwrap};
+pub use flag::{FlagInfo, FlagLongName, FlagShortName, FlagUnwrap};
 pub use optional_output::OptionalOutput;
 pub use positional::{PositionalInfo, PositionalUnwrap};
 pub use variable_declaration::VariableDeclaration;
@@ -37,6 +37,9 @@ pub struct StructOutput<'a> {
 
     /// Match arms for flag long names
     flag_long_names: Vec<FlagLongName>,
+
+    /// Match arms for flag short names
+    flag_short_names: Vec<FlagShortName>,
 
     /// Unwrapping of flag variables
     flag_unwraps: Vec<FlagUnwrap>,
