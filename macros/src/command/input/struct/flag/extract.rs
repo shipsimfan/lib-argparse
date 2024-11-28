@@ -29,7 +29,9 @@ impl<'a> Flag<'a> {
         let r#type = field.r#type;
 
         let variable_name_str = variable_name.to_string();
-        let long_name = Literal::new(variable_name_str.replace('_', "-").as_str());
+        let long_name_str = variable_name_str.replace('_', "-");
+        let long_name = Literal::new(long_name_str.as_str());
+        let info_long_name = Literal::new(format!("--{}", long_name_str).as_str());
 
         let name_upper = variable_name_str.to_uppercase();
         let info_name = Identifier::new(&format!("__{}_INFO", name_upper));
@@ -39,7 +41,9 @@ impl<'a> Flag<'a> {
             info_name,
             r#type,
             long_name,
+            info_long_name,
             short_name: None,
+            info_short_name: None,
             value: None,
             min_count: Literal::new(0),
             max_count: Literal::new(0),

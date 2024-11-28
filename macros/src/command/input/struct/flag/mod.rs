@@ -20,8 +20,14 @@ pub struct Flag<'a> {
     /// The long name for the flag
     long_name: Literal,
 
+    /// The long name with "--" prepended for the flag
+    info_long_name: Literal,
+
     /// The short name for the flag
     short_name: Option<Literal>,
+
+    /// The short name with '-' prepended for the flag
+    info_short_name: Option<Literal>,
 
     /// The name of the value for this flag
     value: Option<Literal>,

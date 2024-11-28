@@ -6,8 +6,8 @@ impl<'a> ToTokens for FlagInfo<'a> {
         let FlagInfo {
             info_name,
             r#type,
-            long_name,
-            short_name,
+            info_long_name: long_name,
+            info_short_name: short_name,
             value,
             min_count,
             max_count,

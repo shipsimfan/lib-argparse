@@ -10,8 +10,8 @@ impl<'a> FlagInfo<'a> {
     pub fn new(
         info_name: Identifier,
         r#type: Type<'a>,
-        long_name: OptionalOutput<Literal>,
-        short_name: OptionalOutput<Literal>,
+        info_long_name: OptionalOutput<Literal>,
+        info_short_name: OptionalOutput<Literal>,
         value: OptionalOutput<Literal>,
         min_count: Literal,
         max_count: Literal,
@@ -20,8 +20,8 @@ impl<'a> FlagInfo<'a> {
         FlagInfo {
             info_name,
             r#type,
-            long_name,
-            short_name,
+            info_long_name,
+            info_short_name,
             value,
             min_count,
             max_count,

@@ -16,10 +16,10 @@ pub struct FlagInfo<'a> {
     r#type: Type<'a>,
 
     /// The long name for the flag
-    long_name: OptionalOutput<Literal>,
+    info_long_name: OptionalOutput<Literal>,
 
     /// The short name for the flag
-    short_name: OptionalOutput<Literal>,
+    info_short_name: OptionalOutput<Literal>,
 
     /// The name of the value
     value: OptionalOutput<Literal>,

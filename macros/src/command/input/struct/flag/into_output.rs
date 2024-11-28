@@ -17,8 +17,8 @@ impl<'a> Flag<'a> {
             FlagInfo::new(
                 self.info_name.clone(),
                 self.r#type,
-                self.long_name.clone().into(),
-                self.short_name.clone().into(),
+                self.info_long_name.into(),
+                self.info_short_name.into(),
                 self.value.into(),
                 self.min_count,
                 self.max_count,
