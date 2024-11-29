@@ -6,5 +6,5 @@ mod input;
 mod output;
 
 pub fn generate(item: DeriveItem) -> Result<Output> {
-    Ok(Input::extract(item).into_output())
+    Ok(Input::extract(item)?.into_output())
 }

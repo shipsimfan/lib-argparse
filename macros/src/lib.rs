@@ -16,3 +16,7 @@ proc_macro_util::proc_macro_derive!(
     /// positional, parsed in the order they appear.
     Command (flag) -> command::generate
 );
+
+mod messages {
+    i18n::include_fluent!("macros/fluent");
+}

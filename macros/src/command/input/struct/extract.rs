@@ -1,9 +1,12 @@
 use super::{Flag, Positional, StructInput};
-use proc_macro_util::ast::items::{Struct, StructBody};
+use proc_macro_util::{
+    ast::items::{Struct, StructBody},
+    Error,
+};
 
 impl<'a> StructInput<'a> {
     /// Extract the required details from `r#struct`
-    pub fn extract(r#struct: Struct<'a>) -> Self {
+    pub fn extract(r#struct: Struct<'a>) -> Result<Self, Error> {
         let name = r#struct.name.into_owned();
 
         let fields = match r#struct.body {
@@ -35,16 +38,16 @@ impl<'a> StructInput<'a> {
         let mut positionals = Vec::new();
         let mut flags = Vec::new();
         for field in fields {
-            match Flag::extract(field) {
+            match Flag::extract(field)? {
                 Ok(flag) => flags.push(flag),
                 Err(field) => positionals.push(Positional::extract(field)),
             };
         }
 
-        StructInput {
+        Ok(StructInput {
             name,
             positionals,
             flags,
-        }
+        })
     }
 }
