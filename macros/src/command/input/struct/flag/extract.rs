@@ -1,5 +1,5 @@
 use super::Flag;
-use crate::messages::*;
+use crate::messages::macros::*;
 use i18n::translation::m;
 use proc_macro_util::{
     ast::{items::StructField, AttrInput, Expression},
