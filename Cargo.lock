@@ -13,7 +13,7 @@ dependencies = [
 [[package]]
 name = "i18n"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-i18n#481851a2ff9bddffacee4700f32a9916acd2f44c"
+source = "git+https://github.com/shipsimfan/lib-i18n#501d560030dbe715c75cd3c56baf53fb2c751441"
 dependencies = [
  "i18n-fluent",
  "i18n-fluent-macro",
@@ -24,12 +24,12 @@ dependencies = [
 [[package]]
 name = "i18n-fluent"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-i18n#481851a2ff9bddffacee4700f32a9916acd2f44c"
+source = "git+https://github.com/shipsimfan/lib-i18n#501d560030dbe715c75cd3c56baf53fb2c751441"
 
 [[package]]
 name = "i18n-fluent-macro"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-i18n#481851a2ff9bddffacee4700f32a9916acd2f44c"
+source = "git+https://github.com/shipsimfan/lib-i18n#501d560030dbe715c75cd3c56baf53fb2c751441"
 dependencies = [
  "i18n-fluent",
  "i18n-locale",
@@ -39,7 +39,7 @@ dependencies = [
 [[package]]
 name = "i18n-locale"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-i18n#481851a2ff9bddffacee4700f32a9916acd2f44c"
+source = "git+https://github.com/shipsimfan/lib-i18n#501d560030dbe715c75cd3c56baf53fb2c751441"
 dependencies = [
  "win32",
 ]
@@ -47,7 +47,7 @@ dependencies = [
 [[package]]
 name = "i18n-translation"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-i18n#481851a2ff9bddffacee4700f32a9916acd2f44c"
+source = "git+https://github.com/shipsimfan/lib-i18n#501d560030dbe715c75cd3c56baf53fb2c751441"
 dependencies = [
  "i18n-locale",
 ]

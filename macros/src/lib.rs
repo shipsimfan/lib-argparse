@@ -18,5 +18,5 @@ proc_macro_util::proc_macro_derive!(
 );
 
 mod messages {
-    i18n::include_fluent!("macros/fluent");
+    i18n::include_fluent!("fluent");
 }
