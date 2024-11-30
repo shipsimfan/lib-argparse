@@ -70,8 +70,11 @@ impl<'a> Flag<'a> {
                     long_name_str = long_name.to_string();
                 }
                 "short_name" => {
-                    parser.parse::<Token![=]>()?;
-                    short_name = Some(parser.parse()?);
+                    short_name = Some(if let Ok(_) = parser.step_parse::<Token![=]>() {
+                        parser.parse()?
+                    } else {
+                        Literal::new(variable_name_str.chars().next().unwrap())
+                    });
                 }
                 "value" => {
                     parser.parse::<Token![=]>()?;
