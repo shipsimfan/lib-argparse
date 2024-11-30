@@ -14,7 +14,7 @@ proc_macro_util::proc_macro_derive!(
     /// Fields can be treated as either flags or positionals. Adding a `flag` attribute to a field
     /// cause it to be a flag. All fields without a `flag` attribute will be treated as a
     /// positional, parsed in the order they appear.
-    Command (flag) -> command::generate
+    Command (flag, arg) -> command::generate
 );
 
 mod messages {

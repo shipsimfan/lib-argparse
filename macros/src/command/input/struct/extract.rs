@@ -40,7 +40,7 @@ impl<'a> StructInput<'a> {
         for field in fields {
             match Flag::extract(field)? {
                 Ok(flag) => flags.push(flag),
-                Err(field) => positionals.push(Positional::extract(field)),
+                Err(field) => positionals.push(Positional::extract(field)?),
             };
         }
 
