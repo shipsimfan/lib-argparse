@@ -83,10 +83,10 @@ impl<'a> ToTokens for StructOutput<'a> {
             }
 
             // Unwrap values and return result
-            Ok(#name {
+            Ok(Some(#name {
                 #positional_unwraps
                 #flag_unwraps
-            })
+            }))
         }
     }
 }
