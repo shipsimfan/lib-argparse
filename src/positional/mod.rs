@@ -30,7 +30,7 @@ pub trait Positional: Sized {
 
     /// Continue parsing as a sub-
     #[allow(unused_variables)]
-    fn sub(this: &mut Option<Self>, parser: &mut dyn ArgumentSource) -> Result<()> {
+    fn sub(this: &mut Option<Self>, parser: &mut dyn ArgumentSource) -> Result<bool> {
         unimplemented!()
     }
 }

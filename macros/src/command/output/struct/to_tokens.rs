@@ -75,8 +75,6 @@ impl<'a> ToTokens for StructOutput<'a> {
                             #positional_sub_commands
                             _ => unreachable!(),
                         };
-
-                        break;
                     }
 
                 }
