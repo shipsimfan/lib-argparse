@@ -1,4 +1,4 @@
-use crate::{ArgumentSource, Error, Result};
+use crate::{ArgumentSource, DefaultDisplay, Error, Result};
 
 mod info;
 
@@ -9,7 +9,7 @@ pub use info::FlagInfo;
 pub use number::InvalidNumberError;
 
 /// A type which can parsed from a flag
-pub trait Flag: Sized {
+pub trait Flag: Sized + DefaultDisplay {
     /// Parse arguments from `source` to get the value
     fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self>;
 

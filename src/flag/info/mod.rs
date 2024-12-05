@@ -1,10 +1,12 @@
+use crate::Flag;
+
 mod default;
 
 /// Information about a flag
 ///
 /// Many types do not use some values in this struct
 #[derive(Debug)]
-pub struct FlagInfo<T> {
+pub struct FlagInfo<T: Flag> {
     /// The long name of the flag argument
     pub long_name: Option<&'static str>,
 

@@ -16,21 +16,27 @@ impl<'a> Positional<'a> {
         let info_name = Identifier::new(&format!("__{}_INFO", name_upper));
 
         let mut arg_attribute = None;
+        let mut command_attribute = false;
         for attribute in field.attributes.into_iter() {
             if attribute.attr.path.remaining.len() > 0 || attribute.attr.path.leading.is_some() {
                 continue;
             }
 
-            if attribute.attr.path.first.to_string().as_str() == "arg" {
-                match attribute.attr.input {
+            match attribute.attr.path.first.to_string().as_str() {
+                "arg" => match attribute.attr.input {
                     Some(AttrInput::Expression(eq, _)) => {
                         return Err(Error::new_at(m!(ExpectedGroupNotExpression), eq.spans[0]))
                     }
                     Some(AttrInput::Group(group)) => arg_attribute = Some(group),
                     None => {}
-                }
-                break;
+                },
+                "command" => command_attribute = true,
+                _ => {}
             }
+        }
+
+        if command_attribute {
+            return Err(Error::new(m!(CommandAttributeOnMember)));
         }
 
         let mut value = Literal::new(name_upper.replace('_', "-").as_str());

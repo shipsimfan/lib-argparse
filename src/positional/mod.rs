@@ -1,4 +1,4 @@
-use crate::{Argument, ArgumentSource, Error, Result};
+use crate::{Argument, ArgumentSource, DefaultDisplay, Error, Result};
 
 mod info;
 mod result;
@@ -11,7 +11,7 @@ pub use info::PositionalInfo;
 pub use result::PositionalResult;
 
 /// A type which can be a positional argument
-pub trait Positional: Sized {
+pub trait Positional: Sized + DefaultDisplay {
     /// Parse `argument` into this value
     fn parse(
         this: &mut Option<Self>,
@@ -28,7 +28,7 @@ pub trait Positional: Sized {
         }
     }
 
-    /// Continue parsing as a sub-
+    /// Continue parsing as a sub-command
     #[allow(unused_variables)]
     fn sub(this: &mut Option<Self>, parser: &mut dyn ArgumentSource) -> Result<bool> {
         unimplemented!()

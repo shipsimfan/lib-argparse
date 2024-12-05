@@ -1,6 +1,6 @@
-use crate::FlagInfo;
+use crate::{Flag, FlagInfo};
 
-impl<T> Default for FlagInfo<T> {
+impl<T: Flag> Default for FlagInfo<T> {
     fn default() -> Self {
         FlagInfo {
             long_name: None,

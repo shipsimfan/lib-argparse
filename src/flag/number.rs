@@ -1,15 +1,5 @@
 use crate::{messages::errors::*, ArgumentSource, Error, Flag, FlagInfo, Result};
 use i18n::translation::m;
-use std::{
-    num::{
-        IntErrorKind, NonZeroI128, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI8, NonZeroIsize,
-        NonZeroU128, NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize, ParseIntError,
-    },
-    sync::atomic::{
-        AtomicI16, AtomicI32, AtomicI64, AtomicI8, AtomicIsize, AtomicU16, AtomicU32, AtomicU64,
-        AtomicU8, AtomicUsize,
-    },
-};
 
 /// An invalid number was parsed
 #[derive(Debug)]
@@ -27,13 +17,6 @@ pub enum InvalidNumberError {
     Zero,
 }
 
-impl InvalidNumberError {
-    /// Creates a new [`InvalidNumberError`]
-    pub(self) fn new(error: ParseIntError) -> Self {
-        error.into()
-    }
-}
-
 impl std::error::Error for InvalidNumberError {}
 
 impl std::fmt::Display for InvalidNumberError {
@@ -47,419 +30,92 @@ impl std::fmt::Display for InvalidNumberError {
     }
 }
 
-impl From<ParseIntError> for InvalidNumberError {
-    fn from(value: ParseIntError) -> Self {
+impl From<std::num::ParseIntError> for InvalidNumberError {
+    fn from(value: std::num::ParseIntError) -> Self {
         match *value.kind() {
-            IntErrorKind::PosOverflow => InvalidNumberError::PosOverflow,
-            IntErrorKind::NegOverflow => InvalidNumberError::NegOverflow,
-            IntErrorKind::Zero => InvalidNumberError::Zero,
+            std::num::IntErrorKind::PosOverflow => InvalidNumberError::PosOverflow,
+            std::num::IntErrorKind::NegOverflow => InvalidNumberError::NegOverflow,
+            std::num::IntErrorKind::Zero => InvalidNumberError::Zero,
             _ => InvalidNumberError::Invalid,
         }
     }
 }
 
-impl Flag for i8 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
+impl From<std::num::ParseFloatError> for InvalidNumberError {
+    fn from(_: std::num::ParseFloatError) -> Self {
+        InvalidNumberError::Invalid
     }
 }
 
-impl Flag for i16 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
+macro_rules! impl_number {
+    ($($t: ty),*) => {$(
+        impl Flag for $t {
+            fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+                let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
 
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
+                value
+                    .as_str()?
+                    .parse()
+                    .map_err(|error| Error::invalid_flag_value(info, long, Into::<InvalidNumberError>::into(error)))
+            }
+        }
+    )*};
 }
 
-impl Flag for i32 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
+macro_rules! impl_atomic {
+    ($($t: ty),*) => {$(
+        impl Flag for $t {
+            fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+                let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
 
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
+                value
+                    .as_str()?
+                    .parse()
+                    .map(<$t>::new)
+                    .map_err(|error| Error::invalid_flag_value(info, long, Into::<InvalidNumberError>::into(error)))
+            }
+        }
+    )*};
 }
 
-impl Flag for i64 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for i128 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for isize {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for u8 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for u16 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for u32 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for u64 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for u128 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for usize {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for f32 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, error))
-    }
-}
-
-impl Flag for f64 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, error))
-    }
-}
-
-impl Flag for AtomicI8 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map(AtomicI8::new)
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for AtomicI16 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map(AtomicI16::new)
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for AtomicI32 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map(AtomicI32::new)
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for AtomicI64 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map(AtomicI64::new)
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for AtomicIsize {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map(AtomicIsize::new)
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for AtomicU8 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map(AtomicU8::new)
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for AtomicU16 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map(AtomicU16::new)
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for AtomicU32 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map(AtomicU32::new)
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for AtomicU64 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map(AtomicU64::new)
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for AtomicUsize {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map(AtomicUsize::new)
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroI8 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroI16 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroI32 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroI64 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroI128 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroIsize {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroU8 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroU16 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroU32 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroU64 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroU128 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
-
-impl Flag for NonZeroUsize {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|error| Error::invalid_flag_value(info, long, InvalidNumberError::new(error)))
-    }
-}
+impl_number!(
+    i8,
+    i16,
+    i32,
+    i64,
+    i128,
+    isize,
+    u8,
+    u16,
+    u32,
+    u64,
+    u128,
+    usize,
+    f32,
+    f64,
+    std::num::NonZeroU8,
+    std::num::NonZeroU16,
+    std::num::NonZeroU32,
+    std::num::NonZeroU64,
+    std::num::NonZeroU128,
+    std::num::NonZeroUsize,
+    std::num::NonZeroI8,
+    std::num::NonZeroI16,
+    std::num::NonZeroI32,
+    std::num::NonZeroI64,
+    std::num::NonZeroI128,
+    std::num::NonZeroIsize
+);
+
+impl_atomic!(
+    std::sync::atomic::AtomicI8,
+    std::sync::atomic::AtomicI16,
+    std::sync::atomic::AtomicI32,
+    std::sync::atomic::AtomicI64,
+    std::sync::atomic::AtomicIsize,
+    std::sync::atomic::AtomicU8,
+    std::sync::atomic::AtomicU16,
+    std::sync::atomic::AtomicU32,
+    std::sync::atomic::AtomicU64,
+    std::sync::atomic::AtomicUsize
+);

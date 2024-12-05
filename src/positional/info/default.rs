@@ -1,6 +1,6 @@
-use crate::PositionalInfo;
+use crate::{Positional, PositionalInfo};
 
-impl<T> Default for PositionalInfo<T> {
+impl<T: Positional> Default for PositionalInfo<T> {
     fn default() -> Self {
         PositionalInfo {
             value: "",

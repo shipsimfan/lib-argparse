@@ -6,9 +6,11 @@
 #![deny(rustdoc::redundant_explicit_links)]
 #![warn(rustdoc::broken_intra_doc_links)]
 #![feature(try_trait_v2)]
+#![feature(os_str_display)]
 
 mod argument;
 mod command;
+mod default_display;
 mod error;
 mod flag;
 mod positional;
@@ -17,6 +19,7 @@ pub use argument::{
     ArgsOsSource, ArgsSource, Argument, ArgumentSource, OsStrArgument, StrArgument,
 };
 pub use command::Command;
+pub use default_display::DefaultDisplay;
 pub use error::{Error, Result};
 pub use flag::{Flag, FlagInfo, InvalidNumberError};
 pub use macros::Command;

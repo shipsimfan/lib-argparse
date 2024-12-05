@@ -1,10 +1,12 @@
+use crate::Positional;
+
 mod default;
 
 /// Information about a positional
 ///
 /// Many types do not use some values in this struct
 #[derive(Debug)]
-pub struct PositionalInfo<T> {
+pub struct PositionalInfo<T: Positional> {
     /// The name of the value for this positional
     pub value: &'static str,
 

@@ -14,6 +14,7 @@ impl<'a> Flag<'a> {
     pub fn extract(mut field: StructField<'a>) -> Result<Result<Self, StructField<'a>>, Error> {
         let mut flag_attribute = None;
         let mut arg_attribute = false;
+        let mut command_attribute = false;
         for (i, attribute) in field.attributes.iter().enumerate() {
             if attribute.attr.path.remaining.len() > 0 || attribute.attr.path.leading.is_some() {
                 continue;
@@ -23,6 +24,7 @@ impl<'a> Flag<'a> {
             match value.as_str() {
                 "flag" => flag_attribute = Some(i),
                 "arg" => arg_attribute = true,
+                "command" => command_attribute = true,
                 _ => {}
             }
         }
@@ -34,6 +36,10 @@ impl<'a> Flag<'a> {
 
         if arg_attribute {
             return Err(Error::new(m!(FlagAndArgAttribute)));
+        }
+
+        if command_attribute {
+            return Err(Error::new(m!(CommandAttributeOnMember)));
         }
 
         let flag_group = match flag_attribute.attr.input {
