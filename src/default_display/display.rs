@@ -14,6 +14,7 @@ macro_rules! impl_display {
 
 impl_display!(
     bool,
+    char,
     i8,
     i16,
     i32,

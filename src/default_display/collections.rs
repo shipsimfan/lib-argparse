@@ -51,6 +51,17 @@ impl<T: DefaultDisplay> DefaultDisplay for VecDeque<T> {
     }
 }
 
+impl<T: DefaultDisplay, const N: usize> DefaultDisplay for [T; N] {
+    type Display<'a>
+        = VecDisplay<'a, T>
+    where
+        T: 'a;
+
+    fn as_display<'a>(&'a self) -> Self::Display<'a> {
+        VecDisplay(self)
+    }
+}
+
 pub struct LinkedListDisplay<'a, T: 'a + DefaultDisplay>(&'a LinkedList<T>);
 
 impl<'a, T: 'a + DefaultDisplay> Display for LinkedListDisplay<'a, T> {
