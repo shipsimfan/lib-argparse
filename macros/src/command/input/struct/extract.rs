@@ -1,4 +1,5 @@
 use super::{Flag, Positional, StructInput};
+use crate::command::input::CommandInfo;
 use proc_macro_util::{
     ast::items::{Struct, StructBody},
     Error,
@@ -6,7 +7,7 @@ use proc_macro_util::{
 
 impl<'a> StructInput<'a> {
     /// Extract the required details from `r#struct`
-    pub fn extract(r#struct: Struct<'a>) -> Result<Self, Error> {
+    pub fn extract(r#struct: Struct<'a>, info: CommandInfo<'a>) -> Result<Self, Error> {
         let name = r#struct.name.into_owned();
 
         let fields = match r#struct.body {
@@ -48,6 +49,7 @@ impl<'a> StructInput<'a> {
             name,
             positionals,
             flags,
+            info,
         })
     }
 }

@@ -1,4 +1,4 @@
-use super::{Input, StructInput};
+use super::{CommandInfo, Input, StructInput};
 use proc_macro_util::{
     ast::{DeriveItem, DeriveItemKind},
     Error,
@@ -19,8 +19,16 @@ impl<'a> Input<'a> {
             }
         }
 
+        let info = if let Some(attribute) = command_attribute {
+            CommandInfo::extract(attribute)?
+        } else {
+            CommandInfo::default()
+        };
+
         match item.kind {
-            DeriveItemKind::Struct(r#struct) => Ok(Input::Struct(StructInput::extract(r#struct)?)),
+            DeriveItemKind::Struct(r#struct) => {
+                Ok(Input::Struct(StructInput::extract(r#struct, info)?))
+            }
         }
     }
 }

@@ -37,6 +37,8 @@ impl<'a> StructInput<'a> {
             }
         }
 
+        let version = self.info.into_output();
+
         Output::new_struct(StructOutput::new(
             self.name,
             positional_info,
@@ -49,6 +51,7 @@ impl<'a> StructInput<'a> {
             flag_long_names,
             flag_short_names,
             flag_unwraps,
+            version,
         ))
     }
 }

@@ -1,3 +1,4 @@
+use super::CommandInfo;
 use flag::Flag;
 use positional::Positional;
 use proc_macro_util::tokens::Identifier;
@@ -18,4 +19,7 @@ pub struct StructInput<'a> {
 
     /// The flags in this struct
     flags: Vec<Flag<'a>>,
+
+    /// The information describing the command
+    info: CommandInfo<'a>,
 }

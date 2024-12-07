@@ -2,6 +2,7 @@ use super::{
     FlagInfo, FlagLongName, FlagShortName, FlagUnwrap, PositionalInfo, PositionalMatch,
     PositionalSubCommand, PositionalUnwrap, StructOutput, VariableDeclaration,
 };
+use crate::command::output::VersionOutput;
 use proc_macro_util::tokens::Identifier;
 
 impl<'a> StructOutput<'a> {
@@ -18,6 +19,7 @@ impl<'a> StructOutput<'a> {
         flag_long_names: Vec<FlagLongName>,
         flag_short_names: Vec<FlagShortName>,
         flag_unwraps: Vec<FlagUnwrap>,
+        version: Option<VersionOutput<'a>>,
     ) -> Self {
         StructOutput {
             name,
@@ -31,6 +33,7 @@ impl<'a> StructOutput<'a> {
             flag_long_names,
             flag_short_names,
             flag_unwraps,
+            version,
         }
     }
 }

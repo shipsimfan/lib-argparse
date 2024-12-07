@@ -1,5 +1,7 @@
+use info::CommandInfo;
 use r#struct::StructInput;
 
+mod info;
 mod r#struct;
 
 mod extract;

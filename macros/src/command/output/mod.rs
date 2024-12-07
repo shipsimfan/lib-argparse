@@ -3,6 +3,7 @@ use proc_macro_util::tokens::Identifier;
 
 mod kind;
 mod r#struct;
+mod version;
 
 mod new;
 mod to_tokens;
@@ -12,6 +13,7 @@ pub use r#struct::{
     PositionalInfo, PositionalMatch, PositionalSubCommand, PositionalUnwrap, StructOutput,
     VariableDeclaration,
 };
+pub use version::VersionOutput;
 
 /// The output code from the Command derive macro
 pub struct Output<'a> {

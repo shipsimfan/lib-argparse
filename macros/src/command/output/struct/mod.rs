@@ -1,3 +1,4 @@
+use super::VersionOutput;
 use proc_macro_util::tokens::Identifier;
 
 mod default_value;
@@ -49,4 +50,7 @@ pub struct StructOutput<'a> {
 
     /// Unwrapping of flag variables
     flag_unwraps: Vec<FlagUnwrap>,
+
+    /// The version flag to output
+    version: Option<VersionOutput<'a>>,
 }
