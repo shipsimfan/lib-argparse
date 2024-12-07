@@ -1,9 +1,12 @@
 mod atomic;
 mod r#box;
+mod cell;
 mod collections;
 mod display;
 mod option;
 mod os_str;
+mod sync;
+mod tuple;
 
 /// Display a default value
 pub trait DefaultDisplay {

@@ -10,3 +10,5 @@ NumberInvalid = invalid number provided
 NumberPosOverflow = provided number is too large
 NumberNegOverflow = provided number is too small
 NumberZero = value cannot be zero
+
+CharInvalid = expected exactly 1 character

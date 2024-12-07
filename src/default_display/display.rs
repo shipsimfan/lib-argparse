@@ -41,5 +41,11 @@ impl_display!(
     std::num::NonZeroU32,
     std::num::NonZeroU64,
     std::num::NonZeroU128,
-    std::num::NonZeroUsize
+    std::num::NonZeroUsize,
+    std::net::IpAddr,
+    std::net::Ipv4Addr,
+    std::net::Ipv6Addr,
+    std::net::SocketAddr,
+    std::net::SocketAddrV4,
+    std::net::SocketAddrV6
 );

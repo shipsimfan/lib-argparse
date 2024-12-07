@@ -7,6 +7,8 @@
 #![warn(rustdoc::broken_intra_doc_links)]
 #![feature(try_trait_v2)]
 #![feature(os_str_display)]
+#![feature(maybe_uninit_array_assume_init)]
+#![feature(maybe_uninit_uninit_array)]
 
 mod argument;
 mod command;

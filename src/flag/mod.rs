@@ -2,8 +2,12 @@ use crate::{ArgumentSource, DefaultDisplay, Error, Result};
 
 mod info;
 
+mod array;
 mod bool;
+mod char;
 mod number;
+mod string;
+mod tuple;
 
 pub use info::FlagInfo;
 pub use number::InvalidNumberError;
