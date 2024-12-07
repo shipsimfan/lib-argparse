@@ -29,6 +29,7 @@ impl_display!(
     usize,
     f32,
     f64,
+    str,
     String,
     std::num::NonZeroI8,
     std::num::NonZeroI16,

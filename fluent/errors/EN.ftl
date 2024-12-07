@@ -12,3 +12,4 @@ NumberNegOverflow = provided number is too small
 NumberZero = value cannot be zero
 
 CharInvalid = expected exactly 1 character
+AddressInvalid = invalid address provided

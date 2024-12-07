@@ -1,10 +1,12 @@
 mod atomic;
+mod borrow;
 mod r#box;
 mod cell;
 mod collections;
 mod display;
 mod option;
 mod os_str;
+mod rc;
 mod sync;
 mod tuple;
 

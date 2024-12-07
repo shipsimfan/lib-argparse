@@ -4,9 +4,17 @@ mod info;
 
 mod array;
 mod bool;
+mod borrow;
+mod r#box;
+mod cell;
 mod char;
+mod net;
 mod number;
+mod option;
+mod path;
+mod rc;
 mod string;
+mod sync;
 mod tuple;
 
 pub use info::FlagInfo;
