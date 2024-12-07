@@ -8,6 +8,7 @@
 #![feature(try_trait_v2)]
 #![feature(os_str_display)]
 #![feature(maybe_uninit_array_assume_init)]
+#![feature(box_into_inner)]
 #![feature(maybe_uninit_uninit_array)]
 
 mod argument;
@@ -22,8 +23,8 @@ pub use argument::{
 };
 pub use command::Command;
 pub use default_display::DefaultDisplay;
-pub use error::{Error, Result};
-pub use flag::{Flag, FlagInfo, InvalidNumberError};
+pub use error::{Error, InvalidAddressError, InvalidCharError, InvalidNumberError, Result};
+pub use flag::{Flag, FlagInfo};
 pub use macros::Command;
 pub use positional::{Positional, PositionalInfo, PositionalResult};
 

@@ -1,4 +1,4 @@
-use crate::{ArgsOsSource, ArgumentSource, FlagInfo, Result};
+use crate::{ArgsOsSource, ArgumentSource, Result};
 
 /// A command which can be parsed from an [`ArgumentSource`]
 pub trait Command: Sized {

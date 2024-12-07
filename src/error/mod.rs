@@ -1,6 +1,13 @@
+mod invalid_address;
+mod invalid_char;
+mod invalid_number;
+
 mod display;
-mod error;
 mod new;
+
+pub use invalid_address::InvalidAddressError;
+pub use invalid_char::InvalidCharError;
+pub use invalid_number::InvalidNumberError;
 
 /// A result of an argparse operation
 pub type Result<T> = core::result::Result<T, Error>;
@@ -32,3 +39,5 @@ pub enum Error {
     /// A custom error used by consumers of this crate
     Custom(Box<dyn std::error::Error>),
 }
+
+impl std::error::Error for Error {}

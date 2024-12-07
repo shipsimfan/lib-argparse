@@ -1,79 +1,25 @@
-use crate::{messages::errors::*, ArgumentSource, Error, Flag, FlagInfo, Result};
-use i18n::translation::m;
+use crate::{ArgumentSource, Error, Flag, FlagInfo, InvalidAddressError, Result};
 
-#[derive(Debug)]
-pub struct InvalidAddress;
+macro_rules! impl_net {
+    ($($t: ty),*) => {$(
+        impl Flag for $t {
+            fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+                let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
 
-impl std::error::Error for InvalidAddress {}
-
-impl std::fmt::Display for InvalidAddress {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        m!(AddressInvalid).fmt(f)
-    }
+                value
+                    .as_str()?
+                    .parse()
+                    .map_err(|_| Error::invalid_flag_value(info, long, InvalidAddressError))
+            }
+        }
+    )*};
 }
 
-impl Flag for std::net::IpAddr {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|_| Error::invalid_flag_value(info, long, InvalidAddress))
-    }
-}
-
-impl Flag for std::net::Ipv4Addr {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|_| Error::invalid_flag_value(info, long, InvalidAddress))
-    }
-}
-
-impl Flag for std::net::Ipv6Addr {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|_| Error::invalid_flag_value(info, long, InvalidAddress))
-    }
-}
-
-impl Flag for std::net::SocketAddr {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|_| Error::invalid_flag_value(info, long, InvalidAddress))
-    }
-}
-
-impl Flag for std::net::SocketAddrV4 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|_| Error::invalid_flag_value(info, long, InvalidAddress))
-    }
-}
-
-impl Flag for std::net::SocketAddrV6 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
-
-        value
-            .as_str()?
-            .parse()
-            .map_err(|_| Error::invalid_flag_value(info, long, InvalidAddress))
-    }
-}
+impl_net!(
+    std::net::IpAddr,
+    std::net::Ipv4Addr,
+    std::net::Ipv6Addr,
+    std::net::SocketAddr,
+    std::net::SocketAddrV4,
+    std::net::SocketAddrV6
+);

@@ -1,0 +1,15 @@
+use crate::{Argument, Positional, PositionalInfo, PositionalResult};
+use std::cell::RefCell;
+
+impl<T: Positional> Positional for RefCell<T> {
+    fn parse(
+        this: &mut Option<Self>,
+        argument: Argument,
+        info: &PositionalInfo<Self>,
+    ) -> PositionalResult {
+        let mut inner = this.take().map(RefCell::into_inner);
+        let result = T::parse(&mut inner, argument, &info.drop_default())?;
+        *this = Some(RefCell::new(inner.unwrap()));
+        result
+    }
+}

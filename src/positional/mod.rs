@@ -3,9 +3,18 @@ use crate::{Argument, ArgumentSource, DefaultDisplay, Error, Result};
 mod info;
 mod result;
 
+mod borrow;
+mod r#box;
+mod cell;
+mod char;
 mod collections;
+mod net;
+mod number;
+mod option;
 mod path;
+mod rc;
 mod string;
+mod sync;
 
 pub use info::PositionalInfo;
 pub use result::PositionalResult;
