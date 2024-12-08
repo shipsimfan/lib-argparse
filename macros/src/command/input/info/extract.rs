@@ -22,7 +22,9 @@ impl<'a> CommandInfo<'a> {
         let mut parser = group.parser();
 
         let mut name = None;
+        let mut description = None;
         let mut version = None;
+        let mut help = false;
         while !parser.empty() {
             let tag = parser.parse::<Identifier>()?;
             let tag_str = tag.to_string();
@@ -32,12 +34,19 @@ impl<'a> CommandInfo<'a> {
                     parser.parse::<Token![=]>()?;
                     name = Some(parser.parse::<Literal>()?);
                 }
+                "description" => {
+                    parser.parse::<Token![=]>()?;
+                    description = Some(parser.parse::<Expression>()?.into_static());
+                }
                 "version" => {
                     version = Some(if let Ok(_) = parser.step_parse::<Token![=]>() {
                         Some(parser.parse::<Expression>()?.into_static())
                     } else {
                         None
                     });
+                }
+                "help" => {
+                    help = true;
                 }
                 _ => {
                     return Err(Error::new_at(
@@ -57,6 +66,11 @@ impl<'a> CommandInfo<'a> {
             return Err(parser.error(m!(UnexpectedToken)));
         }
 
-        Ok(CommandInfo { name, version })
+        Ok(CommandInfo {
+            name,
+            description,
+            version,
+            help,
+        })
     }
 }

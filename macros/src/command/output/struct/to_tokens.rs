@@ -16,6 +16,7 @@ impl<'a> ToTokens for StructOutput<'a> {
             flag_short_names,
             flag_unwraps,
             version,
+            help,
         } = self;
 
         to_tokens! { generator
@@ -42,6 +43,7 @@ impl<'a> ToTokens for StructOutput<'a> {
                         match &__argument[2..] {
                             #flag_long_names
                             #version
+                            #help
                             _ => return Err(::argparse::Error::unknown_argument(__argument.to_string())),
                         }
 

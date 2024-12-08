@@ -1,4 +1,4 @@
-use super::VersionOutput;
+use super::{HelpOutput, VersionOutput};
 use proc_macro_util::tokens::Identifier;
 
 mod default_value;
@@ -53,4 +53,7 @@ pub struct StructOutput<'a> {
 
     /// The version flag to output
     version: Option<VersionOutput<'a>>,
+
+    /// The help flag to output
+    help: Option<HelpOutput<'a>>,
 }

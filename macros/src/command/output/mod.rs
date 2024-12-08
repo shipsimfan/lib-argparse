@@ -1,6 +1,7 @@
 use kind::OutputKind;
 use proc_macro_util::tokens::Identifier;
 
+mod help;
 mod kind;
 mod r#struct;
 mod version;
@@ -8,6 +9,7 @@ mod version;
 mod new;
 mod to_tokens;
 
+pub use help::{HelpOutput, HelpOutputDescription, HelpOutputName};
 pub use r#struct::{
     DefaultValue, FlagInfo, FlagLongName, FlagShortName, FlagUnwrap, OptionalOutput,
     PositionalInfo, PositionalMatch, PositionalSubCommand, PositionalUnwrap, StructOutput,
