@@ -11,7 +11,7 @@ pub use source::{ArgsOsSource, ArgsSource, ArgumentSource};
 pub use str::StrArgument;
 
 /// An arugment from an argument source
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Argument<'a> {
     /// The string is natively an [`std::ffi::OsStr`]
     OsStr(OsStrArgument<'a>),

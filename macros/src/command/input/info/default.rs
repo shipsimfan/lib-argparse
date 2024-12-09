@@ -7,6 +7,7 @@ impl<'a> Default for CommandInfo<'a> {
             description: None,
             version: None,
             help: false,
+            usage_header: None,
         }
     }
 }

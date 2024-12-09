@@ -1,9 +1,15 @@
 use super::CommandInfo;
-use crate::command::output::{HelpOutput, HelpOutputDescription, HelpOutputName, VersionOutput};
+use crate::command::output::{
+    HelpOutput, HelpOutputDescription, HelpOutputName, HelpUsageOutput, PositionalHelpUsageOutput,
+    VersionOutput,
+};
 
 impl<'a> CommandInfo<'a> {
     /// Converts this input into a [`VersionOutput`]
-    pub fn into_output(self) -> (Option<VersionOutput<'a>>, Option<HelpOutput<'a>>) {
+    pub fn into_output(
+        self,
+        positionals: Vec<PositionalHelpUsageOutput>,
+    ) -> (Option<VersionOutput<'a>>, Option<HelpOutput<'a>>) {
         (
             self.version
                 .map(|version| match (self.name.clone(), version) {
@@ -21,6 +27,7 @@ impl<'a> CommandInfo<'a> {
                         Some(description) => HelpOutputDescription::Provided(description),
                         None => HelpOutputDescription::Default,
                     },
+                    HelpUsageOutput::new(self.usage_header, positionals),
                 ))
             } else {
                 None

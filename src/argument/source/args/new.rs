@@ -1,11 +1,10 @@
 use crate::ArgsSource;
 
-impl<'a> ArgsSource<'a> {
+impl ArgsSource {
     /// Creates a new [`ArgsSource`] from the user provided command line arguments
     pub fn new() -> Self {
-        let mut args = std::env::args();
-        let first = args.next().unwrap().into();
+        let args = std::env::args();
 
-        ArgsSource { args, first }
+        ArgsSource { args }
     }
 }

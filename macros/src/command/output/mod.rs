@@ -9,7 +9,9 @@ mod version;
 mod new;
 mod to_tokens;
 
-pub use help::{HelpOutput, HelpOutputDescription, HelpOutputName};
+pub use help::{
+    HelpOutput, HelpOutputDescription, HelpOutputName, HelpUsageOutput, PositionalHelpUsageOutput,
+};
 pub use r#struct::{
     DefaultValue, FlagInfo, FlagLongName, FlagShortName, FlagUnwrap, OptionalOutput,
     PositionalInfo, PositionalMatch, PositionalSubCommand, PositionalUnwrap, StructOutput,

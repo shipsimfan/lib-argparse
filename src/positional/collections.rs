@@ -48,6 +48,14 @@ impl<T: Positional> Positional for Vec<T> {
 
         Ok(vec)
     }
+
+    fn is_required(info: &PositionalInfo<Self>) -> bool {
+        info.min_count > 0
+    }
+
+    fn multiple(info: &PositionalInfo<Self>) -> bool {
+        info.max_count != 1
+    }
 }
 
 impl<T: Positional> Positional for VecDeque<T> {
@@ -93,6 +101,14 @@ impl<T: Positional> Positional for VecDeque<T> {
         }
 
         Ok(vec)
+    }
+
+    fn is_required(info: &PositionalInfo<Self>) -> bool {
+        info.min_count > 0
+    }
+
+    fn multiple(info: &PositionalInfo<Self>) -> bool {
+        info.max_count != 1
     }
 }
 
@@ -140,6 +156,14 @@ impl<T: Positional> Positional for LinkedList<T> {
 
         Ok(list)
     }
+
+    fn is_required(info: &PositionalInfo<Self>) -> bool {
+        info.min_count > 0
+    }
+
+    fn multiple(info: &PositionalInfo<Self>) -> bool {
+        info.max_count != 1
+    }
 }
 
 impl<T: Positional + Eq + Hash> Positional for HashSet<T> {
@@ -185,6 +209,14 @@ impl<T: Positional + Eq + Hash> Positional for HashSet<T> {
         }
 
         Ok(set)
+    }
+
+    fn is_required(info: &PositionalInfo<Self>) -> bool {
+        info.min_count > 0
+    }
+
+    fn multiple(info: &PositionalInfo<Self>) -> bool {
+        info.max_count != 1
     }
 }
 
@@ -232,6 +264,14 @@ impl<T: Positional + Ord> Positional for BTreeSet<T> {
 
         Ok(set)
     }
+
+    fn is_required(info: &PositionalInfo<Self>) -> bool {
+        info.min_count > 0
+    }
+
+    fn multiple(info: &PositionalInfo<Self>) -> bool {
+        info.max_count != 1
+    }
 }
 
 impl<T: Positional + Ord> Positional for BinaryHeap<T> {
@@ -277,5 +317,13 @@ impl<T: Positional + Ord> Positional for BinaryHeap<T> {
         }
 
         Ok(heap)
+    }
+
+    fn is_required(info: &PositionalInfo<Self>) -> bool {
+        info.min_count > 0
+    }
+
+    fn multiple(info: &PositionalInfo<Self>) -> bool {
+        info.max_count != 1
     }
 }

@@ -21,4 +21,12 @@ impl<T: Positional> Positional for Option<T> {
             None => None,
         })
     }
+
+    fn is_required(_: &PositionalInfo<Self>) -> bool {
+        false
+    }
+
+    fn multiple(info: &PositionalInfo<Self>) -> bool {
+        T::multiple(&info.drop_default())
+    }
 }

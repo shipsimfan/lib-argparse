@@ -25,6 +25,7 @@ impl<'a> CommandInfo<'a> {
         let mut description = None;
         let mut version = None;
         let mut help = false;
+        let mut usage_header = None;
         while !parser.empty() {
             let tag = parser.parse::<Identifier>()?;
             let tag_str = tag.to_string();
@@ -47,6 +48,10 @@ impl<'a> CommandInfo<'a> {
                 }
                 "help" => {
                     help = true;
+                }
+                "usage" => {
+                    parser.parse::<Token![=]>()?;
+                    usage_header = Some(parser.parse::<Expression>()?.into_static());
                 }
                 _ => {
                     return Err(Error::new_at(
@@ -71,6 +76,7 @@ impl<'a> CommandInfo<'a> {
             description,
             version,
             help,
+            usage_header,
         })
     }
 }

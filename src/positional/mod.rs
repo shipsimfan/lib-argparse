@@ -39,7 +39,22 @@ pub trait Positional: Sized + DefaultDisplay {
 
     /// Continue parsing as a sub-command
     #[allow(unused_variables)]
-    fn sub(this: &mut Option<Self>, parser: &mut dyn ArgumentSource) -> Result<bool> {
+    fn sub(
+        this: &mut Option<Self>,
+        parser: &mut dyn ArgumentSource,
+        command_list: String,
+    ) -> Result<bool> {
         unimplemented!()
+    }
+
+    /// Is this positional required?
+    fn is_required(info: &PositionalInfo<Self>) -> bool {
+        info.default.is_none()
+    }
+
+    /// Can this positional take multiple values
+    #[allow(unused_variables)]
+    fn multiple(info: &PositionalInfo<Self>) -> bool {
+        false
     }
 }

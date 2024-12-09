@@ -17,4 +17,7 @@ pub struct CommandInfo<'a> {
 
     /// Should a help flag be included
     help: bool,
+
+    /// The user provided header for usage
+    usage_header: Option<Expression<'a>>,
 }

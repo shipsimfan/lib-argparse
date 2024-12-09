@@ -1,7 +1,7 @@
 use super::Positional;
 use crate::command::output::{
-    DefaultValue, PositionalInfo, PositionalMatch, PositionalSubCommand, PositionalUnwrap,
-    VariableDeclaration,
+    DefaultValue, PositionalHelpUsageOutput, PositionalInfo, PositionalMatch, PositionalSubCommand,
+    PositionalUnwrap, VariableDeclaration,
 };
 
 impl<'a> Positional<'a> {
@@ -14,12 +14,13 @@ impl<'a> Positional<'a> {
         PositionalMatch,
         PositionalSubCommand,
         PositionalUnwrap,
+        PositionalHelpUsageOutput,
     ) {
         (
             PositionalInfo::new(
                 self.info_name.clone(),
-                self.r#type,
-                self.value,
+                self.r#type.clone(),
+                self.value.clone(),
                 self.min_count,
                 self.max_count,
                 self.default.map(DefaultValue::new).into(),
@@ -27,7 +28,8 @@ impl<'a> Positional<'a> {
             VariableDeclaration::new(self.variable_name.clone()),
             PositionalMatch::new(index, self.variable_name.clone(), self.info_name.clone()),
             PositionalSubCommand::new(index, self.variable_name.clone()),
-            PositionalUnwrap::new(self.variable_name, self.info_name),
+            PositionalUnwrap::new(self.variable_name, self.info_name.clone()),
+            PositionalHelpUsageOutput::new(self.info_name, self.value),
         )
     }
 }
