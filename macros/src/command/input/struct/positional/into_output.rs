@@ -20,7 +20,7 @@ impl<'a> Positional<'a> {
             PositionalInfo::new(
                 self.info_name.clone(),
                 self.r#type.clone(),
-                self.value.clone(),
+                self.value,
                 self.min_count,
                 self.max_count,
                 self.default.map(DefaultValue::new).into(),
@@ -29,7 +29,7 @@ impl<'a> Positional<'a> {
             PositionalMatch::new(index, self.variable_name.clone(), self.info_name.clone()),
             PositionalSubCommand::new(index, self.variable_name.clone()),
             PositionalUnwrap::new(self.variable_name, self.info_name.clone()),
-            PositionalHelpUsageOutput::new(self.info_name, self.value),
+            PositionalHelpUsageOutput::new(self.info_name),
         )
     }
 }

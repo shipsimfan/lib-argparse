@@ -1,9 +1,8 @@
 use crate::Positional;
 
 mod default;
+mod display_usage;
 mod drop_default;
-mod is_required;
-mod multiple;
 
 /// Information about a positional
 ///

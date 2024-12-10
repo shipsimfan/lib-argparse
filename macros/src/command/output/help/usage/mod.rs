@@ -1,7 +1,8 @@
 use proc_macro_util::ast::Expression;
 
-mod new;
 mod positional;
+
+mod new;
 mod to_tokens;
 
 pub use positional::PositionalHelpUsageOutput;

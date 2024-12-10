@@ -1,4 +1,4 @@
-use proc_macro_util::tokens::{Identifier, Literal};
+use proc_macro_util::tokens::Identifier;
 
 mod new;
 mod to_tokens;
@@ -7,7 +7,4 @@ mod to_tokens;
 pub struct PositionalHelpUsageOutput {
     /// The name for the information describing this positional
     info_name: Identifier,
-
-    /// The name for the value
-    value: Literal,
 }
