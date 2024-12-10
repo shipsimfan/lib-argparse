@@ -19,6 +19,8 @@ mod tuple;
 
 pub use info::FlagInfo;
 
+pub(crate) const DEFUALT_FLAG_VALUE: &str = "VALUE";
+
 /// A type which can parsed from a flag
 pub trait Flag: Sized + DefaultDisplay {
     /// Parse arguments from `source` to get the value
@@ -33,5 +35,16 @@ pub trait Flag: Sized + DefaultDisplay {
                 info.long_name.unwrap_or_else(|| info.short_name.unwrap()),
             )),
         }
+    }
+
+    /// Is this flag required?
+    fn is_required(info: &FlagInfo<Self>) -> bool {
+        info.default.is_none()
+    }
+
+    /// Does this flag take a value
+    #[allow(unused_variables)]
+    fn takes_value(info: &FlagInfo<Self>) -> bool {
+        true
     }
 }

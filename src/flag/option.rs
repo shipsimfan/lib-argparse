@@ -11,4 +11,12 @@ impl<T: Flag> Flag for Option<T> {
             None => None,
         })
     }
+
+    fn is_required(_: &FlagInfo<Self>) -> bool {
+        false
+    }
+
+    fn takes_value(info: &FlagInfo<Self>) -> bool {
+        T::takes_value(&info.drop_default())
+    }
 }

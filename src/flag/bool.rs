@@ -9,6 +9,10 @@ impl Flag for bool {
     fn unwrap(this: Option<Self>, _: &FlagInfo<Self>) -> Result<Self> {
         Ok(this.unwrap_or(false))
     }
+
+    fn takes_value(_: &FlagInfo<Self>) -> bool {
+        false
+    }
 }
 
 impl Flag for AtomicBool {
@@ -18,5 +22,9 @@ impl Flag for AtomicBool {
 
     fn unwrap(this: Option<Self>, _: &FlagInfo<Self>) -> Result<Self> {
         Ok(this.unwrap_or(AtomicBool::new(false)))
+    }
+
+    fn takes_value(_: &FlagInfo<Self>) -> bool {
+        false
     }
 }

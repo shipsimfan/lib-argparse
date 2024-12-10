@@ -11,12 +11,14 @@ impl<'a> StructInput<'a> {
         let mut flag_long_names = Vec::with_capacity(self.flags.len());
         let mut flag_short_names = Vec::with_capacity(self.flags.len());
         let mut flag_unwraps = Vec::with_capacity(self.flags.len());
+        let mut flag_usages = Vec::with_capacity(self.flags.len());
         for flag in self.flags {
-            let (info, declaration, long_name, short_name, unwrap) = flag.into_output();
+            let (info, declaration, long_name, short_name, unwrap, usage) = flag.into_output();
             flag_info.push(info);
             flag_declarations.push(declaration);
             flag_long_names.push(long_name);
             flag_unwraps.push(unwrap);
+            flag_usages.push(usage);
 
             if let Some(short_name) = short_name {
                 flag_short_names.push(short_name);
@@ -40,7 +42,7 @@ impl<'a> StructInput<'a> {
             positional_usages.push(usage);
         }
 
-        let (version, help) = self.info.into_output(positional_usages);
+        let (version, help) = self.info.into_output(positional_usages, flag_usages);
 
         Output::new_struct(StructOutput::new(
             self.name,

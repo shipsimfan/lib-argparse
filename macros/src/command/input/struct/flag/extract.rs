@@ -122,7 +122,7 @@ impl<'a> Flag<'a> {
             if short_name_str.len() < 2 {
                 Literal::new("")
             } else {
-                Literal::new(format!("-{}", &short_name_str[1..3]).as_str())
+                Literal::new(format!("-{}", &short_name_str[1..2]).as_str())
             }
         });
 

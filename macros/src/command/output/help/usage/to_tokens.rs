@@ -6,6 +6,7 @@ impl<'a> ToTokens for HelpUsageOutput<'a> {
         let HelpUsageOutput {
             header,
             positionals,
+            flags,
         } = self;
 
         match header {
@@ -23,6 +24,14 @@ impl<'a> ToTokens for HelpUsageOutput<'a> {
 
         to_tokens! { generator
             ::std::print!("    {}", __command_list);
+
+            let mut __optional_flags = false;
+
+            #flags
+
+            if __optional_flags {
+                ::std::print!("[OPTIONS..] ");
+            }
 
             #positionals
 

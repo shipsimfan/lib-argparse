@@ -1,4 +1,4 @@
-use crate::{Error, Flag, FlagInfo};
+use crate::{flag::DEFUALT_FLAG_VALUE, Error, Flag, FlagInfo};
 
 impl Error {
     /// Create an [`Error::Custom`] containing `message`
@@ -38,7 +38,7 @@ impl Error {
                 info.short_name
             }
             .unwrap(),
-            info.value.unwrap_or("VALUE"),
+            info.value.unwrap_or(DEFUALT_FLAG_VALUE),
         )
     }
 
@@ -55,7 +55,7 @@ impl Error {
                 info.short_name
             }
             .unwrap(),
-            info.value.unwrap_or("VALUE"),
+            info.value.unwrap_or(DEFUALT_FLAG_VALUE),
             Box::new(error),
         )
     }

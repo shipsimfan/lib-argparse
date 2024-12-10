@@ -7,7 +7,7 @@ mod to_tokens;
 
 pub use description::HelpOutputDescription;
 pub use name::HelpOutputName;
-pub use usage::{HelpUsageOutput, PositionalHelpUsageOutput};
+pub use usage::{FlagHelpUsageOutput, HelpUsageOutput, PositionalHelpUsageOutput};
 
 /// Generates the code to display a help message
 pub struct HelpOutput<'a> {

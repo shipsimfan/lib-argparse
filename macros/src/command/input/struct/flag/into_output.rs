@@ -1,6 +1,7 @@
 use super::Flag;
 use crate::command::output::{
-    DefaultValue, FlagInfo, FlagLongName, FlagShortName, FlagUnwrap, VariableDeclaration,
+    DefaultValue, FlagHelpUsageOutput, FlagInfo, FlagLongName, FlagShortName, FlagUnwrap,
+    VariableDeclaration,
 };
 
 impl<'a> Flag<'a> {
@@ -12,6 +13,7 @@ impl<'a> Flag<'a> {
         FlagLongName,
         Option<FlagShortName>,
         FlagUnwrap,
+        FlagHelpUsageOutput,
     ) {
         (
             FlagInfo::new(
@@ -37,7 +39,8 @@ impl<'a> Flag<'a> {
                     self.info_name.clone(),
                 )
             }),
-            FlagUnwrap::new(self.variable_name, self.info_name),
+            FlagUnwrap::new(self.variable_name, self.info_name.clone()),
+            FlagHelpUsageOutput::new(self.info_name),
         )
     }
 }

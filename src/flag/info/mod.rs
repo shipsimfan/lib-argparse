@@ -1,6 +1,7 @@
 use crate::Flag;
 
 mod default;
+mod display_usage;
 mod drop_default;
 
 /// Information about a flag

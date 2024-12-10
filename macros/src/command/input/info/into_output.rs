@@ -1,7 +1,7 @@
 use super::CommandInfo;
 use crate::command::output::{
-    HelpOutput, HelpOutputDescription, HelpOutputName, HelpUsageOutput, PositionalHelpUsageOutput,
-    VersionOutput,
+    FlagHelpUsageOutput, HelpOutput, HelpOutputDescription, HelpOutputName, HelpUsageOutput,
+    PositionalHelpUsageOutput, VersionOutput,
 };
 
 impl<'a> CommandInfo<'a> {
@@ -9,6 +9,7 @@ impl<'a> CommandInfo<'a> {
     pub fn into_output(
         self,
         positionals: Vec<PositionalHelpUsageOutput>,
+        flags: Vec<FlagHelpUsageOutput>,
     ) -> (Option<VersionOutput<'a>>, Option<HelpOutput<'a>>) {
         (
             self.version
@@ -27,7 +28,7 @@ impl<'a> CommandInfo<'a> {
                         Some(description) => HelpOutputDescription::Provided(description),
                         None => HelpOutputDescription::Default,
                     },
-                    HelpUsageOutput::new(self.usage_header, positionals),
+                    HelpUsageOutput::new(self.usage_header, positionals, flags),
                 ))
             } else {
                 None
