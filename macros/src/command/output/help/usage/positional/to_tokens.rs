@@ -7,20 +7,25 @@ impl ToTokens for PositionalHelpUsageOutput {
 
         let info_name1 = info_name.clone();
 
-        let value1 = value.clone();
-        let value2 = value.clone();
-        let value3 = value.clone();
-
         to_tokens! { generator
             let __required = #info_name.is_required();
             let __multiple = #info_name1.multiple();
 
-            __usage.push_str(match (__required, __multiple) {
-                (true, true) => ::std::concat!(#value, ".. "),
-                (true, false) => ::std::concat!(#value1, " "),
-                (false, true) => ::std::concat!("[", #value2, "..] "),
-                (false, false) => ::std::concat!("[", #value3, "] "),
-            });
+            if !__required {
+                ::std::print!("[");
+            }
+
+            ::std::print!("{}", #value);
+
+            if __multiple {
+                ::std::print!("..");
+            }
+
+            if !__required {
+                ::std::print!("]");
+            }
+
+            ::std::print!(" ");
         }
     }
 }

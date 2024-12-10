@@ -22,11 +22,11 @@ impl<'a> ToTokens for HelpUsageOutput<'a> {
         }
 
         to_tokens! { generator
-            let mut __usage = ::std::string::String::new();
+            ::std::print!("    {}", __command_list);
 
             #positionals
 
-            ::std::println!("    {}{}", __command_list, __usage);
+            ::std::println!();
             ::std::println!();
         }
     }
