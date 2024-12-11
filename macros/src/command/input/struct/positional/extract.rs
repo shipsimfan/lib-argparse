@@ -43,6 +43,7 @@ impl<'a> Positional<'a> {
         let mut min_count = Literal::new(0);
         let mut max_count = Literal::new(0);
         let mut default = None;
+        let mut description = None;
         if let Some(attribute) = arg_attribute {
             let mut parser = attribute.parser();
             while !parser.empty() {
@@ -65,6 +66,10 @@ impl<'a> Positional<'a> {
                     "default" => {
                         parser.parse::<Token![=]>()?;
                         default = Some(parser.parse::<Expression>()?.into_static());
+                    }
+                    "description" => {
+                        parser.parse::<Token![=]>()?;
+                        description = Some(parser.parse::<Expression>()?.into_static());
                     }
                     _ => {
                         return Err(Error::new_at(
@@ -93,6 +98,7 @@ impl<'a> Positional<'a> {
             min_count,
             max_count,
             default,
+            description,
         })
     }
 }

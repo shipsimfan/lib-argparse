@@ -1,6 +1,7 @@
 use crate::Flag;
 
 mod default;
+mod display_help;
 mod display_usage;
 mod drop_default;
 
@@ -26,4 +27,7 @@ pub struct FlagInfo<T: Flag> {
 
     /// The default value if none is provided by the user
     pub default: Option<fn() -> T>,
+
+    /// A function which writes the description of this flag to stdout, taking a margin for printing new lines
+    pub description: Option<fn()>,
 }

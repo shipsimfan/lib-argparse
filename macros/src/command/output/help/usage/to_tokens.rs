@@ -9,20 +9,9 @@ impl<'a> ToTokens for HelpUsageOutput<'a> {
             flags,
         } = self;
 
-        match header {
-            Some(header) => {
-                to_tokens! { generator
-                    ::std::println!("{}", #header);
-                }
-            }
-            None => {
-                to_tokens! { generator
-                    ::std::println!("USAGE:");
-                }
-            }
-        }
-
         to_tokens! { generator
+            #header
+
             ::std::print!("    {}", __command_list);
 
             let mut __optional_flags = false;
@@ -35,7 +24,6 @@ impl<'a> ToTokens for HelpUsageOutput<'a> {
 
             #positionals
 
-            ::std::println!();
             ::std::println!();
         }
     }

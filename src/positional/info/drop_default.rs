@@ -8,6 +8,7 @@ impl<T: Positional> PositionalInfo<T> {
             min_count: self.min_count,
             max_count: self.max_count,
             default: None,
+            description: self.description,
         }
     }
 }

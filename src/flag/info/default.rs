@@ -9,6 +9,7 @@ impl<T: Flag> Default for FlagInfo<T> {
             min_count: 0,
             max_count: 0,
             default: None,
+            description: None,
         }
     }
 }

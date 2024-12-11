@@ -10,6 +10,7 @@ impl<T: Flag> FlagInfo<T> {
             min_count: self.min_count,
             max_count: self.max_count,
             default: None,
+            description: self.description,
         }
     }
 }

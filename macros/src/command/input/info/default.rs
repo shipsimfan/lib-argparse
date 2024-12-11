@@ -8,6 +8,7 @@ impl<'a> Default for CommandInfo<'a> {
             version: None,
             help: false,
             usage_header: None,
+            positional_header: None,
         }
     }
 }

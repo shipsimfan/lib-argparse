@@ -1,10 +1,10 @@
 use super::{FlagHelpUsageOutput, HelpUsageOutput, PositionalHelpUsageOutput};
-use proc_macro_util::ast::Expression;
+use crate::command::output::help::HelpHeader;
 
 impl<'a> HelpUsageOutput<'a> {
     /// Creates a new [`HelpUsageOutput`]
     pub fn new(
-        header: Option<Expression<'a>>,
+        header: HelpHeader<'a>,
         positionals: Vec<PositionalHelpUsageOutput>,
         flags: Vec<FlagHelpUsageOutput>,
     ) -> Self {

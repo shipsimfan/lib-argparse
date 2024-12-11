@@ -7,6 +7,8 @@ impl<'a> ToTokens for HelpOutput<'a> {
             name,
             description,
             usage,
+            positional_header,
+            positionals,
         } = self;
 
         to_tokens! { generator
@@ -16,6 +18,9 @@ impl<'a> ToTokens for HelpOutput<'a> {
                 ::std::println!();
 
                 #usage
+
+                #positional_header
+                #positionals
 
                 return Ok(None);
             }

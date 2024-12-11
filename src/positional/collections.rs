@@ -27,6 +27,7 @@ impl<T: Positional> Positional for Vec<T> {
                 min_count: 1,
                 max_count: 1,
                 default: None,
+                description: None,
             },
         )?;
 
@@ -81,6 +82,7 @@ impl<T: Positional> Positional for VecDeque<T> {
                 min_count: 1,
                 max_count: 1,
                 default: None,
+                description: None,
             },
         )?;
 
@@ -135,6 +137,7 @@ impl<T: Positional> Positional for LinkedList<T> {
                 min_count: 1,
                 max_count: 1,
                 default: None,
+                description: None,
             },
         )?;
 
@@ -189,6 +192,7 @@ impl<T: Positional + Eq + Hash> Positional for HashSet<T> {
                 min_count: 1,
                 max_count: 1,
                 default: None,
+                description: None,
             },
         )?;
 
@@ -243,6 +247,7 @@ impl<T: Positional + Ord> Positional for BTreeSet<T> {
                 min_count: 1,
                 max_count: 1,
                 default: None,
+                description: None,
             },
         )?;
 
@@ -297,6 +302,7 @@ impl<T: Positional + Ord> Positional for BinaryHeap<T> {
                 min_count: 1,
                 max_count: 1,
                 default: None,
+                description: None,
             },
         )?;
 

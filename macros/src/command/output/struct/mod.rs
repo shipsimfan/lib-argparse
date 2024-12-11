@@ -2,6 +2,7 @@ use super::{HelpOutput, VersionOutput};
 use proc_macro_util::tokens::Identifier;
 
 mod default_value;
+mod description;
 mod flag;
 mod optional_output;
 mod positional;
@@ -11,6 +12,7 @@ mod new;
 mod to_tokens;
 
 pub use default_value::DefaultValue;
+pub use description::Description;
 pub use flag::{FlagInfo, FlagLongName, FlagShortName, FlagUnwrap};
 pub use optional_output::OptionalOutput;
 pub use positional::{PositionalInfo, PositionalMatch, PositionalSubCommand, PositionalUnwrap};

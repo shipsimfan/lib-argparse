@@ -1,6 +1,7 @@
 use crate::Positional;
 
 mod default;
+mod display_help;
 mod display_usage;
 mod drop_default;
 
@@ -20,4 +21,7 @@ pub struct PositionalInfo<T: Positional> {
 
     /// The default value if none is provided by the user
     pub default: Option<fn() -> T>,
+
+    /// A function which writes the description of this positional to stdout, taking a margin for printing new lines
+    pub description: Option<fn()>,
 }

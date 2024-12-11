@@ -4,6 +4,7 @@ use proc_macro_util::{
 };
 
 mod extract;
+mod help_length;
 mod into_output;
 
 /// The information extracted for a positional
@@ -28,4 +29,7 @@ pub struct Positional<'a> {
 
     /// The default value
     default: Option<Expression<'a>>,
+
+    /// The description of this positional
+    description: Option<Expression<'a>>,
 }

@@ -10,6 +10,7 @@ impl<'a> ToTokens for PositionalInfo<'a> {
             min_count,
             max_count,
             default,
+            description,
         } = self;
 
         to_tokens! { generator
@@ -18,6 +19,7 @@ impl<'a> ToTokens for PositionalInfo<'a> {
                 min_count: #min_count,
                 max_count: #max_count,
                 default: #default,
+                description: #description,
             };
         }
     }

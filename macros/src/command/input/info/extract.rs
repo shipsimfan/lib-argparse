@@ -26,6 +26,7 @@ impl<'a> CommandInfo<'a> {
         let mut version = None;
         let mut help = false;
         let mut usage_header = None;
+        let mut positional_header = None;
         while !parser.empty() {
             let tag = parser.parse::<Identifier>()?;
             let tag_str = tag.to_string();
@@ -53,6 +54,10 @@ impl<'a> CommandInfo<'a> {
                     parser.parse::<Token![=]>()?;
                     usage_header = Some(parser.parse::<Expression>()?.into_static());
                 }
+                "args" => {
+                    parser.parse::<Token![=]>()?;
+                    positional_header = Some(parser.parse::<Expression>()?.into_static());
+                }
                 _ => {
                     return Err(Error::new_at(
                         m!(UnknownCommandTag, tag => &tag_str),
@@ -77,6 +82,7 @@ impl<'a> CommandInfo<'a> {
             version,
             help,
             usage_header,
+            positional_header,
         })
     }
 }
