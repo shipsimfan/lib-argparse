@@ -9,6 +9,7 @@ impl<'a> Default for CommandInfo<'a> {
             help: false,
             usage_header: None,
             positional_header: None,
+            flag_header: None,
         }
     }
 }

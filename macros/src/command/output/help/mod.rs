@@ -1,4 +1,5 @@
 mod description;
+mod flag;
 mod header;
 mod name;
 mod positional;
@@ -8,6 +9,7 @@ mod new;
 mod to_tokens;
 
 pub use description::HelpOutputDescription;
+pub use flag::FlagHelpOutput;
 pub use header::HelpHeader;
 pub use name::HelpOutputName;
 pub use positional::PositionalHelpOutput;
@@ -29,4 +31,10 @@ pub struct HelpOutput<'a> {
 
     /// The positionals to display help for
     positionals: Vec<PositionalHelpOutput>,
+
+    /// The header for the flags section
+    flag_header: Option<HelpHeader<'a>>,
+
+    /// The flags to display help for
+    flags: Vec<FlagHelpOutput>,
 }

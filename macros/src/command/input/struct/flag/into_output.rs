@@ -1,12 +1,14 @@
 use super::Flag;
 use crate::command::output::{
-    DefaultValue, FlagHelpUsageOutput, FlagInfo, FlagLongName, FlagShortName, FlagUnwrap,
-    VariableDeclaration,
+    DefaultValue, Description, FlagHelpOutput, FlagHelpUsageOutput, FlagInfo, FlagLongName,
+    FlagShortName, FlagUnwrap, VariableDeclaration,
 };
 
 impl<'a> Flag<'a> {
     pub fn into_output(
         self,
+        description_offset: usize,
+        short_names: bool,
     ) -> (
         FlagInfo<'a>,
         VariableDeclaration,
@@ -14,6 +16,7 @@ impl<'a> Flag<'a> {
         Option<FlagShortName>,
         FlagUnwrap,
         FlagHelpUsageOutput,
+        FlagHelpOutput,
     ) {
         (
             FlagInfo::new(
@@ -25,6 +28,7 @@ impl<'a> Flag<'a> {
                 self.min_count,
                 self.max_count,
                 self.default.map(DefaultValue::new).into(),
+                self.description.map(Description::new).into(),
             ),
             VariableDeclaration::new(self.variable_name.clone()),
             FlagLongName::new(
@@ -40,7 +44,8 @@ impl<'a> Flag<'a> {
                 )
             }),
             FlagUnwrap::new(self.variable_name, self.info_name.clone()),
-            FlagHelpUsageOutput::new(self.info_name),
+            FlagHelpUsageOutput::new(self.info_name.clone()),
+            FlagHelpOutput::new(self.info_name, description_offset, short_names),
         )
     }
 }

@@ -4,6 +4,8 @@ use proc_macro_util::{
 };
 
 mod extract;
+mod get;
+mod help_length;
 mod into_output;
 
 /// The information extracted for a flag
@@ -40,4 +42,7 @@ pub struct Flag<'a> {
 
     /// The default value
     default: Option<Expression<'a>>,
+
+    /// The description of this flag
+    description: Option<Expression<'a>>,
 }

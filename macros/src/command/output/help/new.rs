@@ -1,5 +1,5 @@
 use super::{
-    HelpHeader, HelpOutput, HelpOutputDescription, HelpOutputName, HelpUsageOutput,
+    FlagHelpOutput, HelpHeader, HelpOutput, HelpOutputDescription, HelpOutputName, HelpUsageOutput,
     PositionalHelpOutput,
 };
 
@@ -11,6 +11,8 @@ impl<'a> HelpOutput<'a> {
         usage: HelpUsageOutput<'a>,
         positional_header: Option<HelpHeader<'a>>,
         positionals: Vec<PositionalHelpOutput>,
+        flag_header: Option<HelpHeader<'a>>,
+        flags: Vec<FlagHelpOutput>,
     ) -> Self {
         HelpOutput {
             name,
@@ -18,6 +20,8 @@ impl<'a> HelpOutput<'a> {
             usage,
             positional_header,
             positionals,
+            flag_header,
+            flags,
         }
     }
 }

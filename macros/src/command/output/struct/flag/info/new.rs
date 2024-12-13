@@ -1,5 +1,5 @@
 use super::FlagInfo;
-use crate::command::output::{DefaultValue, OptionalOutput};
+use crate::command::output::{DefaultValue, Description, OptionalOutput};
 use proc_macro_util::{
     ast::Type,
     tokens::{Identifier, Literal},
@@ -16,6 +16,7 @@ impl<'a> FlagInfo<'a> {
         min_count: Literal,
         max_count: Literal,
         default: OptionalOutput<DefaultValue<'a>>,
+        description: OptionalOutput<Description<'a>>,
     ) -> Self {
         FlagInfo {
             info_name,
@@ -26,6 +27,7 @@ impl<'a> FlagInfo<'a> {
             min_count,
             max_count,
             default,
+            description,
         }
     }
 }

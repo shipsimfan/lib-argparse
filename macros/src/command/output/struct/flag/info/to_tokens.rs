@@ -12,6 +12,7 @@ impl<'a> ToTokens for FlagInfo<'a> {
             min_count,
             max_count,
             default,
+            description,
         } = self;
 
         to_tokens! { generator
@@ -22,7 +23,7 @@ impl<'a> ToTokens for FlagInfo<'a> {
                 min_count: #min_count,
                 max_count: #max_count,
                 default: #default,
-                description: None,
+                description: #description,
             };
         }
     }

@@ -23,4 +23,7 @@ pub struct CommandInfo<'a> {
 
     /// The user provided header for positionals
     positional_header: Option<Expression<'a>>,
+
+    /// The user provided header for flags
+    flag_header: Option<Expression<'a>>,
 }

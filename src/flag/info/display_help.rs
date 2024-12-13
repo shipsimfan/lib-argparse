@@ -21,6 +21,14 @@ impl<T: Flag> FlagInfo<T> {
             offset += long_name.len();
         }
 
+        if let Some(value) = self.value {
+            print!(" {}", value);
+            offset += value.len() + 1;
+        } else if T::takes_value(self) {
+            print!(" VALUE");
+            offset += 6;
+        }
+
         if let Some(description) = self.description {
             for _ in 0..description_offset - offset {
                 print!(" ");

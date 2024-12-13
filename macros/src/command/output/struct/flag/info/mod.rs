@@ -1,4 +1,4 @@
-use crate::command::output::{r#struct::DefaultValue, OptionalOutput};
+use crate::command::output::{r#struct::DefaultValue, Description, OptionalOutput};
 use proc_macro_util::{
     ast::Type,
     tokens::{Identifier, Literal},
@@ -32,4 +32,7 @@ pub struct FlagInfo<'a> {
 
     /// The default value
     default: OptionalOutput<DefaultValue<'a>>,
+
+    /// The description
+    description: OptionalOutput<Description<'a>>,
 }

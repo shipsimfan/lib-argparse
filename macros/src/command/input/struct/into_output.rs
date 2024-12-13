@@ -6,31 +6,48 @@ use crate::command::{
 impl<'a> StructInput<'a> {
     /// Converts this input into an [`Output`]
     pub fn into_output(self) -> Output<'a> {
+        let mut flag_description_offset = 0;
+        let mut short_names = false;
+        for flag in &self.flags {
+            flag_description_offset = flag_description_offset.max(flag.help_length());
+            short_names |= flag.short_name().is_some();
+        }
+
+        if short_names {
+            flag_description_offset += 3;
+        }
+
+        flag_description_offset += 2;
+
         let mut flag_info = Vec::with_capacity(self.flags.len());
         let mut flag_declarations = Vec::with_capacity(self.flags.len());
         let mut flag_long_names = Vec::with_capacity(self.flags.len());
         let mut flag_short_names = Vec::with_capacity(self.flags.len());
         let mut flag_unwraps = Vec::with_capacity(self.flags.len());
         let mut flag_usages = Vec::with_capacity(self.flags.len());
+        let mut flag_help = Vec::with_capacity(self.flags.len());
         for flag in self.flags {
-            let (info, declaration, long_name, short_name, unwrap, usage) = flag.into_output();
+            let (info, declaration, long_name, short_name, unwrap, usage, help) =
+                flag.into_output(flag_description_offset, short_names);
             flag_info.push(info);
             flag_declarations.push(declaration);
             flag_long_names.push(long_name);
             flag_unwraps.push(unwrap);
             flag_usages.push(usage);
+            flag_help.push(help);
 
             if let Some(short_name) = short_name {
                 flag_short_names.push(short_name);
             }
         }
 
-        let mut description_offset = 0;
+        let mut positional_description_offset = 0;
         for positional in &self.positionals {
-            description_offset = description_offset.max(positional.help_length());
+            positional_description_offset =
+                positional_description_offset.max(positional.help_length());
         }
 
-        description_offset += 2;
+        positional_description_offset += 2;
 
         let mut positional_info = Vec::with_capacity(self.positionals.len());
         let mut positional_declarations = Vec::with_capacity(self.positionals.len());
@@ -41,7 +58,7 @@ impl<'a> StructInput<'a> {
         let mut positional_help = Vec::with_capacity(self.positionals.len());
         for (index, positional) in self.positionals.into_iter().enumerate() {
             let (info, declaration, r#match, sub_command, unwrap, usage, help) =
-                positional.into_output(index, description_offset);
+                positional.into_output(index, positional_description_offset);
             positional_info.push(info);
             positional_declarations.push(declaration);
             positional_matches.push(r#match);
@@ -53,7 +70,7 @@ impl<'a> StructInput<'a> {
 
         let (version, help) =
             self.info
-                .into_output(positional_usages, positional_help, flag_usages);
+                .into_output(positional_usages, positional_help, flag_usages, flag_help);
 
         Output::new_struct(StructOutput::new(
             self.name,

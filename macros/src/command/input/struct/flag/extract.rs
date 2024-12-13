@@ -64,6 +64,7 @@ impl<'a> Flag<'a> {
         let mut min_count = Literal::new(0);
         let mut max_count = Literal::new(0);
         let mut default = None;
+        let mut description = None;
         let mut parser = flag_group.parser();
         while !parser.empty() {
             let tag = parser.parse::<Identifier>()?;
@@ -97,6 +98,10 @@ impl<'a> Flag<'a> {
                 "default" => {
                     parser.parse::<Token![=]>()?;
                     default = Some(parser.parse::<Expression>()?.into_static());
+                }
+                "description" => {
+                    parser.parse::<Token![=]>()?;
+                    description = Some(parser.parse::<Expression>()?.into_static());
                 }
                 _ => {
                     return Err(Error::new_at(
@@ -138,6 +143,7 @@ impl<'a> Flag<'a> {
             min_count,
             max_count,
             default,
+            description,
         }))
     }
 }
