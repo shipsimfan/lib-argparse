@@ -10,6 +10,10 @@ impl Flag for bool {
         Ok(this.unwrap_or(false))
     }
 
+    fn is_required(_: &FlagInfo<Self>) -> bool {
+        false
+    }
+
     fn takes_value(_: &FlagInfo<Self>) -> bool {
         false
     }
@@ -22,6 +26,10 @@ impl Flag for AtomicBool {
 
     fn unwrap(this: Option<Self>, _: &FlagInfo<Self>) -> Result<Self> {
         Ok(this.unwrap_or(AtomicBool::new(false)))
+    }
+
+    fn is_required(_: &FlagInfo<Self>) -> bool {
+        false
     }
 
     fn takes_value(_: &FlagInfo<Self>) -> bool {
