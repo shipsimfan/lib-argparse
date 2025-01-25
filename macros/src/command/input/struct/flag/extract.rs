@@ -1,6 +1,4 @@
 use super::Flag;
-use crate::messages::macros::*;
-use i18n::translation::m;
 use proc_macro_util::{
     ast::{items::StructField, AttrInput, Expression},
     tokens::{Group, Identifier, Literal},
@@ -35,18 +33,25 @@ impl<'a> Flag<'a> {
         };
 
         if arg_attribute {
-            return Err(Error::new(m!(FlagAndArgAttribute)));
+            return Err(Error::new(
+                "cannot have both `arg` and `flag` attributes on a single field",
+            ));
         }
 
         if command_attribute {
-            return Err(Error::new(m!(CommandAttributeOnMember)));
+            return Err(Error::new(
+                "cannot have the `command` attribute on a member",
+            ));
         }
 
         let flag_group = match flag_attribute.attr.input {
             Some(AttrInput::Group(group)) => group,
             None => Cow::Owned(Group::new_parenthesis()),
             Some(AttrInput::Expression(eq, _)) => {
-                return Err(Error::new_at(m!(ExpectedGroupNotExpression), eq.spans[0]))
+                return Err(Error::new_at(
+                    "expected a group, not an expression",
+                    eq.spans[0],
+                ))
             }
         };
 
@@ -105,7 +110,7 @@ impl<'a> Flag<'a> {
                 }
                 _ => {
                     return Err(Error::new_at(
-                        m!(UnknownFlagTag, tag => &tag_str),
+                        format!("unknown flag tag \"{tag}\""),
                         tag.span(),
                     ))
                 }
@@ -118,7 +123,7 @@ impl<'a> Flag<'a> {
         }
 
         if !parser.empty() {
-            return Err(parser.error(m!(UnexpectedToken)));
+            return Err(parser.error("unexpected token"));
         }
 
         let info_long_name = Literal::new(format!("--{}", long_name_str).as_str());

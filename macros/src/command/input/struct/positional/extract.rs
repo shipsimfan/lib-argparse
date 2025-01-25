@@ -1,6 +1,4 @@
 use super::Positional;
-use crate::messages::macros::*;
-use i18n::translation::m;
 use proc_macro_util::{
     ast::{items::StructField, AttrInput, Expression},
     tokens::{Identifier, Literal},
@@ -25,7 +23,10 @@ impl<'a> Positional<'a> {
             match attribute.attr.path.first.to_string().as_str() {
                 "arg" => match attribute.attr.input {
                     Some(AttrInput::Expression(eq, _)) => {
-                        return Err(Error::new_at(m!(ExpectedGroupNotExpression), eq.spans[0]))
+                        return Err(Error::new_at(
+                            "expected a group, not an expression",
+                            eq.spans[0],
+                        ))
                     }
                     Some(AttrInput::Group(group)) => arg_attribute = Some(group),
                     None => {}
@@ -36,7 +37,9 @@ impl<'a> Positional<'a> {
         }
 
         if command_attribute {
-            return Err(Error::new(m!(CommandAttributeOnMember)));
+            return Err(Error::new(
+                "cannot have the `command` attribute on a member",
+            ));
         }
 
         let mut value = Literal::new(name_upper.replace('_', "-").as_str());
@@ -73,7 +76,7 @@ impl<'a> Positional<'a> {
                     }
                     _ => {
                         return Err(Error::new_at(
-                            m!(UnknownArgTag, tag => &tag_str),
+                            format!("unknown arg tag \"{tag_str}\""),
                             tag.span(),
                         ))
                     }
@@ -86,7 +89,7 @@ impl<'a> Positional<'a> {
             }
 
             if !parser.empty() {
-                return Err(parser.error(m!(UnexpectedToken)));
+                return Err(parser.error("unexpected token"));
             }
         }
 

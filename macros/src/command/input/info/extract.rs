@@ -1,6 +1,4 @@
 use super::CommandInfo;
-use crate::messages::macros::*;
-use i18n::translation::m;
 use proc_macro_util::{
     ast::{AttrInput, Expression, OuterAttribute},
     tokens::{Group, Identifier, Literal},
@@ -15,7 +13,10 @@ impl<'a> CommandInfo<'a> {
             Some(AttrInput::Group(group)) => group,
             None => Cow::Owned(Group::new_parenthesis()),
             Some(AttrInput::Expression(eq, _)) => {
-                return Err(Error::new_at(m!(ExpectedGroupNotExpression), eq.spans[0]))
+                return Err(Error::new_at(
+                    "expected a group, not an expression",
+                    eq.spans[0],
+                ))
             }
         };
 
@@ -65,7 +66,7 @@ impl<'a> CommandInfo<'a> {
                 }
                 _ => {
                     return Err(Error::new_at(
-                        m!(UnknownCommandTag, tag => &tag_str),
+                        format!("unknown command tag \"{tag_str}\""),
                         tag.span(),
                     ))
                 }
@@ -78,7 +79,7 @@ impl<'a> CommandInfo<'a> {
         }
 
         if !parser.empty() {
-            return Err(parser.error(m!(UnexpectedToken)));
+            return Err(parser.error("unexpected token"));
         }
 
         Ok(CommandInfo {

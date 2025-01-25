@@ -15,4 +15,3 @@ proc-macro = true
 
 [dependencies]
 proc-macro-util.workspace = true
-i18n.workspace = true

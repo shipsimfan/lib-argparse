@@ -27,8 +27,3 @@ pub use error::{Error, InvalidAddressError, InvalidCharError, InvalidNumberError
 pub use flag::{Flag, FlagInfo};
 pub use macros::Command;
 pub use positional::{Positional, PositionalInfo, PositionalResult};
-
-mod messages {
-    #![allow(missing_docs)]
-    i18n::include_fluent!("fluent");
-}
