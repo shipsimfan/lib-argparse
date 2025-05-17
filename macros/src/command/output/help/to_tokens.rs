@@ -16,7 +16,7 @@ impl<'a> ToTokens for HelpOutput<'a> {
         to_tokens! { generator
             "help" => {
                 ::std::println!("{}", #name);
-                ::std::println!("{}", #description);
+                (#description)(0);
 
                 #usage
 

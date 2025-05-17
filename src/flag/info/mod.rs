@@ -29,5 +29,5 @@ pub struct FlagInfo<T: Flag> {
     pub default: Option<fn() -> T>,
 
     /// A function which writes the description of this flag to stdout, taking a margin for printing new lines
-    pub description: Option<fn()>,
+    pub description: Option<fn(usize)>,
 }

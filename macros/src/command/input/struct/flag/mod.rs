@@ -44,5 +44,5 @@ pub struct Flag<'a> {
     default: Option<Expression<'a>>,
 
     /// The description of this flag
-    description: Option<Expression<'a>>,
+    description: Option<Vec<Expression<'a>>>,
 }

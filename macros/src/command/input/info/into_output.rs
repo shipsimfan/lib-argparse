@@ -1,8 +1,8 @@
 use super::CommandInfo;
 use crate::command::output::{
-    FlagHelpOutput, FlagHelpUsageOutput, HelpHeader, HelpOutput, HelpOutputDescription,
-    HelpOutputName, HelpUsageOutput, PositionalHelpOutput, PositionalHelpUsageOutput,
-    VersionOutput,
+    Description, FlagHelpOutput, FlagHelpUsageOutput, HelpHeader, HelpOutput,
+    HelpOutputDescription, HelpOutputName, HelpUsageOutput, PositionalHelpOutput,
+    PositionalHelpUsageOutput, VersionOutput,
 };
 
 impl<'a> CommandInfo<'a> {
@@ -28,7 +28,9 @@ impl<'a> CommandInfo<'a> {
                         None => HelpOutputName::Default,
                     },
                     match self.description {
-                        Some(description) => HelpOutputDescription::Provided(description),
+                        Some(description) => {
+                            HelpOutputDescription::Provided(Description::new(description))
+                        }
                         None => HelpOutputDescription::Default,
                     },
                     HelpUsageOutput::new(

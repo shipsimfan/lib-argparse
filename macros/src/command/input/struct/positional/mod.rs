@@ -31,5 +31,5 @@ pub struct Positional<'a> {
     default: Option<Expression<'a>>,
 
     /// The description of this positional
-    description: Option<Expression<'a>>,
+    description: Option<Vec<Expression<'static>>>,
 }

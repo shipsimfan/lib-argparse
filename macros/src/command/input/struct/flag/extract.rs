@@ -13,6 +13,7 @@ impl<'a> Flag<'a> {
         let mut flag_attribute = None;
         let mut arg_attribute = false;
         let mut command_attribute = false;
+        let mut docs = Vec::new();
         for (i, attribute) in field.attributes.iter().enumerate() {
             if attribute.attr.path.remaining.len() > 0 || attribute.attr.path.leading.is_some() {
                 continue;
@@ -23,6 +24,12 @@ impl<'a> Flag<'a> {
                 "flag" => flag_attribute = Some(i),
                 "arg" => arg_attribute = true,
                 "command" => command_attribute = true,
+                "doc" => match &attribute.attr.input {
+                    Some(AttrInput::Expression(_, expression)) => {
+                        docs.push(expression.clone().into_static())
+                    }
+                    _ => {}
+                },
                 _ => {}
             }
         }
@@ -106,7 +113,22 @@ impl<'a> Flag<'a> {
                 }
                 "description" => {
                     parser.parse::<Token![=]>()?;
-                    description = Some(parser.parse::<Expression>()?.into_static());
+
+                    description = Some(if let Ok(group) = parser.step_parse::<&Group>() {
+                        let mut parser = group.parser();
+                        let mut description = vec![parser.parse::<Expression>()?.into_static()];
+                        while !parser.empty() {
+                            parser.parse::<Token![,]>()?;
+                            if parser.empty() {
+                                break;
+                            }
+
+                            description.push(parser.parse::<Expression>()?.into_static());
+                        }
+                        description
+                    } else {
+                        vec![parser.parse::<Expression>()?.into_static()]
+                    })
                 }
                 _ => {
                     return Err(Error::new_at(
@@ -135,6 +157,10 @@ impl<'a> Flag<'a> {
                 Literal::new(format!("-{}", &short_name_str[1..2]).as_str())
             }
         });
+
+        if description.is_none() && docs.len() > 0 {
+            description = Some(docs);
+        }
 
         Ok(Ok(Flag {
             variable_name,

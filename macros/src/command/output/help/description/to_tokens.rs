@@ -6,7 +6,7 @@ impl<'a> ToTokens for HelpOutputDescription<'a> {
         match self {
             HelpOutputDescription::Default => {
                 to_tokens! { generator
-                    ::std::env!("CARGO_PKG_DESCRIPTION")
+                   |_| { println!("{}", ::std::env!("CARGO_PKG_DESCRIPTION")); }
                 }
             }
             HelpOutputDescription::Provided(expression) => expression.to_tokens(generator),

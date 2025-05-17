@@ -10,7 +10,7 @@ impl<T: Positional> PositionalInfo<T> {
                 print!(" ");
             }
 
-            description();
+            description(description_offset);
         } else {
             println!();
         }

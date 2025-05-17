@@ -1,4 +1,4 @@
-use proc_macro_util::ast::Expression;
+use crate::command::output::Description;
 
 mod to_tokens;
 
@@ -8,5 +8,5 @@ pub enum HelpOutputDescription<'a> {
     Default,
 
     /// Use the provided description
-    Provided(Expression<'a>),
+    Provided(Description<'a>),
 }

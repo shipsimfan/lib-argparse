@@ -23,5 +23,5 @@ pub struct PositionalInfo<T: Positional> {
     pub default: Option<fn() -> T>,
 
     /// A function which writes the description of this positional to stdout, taking a margin for printing new lines
-    pub description: Option<fn()>,
+    pub description: Option<fn(usize)>,
 }

@@ -8,7 +8,10 @@ use std::borrow::Cow;
 
 impl<'a> CommandInfo<'a> {
     /// Extracts the [`CommandInfo`] from `attribute`
-    pub fn extract(attribute: OuterAttribute<'a>) -> Result<Self, Error> {
+    pub fn extract(
+        attribute: OuterAttribute<'a>,
+        docs: Vec<Expression<'a>>,
+    ) -> Result<Self, Error> {
         let group = match attribute.attr.input {
             Some(AttrInput::Group(group)) => group,
             None => Cow::Owned(Group::new_parenthesis()),
@@ -39,8 +42,25 @@ impl<'a> CommandInfo<'a> {
                     name = Some(parser.parse::<Literal>()?);
                 }
                 "description" => {
-                    parser.parse::<Token![=]>()?;
-                    description = Some(parser.parse::<Expression>()?.into_static());
+                    description = Some(if parser.step_parse::<Token![=]>().is_ok() {
+                        Some(if let Ok(group) = parser.step_parse::<&Group>() {
+                            let mut parser = group.parser();
+                            let mut description = vec![parser.parse::<Expression>()?.into_static()];
+                            while !parser.empty() {
+                                parser.parse::<Token![,]>()?;
+                                if parser.empty() {
+                                    break;
+                                }
+
+                                description.push(parser.parse::<Expression>()?.into_static());
+                            }
+                            description
+                        } else {
+                            vec![parser.parse::<Expression>()?.into_static()]
+                        })
+                    } else {
+                        None
+                    })
                 }
                 "version" => {
                     version = Some(if let Ok(_) = parser.step_parse::<Token![=]>() {
@@ -81,6 +101,12 @@ impl<'a> CommandInfo<'a> {
         if !parser.empty() {
             return Err(parser.error("unexpected token"));
         }
+
+        let description = match description {
+            Some(Some(description)) => Some(description),
+            Some(None) => Some(docs),
+            None => None,
+        };
 
         Ok(CommandInfo {
             name,

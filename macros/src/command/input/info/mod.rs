@@ -10,7 +10,7 @@ pub struct CommandInfo<'a> {
     name: Option<Literal>,
 
     /// The description of the program
-    description: Option<Expression<'a>>,
+    description: Option<Vec<Expression<'a>>>,
 
     /// If a version flag should be included, and what content it should have
     version: Option<Option<Expression<'a>>>,

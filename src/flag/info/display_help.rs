@@ -34,7 +34,7 @@ impl<T: Flag> FlagInfo<T> {
                 print!(" ");
             }
 
-            description();
+            description(description_offset);
         } else {
             println!();
         }
