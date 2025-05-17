@@ -29,6 +29,7 @@ impl<'a> Input<'a> {
             DeriveItemKind::Struct(r#struct) => {
                 Ok(Input::Struct(StructInput::extract(r#struct, info)?))
             }
+            DeriveItemKind::Enum(r#enum) => todo!(),
         }
     }
 }
