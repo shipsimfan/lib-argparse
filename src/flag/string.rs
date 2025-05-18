@@ -2,7 +2,16 @@ use crate::{Argument, ArgumentSource, Error, Flag, FlagInfo, InvalidLengthError,
 use std::ffi::OsString;
 
 impl Flag for String {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+    fn parse(
+        this: &mut Option<Self>,
+        source: &mut dyn ArgumentSource,
+        info: &FlagInfo<Self>,
+        long: bool,
+    ) -> Result<()> {
+        if this.is_some() {
+            return Err(Error::repeated_flag(info, long));
+        }
+
         let str = source
             .next()
             .ok_or(Error::missing_flag_value(info, long))?
@@ -29,12 +38,22 @@ impl Flag for String {
             }
         }
 
-        Ok(str)
+        *this = Some(str);
+        Ok(())
     }
 }
 
 impl Flag for OsString {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+    fn parse(
+        this: &mut Option<Self>,
+        source: &mut dyn ArgumentSource,
+        info: &FlagInfo<Self>,
+        long: bool,
+    ) -> Result<()> {
+        if this.is_some() {
+            return Err(Error::repeated_flag(info, long));
+        }
+
         let str = match source.next().ok_or(Error::missing_flag_value(info, long))? {
             Argument::OsStr(os_str) => os_str.into_owned(),
             Argument::Str(str) => OsString::from(str.as_ref()),
@@ -60,6 +79,7 @@ impl Flag for OsString {
             }
         }
 
-        Ok(str)
+        *this = Some(str);
+        Ok(())
     }
 }

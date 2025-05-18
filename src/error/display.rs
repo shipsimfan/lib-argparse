@@ -15,6 +15,7 @@ impl std::fmt::Display for Error {
             Error::InvalidFlagValue(argument, value, error) => {
                 write!(f, "invalid \"{value}\" for \"{argument}\" - {error}")
             }
+            Error::RepeatedFlag(argument) => write!(f, "repeated flag \"{argument}\""),
             Error::UnknownArgument(argument) => write!(f, "unknown argument \"{argument}\""),
             Error::Custom(message) => message.fmt(f),
         }

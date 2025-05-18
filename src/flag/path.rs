@@ -2,7 +2,16 @@ use crate::{Argument, ArgumentSource, Error, Flag, FlagInfo, InvalidLengthError,
 use std::path::PathBuf;
 
 impl Flag for PathBuf {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+    fn parse(
+        this: &mut Option<Self>,
+        source: &mut dyn ArgumentSource,
+        info: &FlagInfo<Self>,
+        long: bool,
+    ) -> Result<()> {
+        if this.is_some() {
+            return Err(Error::repeated_flag(info, long));
+        }
+
         let path = match source.next().ok_or(Error::missing_flag_value(info, long))? {
             Argument::Str(str) => PathBuf::from(str.into_owned()),
             Argument::OsStr(os_str) => PathBuf::from(os_str.into_owned()),
@@ -28,6 +37,7 @@ impl Flag for PathBuf {
             }
         }
 
-        Ok(path)
+        *this = Some(path);
+        Ok(())
     }
 }

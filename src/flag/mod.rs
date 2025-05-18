@@ -8,6 +8,7 @@ mod borrow;
 mod r#box;
 mod cell;
 mod char;
+mod collections;
 mod net;
 mod number;
 mod option;
@@ -24,7 +25,12 @@ pub(crate) const DEFUALT_FLAG_VALUE: &str = "VALUE";
 /// A type which can parsed from a flag
 pub trait Flag: Sized + DefaultDisplay {
     /// Parse arguments from `source` to get the value
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self>;
+    fn parse(
+        this: &mut Option<Self>,
+        source: &mut dyn ArgumentSource,
+        info: &FlagInfo<Self>,
+        long: bool,
+    ) -> Result<()>;
 
     /// Unwrap this flag
     fn unwrap(this: Option<Self>, info: &FlagInfo<Self>) -> Result<Self> {

@@ -35,6 +35,9 @@ pub enum Error {
     /// An invalid value was given for a flag
     InvalidFlagValue(&'static str, &'static str, Box<dyn std::error::Error>),
 
+    /// A second repeated flag was passed that can't be repeated
+    RepeatedFlag(&'static str),
+
     /// An unknown argument was passed
     UnknownArgument(String),
 

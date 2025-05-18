@@ -60,6 +60,18 @@ impl Error {
         )
     }
 
+    /// Create an [`Error::RepeatedFlag`] for `value` of `argument`
+    pub fn repeated_flag<T: Flag>(info: &FlagInfo<T>, long: bool) -> Self {
+        Error::RepeatedFlag(
+            if long {
+                info.long_name
+            } else {
+                info.short_name
+            }
+            .unwrap(),
+        )
+    }
+
     /// Create an [`Error::UnknownArgument`] for `argument`
     pub fn unknown_argument(argument: String) -> Self {
         Error::UnknownArgument(argument)

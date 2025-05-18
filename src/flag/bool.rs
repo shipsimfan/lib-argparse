@@ -1,9 +1,19 @@
-use crate::{ArgumentSource, Flag, FlagInfo, Result};
+use crate::{ArgumentSource, Error, Flag, FlagInfo, Result};
 use std::sync::atomic::AtomicBool;
 
 impl Flag for bool {
-    fn parse(_: &mut dyn ArgumentSource, _: &FlagInfo<Self>, _: bool) -> Result<Self> {
-        Ok(true)
+    fn parse(
+        this: &mut Option<Self>,
+        _: &mut dyn ArgumentSource,
+        info: &FlagInfo<Self>,
+        long: bool,
+    ) -> Result<()> {
+        if this.is_some() {
+            return Err(Error::repeated_flag(info, long));
+        }
+
+        *this = Some(true);
+        Ok(())
     }
 
     fn unwrap(this: Option<Self>, _: &FlagInfo<Self>) -> Result<Self> {
@@ -20,8 +30,14 @@ impl Flag for bool {
 }
 
 impl Flag for AtomicBool {
-    fn parse(_: &mut dyn ArgumentSource, _: &FlagInfo<Self>, _: bool) -> Result<Self> {
-        Ok(AtomicBool::new(true))
+    fn parse(
+        this: &mut Option<Self>,
+        _: &mut dyn ArgumentSource,
+        _: &FlagInfo<Self>,
+        _: bool,
+    ) -> Result<()> {
+        *this = Some(AtomicBool::new(true));
+        Ok(())
     }
 
     fn unwrap(this: Option<Self>, _: &FlagInfo<Self>) -> Result<Self> {

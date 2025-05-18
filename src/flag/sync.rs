@@ -1,9 +1,22 @@
-use crate::{ArgumentSource, Flag, FlagInfo, Result};
+use crate::{ArgumentSource, Error, Flag, FlagInfo, Result};
 use std::sync::{Mutex, RwLock};
 
 impl<T: Flag> Flag for Mutex<T> {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        T::parse(source, &info.drop_default(), long).map(Mutex::new)
+    fn parse(
+        this: &mut Option<Self>,
+        source: &mut dyn ArgumentSource,
+        info: &FlagInfo<Self>,
+        long: bool,
+    ) -> Result<()> {
+        if this.is_some() {
+            return Err(Error::repeated_flag(info, long));
+        }
+
+        let mut new = None;
+        let info = info.drop_default();
+        T::parse(&mut new, source, &info, long)?;
+        *this = Some(Mutex::new(T::unwrap(new, &info)?));
+        Ok(())
     }
 
     fn takes_value(info: &FlagInfo<Self>) -> bool {
@@ -12,8 +25,21 @@ impl<T: Flag> Flag for Mutex<T> {
 }
 
 impl<T: Flag> Flag for RwLock<T> {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
-        T::parse(source, &info.drop_default(), long).map(RwLock::new)
+    fn parse(
+        this: &mut Option<Self>,
+        source: &mut dyn ArgumentSource,
+        info: &FlagInfo<Self>,
+        long: bool,
+    ) -> Result<()> {
+        if this.is_some() {
+            return Err(Error::repeated_flag(info, long));
+        }
+
+        let mut new = None;
+        let info = info.drop_default();
+        T::parse(&mut new, source, &info, long)?;
+        *this = Some(RwLock::new(T::unwrap(new, &info)?));
+        Ok(())
     }
 
     fn takes_value(info: &FlagInfo<Self>) -> bool {

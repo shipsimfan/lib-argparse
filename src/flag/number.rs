@@ -3,7 +3,16 @@ use crate::{ArgumentSource, Error, Flag, FlagInfo, InvalidNumberError, Result};
 macro_rules! impl_number {
     ($($t: ty),*) => {$(
         impl Flag for $t {
-            fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+            fn parse(
+                this: &mut Option<Self>,
+                source: &mut dyn ArgumentSource,
+                info: &FlagInfo<Self>,
+                long: bool
+            ) -> Result<()> {
+                if this.is_some() {
+                    return Err(Error::repeated_flag(info, long));
+                }
+
                 let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
 
                 let value = value
@@ -23,12 +32,18 @@ macro_rules! impl_number {
                     }
                 }
 
-                Ok(value)
+                *this = Some(value);
+                Ok(())
             }
         }
 
         impl Flag for std::num::NonZero<$t> {
-            fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+            fn parse(
+                this: &mut Option<Self>,
+                source: &mut dyn ArgumentSource,
+                info: &FlagInfo<Self>,
+                long: bool
+            ) -> Result<()> {
                 let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
 
                 let value: std::num::NonZero<$t> = value
@@ -48,7 +63,8 @@ macro_rules! impl_number {
                     }
                 }
 
-                Ok(value)
+                *this = Some(value);
+                Ok(())
             }
         }
     )*};
@@ -57,7 +73,12 @@ macro_rules! impl_number {
 macro_rules! impl_atomic {
     ($($t: ty),*) => {$(
         impl Flag for $t {
-            fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+            fn parse(
+                this: &mut Option<Self>,
+                source: &mut dyn ArgumentSource,
+                info: &FlagInfo<Self>,
+                long: bool
+            ) -> Result<()> {
                 let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
 
                let value = value
@@ -77,7 +98,8 @@ macro_rules! impl_atomic {
                     }
                 }
 
-                Ok(<$t>::new(value))
+                *this = Some(<$t>::new(value));
+                Ok(())
             }
         }
     )*};
@@ -99,7 +121,12 @@ impl_atomic!(
 );
 
 impl Flag for f32 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+    fn parse(
+        this: &mut Option<Self>,
+        source: &mut dyn ArgumentSource,
+        info: &FlagInfo<Self>,
+        long: bool,
+    ) -> Result<()> {
         let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
 
         let value = value.as_str()?.parse().map_err(|error| {
@@ -126,12 +153,18 @@ impl Flag for f32 {
             }
         }
 
-        Ok(value)
+        *this = Some(value);
+        Ok(())
     }
 }
 
 impl Flag for f64 {
-    fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+    fn parse(
+        this: &mut Option<Self>,
+        source: &mut dyn ArgumentSource,
+        info: &FlagInfo<Self>,
+        long: bool,
+    ) -> Result<()> {
         let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
 
         let value = value.as_str()?.parse().map_err(|error| {
@@ -139,7 +172,7 @@ impl Flag for f64 {
         })?;
 
         if let Some(min) = info.min {
-            if value < min as _ {
+            if value < min {
                 return Err(Error::invalid_flag_value(
                     info,
                     long,
@@ -158,6 +191,7 @@ impl Flag for f64 {
             }
         }
 
-        Ok(value)
+        *this = Some(value);
+        Ok(())
     }
 }

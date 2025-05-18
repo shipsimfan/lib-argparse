@@ -1,4 +1,6 @@
-use crate::{Argument, Error, Positional, PositionalInfo, PositionalResult, Result};
+use crate::{
+    Argument, Error, InvalidLengthError, Positional, PositionalInfo, PositionalResult, Result,
+};
 use std::{
     collections::{BTreeSet, BinaryHeap, HashSet, LinkedList, VecDeque},
     hash::Hash,
@@ -34,7 +36,10 @@ impl<T: Positional> Positional for Vec<T> {
         let vec = this.unwrap_or(Vec::new());
 
         if Some(vec.len()) < info.min.map(|f| f as usize) {
-            return Err(Error::missing_positional_value(info.value));
+            return Err(Error::invalid_positional_value(
+                info.value,
+                InvalidLengthError::TooShort,
+            ));
         }
 
         Ok(vec)
@@ -80,7 +85,10 @@ impl<T: Positional> Positional for VecDeque<T> {
         let vec = this.unwrap_or(VecDeque::new());
 
         if Some(vec.len()) < info.min.map(|f| f as usize) {
-            return Err(Error::missing_positional_value(info.value));
+            return Err(Error::invalid_positional_value(
+                info.value,
+                InvalidLengthError::TooShort,
+            ));
         }
 
         Ok(vec)
@@ -126,7 +134,10 @@ impl<T: Positional> Positional for LinkedList<T> {
         let list = this.unwrap_or(LinkedList::new());
 
         if Some(list.len()) < info.min.map(|f| f as usize) {
-            return Err(Error::missing_positional_value(info.value));
+            return Err(Error::invalid_positional_value(
+                info.value,
+                InvalidLengthError::TooShort,
+            ));
         }
 
         Ok(list)
@@ -172,7 +183,10 @@ impl<T: Positional + Eq + Hash> Positional for HashSet<T> {
         let set = this.unwrap_or(HashSet::new());
 
         if Some(set.len()) < info.min.map(|f| f as usize) {
-            return Err(Error::missing_positional_value(info.value));
+            return Err(Error::invalid_positional_value(
+                info.value,
+                InvalidLengthError::TooShort,
+            ));
         }
 
         Ok(set)
@@ -218,7 +232,10 @@ impl<T: Positional + Ord> Positional for BTreeSet<T> {
         let set = this.unwrap_or(BTreeSet::new());
 
         if Some(set.len()) < info.min.map(|f| f as usize) {
-            return Err(Error::missing_positional_value(info.value));
+            return Err(Error::invalid_positional_value(
+                info.value,
+                InvalidLengthError::TooShort,
+            ));
         }
 
         Ok(set)
@@ -264,7 +281,10 @@ impl<T: Positional + Ord> Positional for BinaryHeap<T> {
         let heap = this.unwrap_or(BinaryHeap::new());
 
         if Some(heap.len()) < info.min.map(|f| f as usize) {
-            return Err(Error::missing_positional_value(info.value));
+            return Err(Error::invalid_positional_value(
+                info.value,
+                InvalidLengthError::TooShort,
+            ));
         }
 
         Ok(heap)

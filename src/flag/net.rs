@@ -3,13 +3,22 @@ use crate::{ArgumentSource, Error, Flag, FlagInfo, InvalidAddressError, Result};
 macro_rules! impl_net {
     ($($t: ty),*) => {$(
         impl Flag for $t {
-            fn parse(source: &mut dyn ArgumentSource, info: &FlagInfo<Self>, long: bool) -> Result<Self> {
+            fn parse(
+                this: &mut Option<Self>,
+                source: &mut dyn ArgumentSource,
+                info: &FlagInfo<Self>,
+                long: bool
+            ) -> Result<()> {
+                if this.is_some() {
+                    return Err(Error::repeated_flag(info, long));
+                }
+
                 let value = source.next().ok_or(Error::missing_flag_value(info, long))?;
 
-                value
-                    .as_str()?
-                    .parse()
-                    .map_err(|_| Error::invalid_flag_value(info, long, InvalidAddressError))
+                *this = Some(value.as_str()?.parse().map_err(|_| {
+                    Error::invalid_flag_value(info, long, InvalidAddressError)
+                })?);
+                Ok(())
             }
         }
     )*};
