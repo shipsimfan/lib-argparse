@@ -16,6 +16,7 @@ impl<'a> ToTokens for Description<'a> {
                 first = false;
             } else {
                 to_tokens! { generator
+                    ::std::println!();
                     for _ in 0..__count {
                         ::std::print!(" ");
                     }
@@ -23,7 +24,7 @@ impl<'a> ToTokens for Description<'a> {
             }
 
             to_tokens! { generator
-                ::std::println!("{}", #expression);
+                ::std::print!("{}", #expression);
             }
         }
     }

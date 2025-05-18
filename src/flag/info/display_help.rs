@@ -35,8 +35,12 @@ impl<T: Flag> FlagInfo<T> {
             }
 
             description(description_offset);
-        } else {
-            println!();
+
+            if let Some(default) = self.default {
+                print!(" [Default: {}]", default().as_display());
+            }
         }
+
+        println!();
     }
 }
