@@ -7,6 +7,7 @@
 #![warn(rustdoc::broken_intra_doc_links)]
 
 mod command;
+mod flag_group;
 
 proc_macro_util::proc_macro_derive!(
     /// Derives the `Command` trait for a structure, allowing it to parse arguments
@@ -15,4 +16,12 @@ proc_macro_util::proc_macro_derive!(
     /// cause it to be a flag. All fields without a `flag` attribute will be treated as a
     /// positional, parsed in the order they appear.
     Command (command, flag, arg) -> command::generate
+);
+
+proc_macro_util::proc_macro_derive!(
+    /// Derives the `FlagGroup` trait for a structure
+    ///
+    /// Fields can have a `flag` attribute attached to give extra information about the flag. See
+    /// documentation for `Command` derive for details on the `flag` attribute.
+    FlagGroup (flag) -> flag_group::generate
 );

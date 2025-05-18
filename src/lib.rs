@@ -15,6 +15,7 @@ mod command;
 mod default_display;
 mod error;
 mod flag;
+mod flag_group;
 mod positional;
 
 pub use argument::{
@@ -26,5 +27,6 @@ pub use error::{
     Error, InvalidAddressError, InvalidCharError, InvalidLengthError, InvalidNumberError, Result,
 };
 pub use flag::{Flag, FlagInfo};
-pub use macros::Command;
+pub use flag_group::FlagGroup;
+pub use macros::{Command, FlagGroup};
 pub use positional::{Positional, PositionalInfo, PositionalResult};
