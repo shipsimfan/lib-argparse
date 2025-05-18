@@ -19,21 +19,11 @@ impl<T: Positional> Positional for Vec<T> {
         };
 
         let mut value = None;
-        T::parse(
-            &mut value,
-            argument,
-            &PositionalInfo {
-                value: info.value,
-                min_count: 1,
-                max_count: 1,
-                default: None,
-                description: None,
-            },
-        )?;
+        T::parse(&mut value, argument, &info.drop_default())?;
 
         vec.push(value.unwrap());
 
-        if vec.len() == info.max_count {
+        if Some(vec.len()) == info.max.map(|f| f as usize) {
             PositionalResult::Next
         } else {
             PositionalResult::Continue
@@ -43,7 +33,7 @@ impl<T: Positional> Positional for Vec<T> {
     fn unwrap(this: Option<Self>, info: &PositionalInfo<Self>) -> Result<Self> {
         let vec = this.unwrap_or(Vec::new());
 
-        if vec.len() < info.min_count {
+        if Some(vec.len()) < info.min.map(|f| f as usize) {
             return Err(Error::missing_positional_value(info.value));
         }
 
@@ -51,11 +41,12 @@ impl<T: Positional> Positional for Vec<T> {
     }
 
     fn is_required(info: &PositionalInfo<Self>) -> bool {
-        info.min_count > 0
+        info.min.map(|f| f as usize > 0).unwrap_or(false)
     }
 
     fn multiple(info: &PositionalInfo<Self>) -> bool {
-        info.max_count != 1
+        info.max.is_none()
+            || (info.max.map(|f| f as usize) != Some(0) && info.max.map(|f| f as usize) != Some(1))
     }
 }
 
@@ -74,21 +65,11 @@ impl<T: Positional> Positional for VecDeque<T> {
         };
 
         let mut value = None;
-        T::parse(
-            &mut value,
-            argument,
-            &PositionalInfo {
-                value: info.value,
-                min_count: 1,
-                max_count: 1,
-                default: None,
-                description: None,
-            },
-        )?;
+        T::parse(&mut value, argument, &info.drop_default())?;
 
         vec.push_back(value.unwrap());
 
-        if vec.len() == info.max_count {
+        if Some(vec.len()) == info.max.map(|f| f as usize) {
             PositionalResult::Next
         } else {
             PositionalResult::Continue
@@ -98,7 +79,7 @@ impl<T: Positional> Positional for VecDeque<T> {
     fn unwrap(this: Option<Self>, info: &PositionalInfo<Self>) -> Result<Self> {
         let vec = this.unwrap_or(VecDeque::new());
 
-        if vec.len() < info.min_count {
+        if Some(vec.len()) < info.min.map(|f| f as usize) {
             return Err(Error::missing_positional_value(info.value));
         }
 
@@ -106,11 +87,12 @@ impl<T: Positional> Positional for VecDeque<T> {
     }
 
     fn is_required(info: &PositionalInfo<Self>) -> bool {
-        info.min_count > 0
+        info.min.map(|f| f as usize > 0).unwrap_or(false)
     }
 
     fn multiple(info: &PositionalInfo<Self>) -> bool {
-        info.max_count != 1
+        info.max.is_none()
+            || (info.max.map(|f| f as usize) != Some(0) && info.max.map(|f| f as usize) != Some(1))
     }
 }
 
@@ -129,21 +111,11 @@ impl<T: Positional> Positional for LinkedList<T> {
         };
 
         let mut value = None;
-        T::parse(
-            &mut value,
-            argument,
-            &PositionalInfo {
-                value: info.value,
-                min_count: 1,
-                max_count: 1,
-                default: None,
-                description: None,
-            },
-        )?;
+        T::parse(&mut value, argument, &info.drop_default())?;
 
         list.push_back(value.unwrap());
 
-        if list.len() == info.max_count {
+        if Some(list.len()) == info.max.map(|f| f as usize) {
             PositionalResult::Next
         } else {
             PositionalResult::Continue
@@ -153,7 +125,7 @@ impl<T: Positional> Positional for LinkedList<T> {
     fn unwrap(this: Option<Self>, info: &PositionalInfo<Self>) -> Result<Self> {
         let list = this.unwrap_or(LinkedList::new());
 
-        if list.len() < info.min_count {
+        if Some(list.len()) < info.min.map(|f| f as usize) {
             return Err(Error::missing_positional_value(info.value));
         }
 
@@ -161,11 +133,12 @@ impl<T: Positional> Positional for LinkedList<T> {
     }
 
     fn is_required(info: &PositionalInfo<Self>) -> bool {
-        info.min_count > 0
+        info.min.map(|f| f as usize > 0).unwrap_or(false)
     }
 
     fn multiple(info: &PositionalInfo<Self>) -> bool {
-        info.max_count != 1
+        info.max.is_none()
+            || (info.max.map(|f| f as usize) != Some(0) && info.max.map(|f| f as usize) != Some(1))
     }
 }
 
@@ -184,21 +157,11 @@ impl<T: Positional + Eq + Hash> Positional for HashSet<T> {
         };
 
         let mut value = None;
-        T::parse(
-            &mut value,
-            argument,
-            &PositionalInfo {
-                value: info.value,
-                min_count: 1,
-                max_count: 1,
-                default: None,
-                description: None,
-            },
-        )?;
+        T::parse(&mut value, argument, &info.drop_default())?;
 
         set.insert(value.unwrap());
 
-        if set.len() == info.max_count {
+        if Some(set.len()) == info.max.map(|f| f as usize) {
             PositionalResult::Next
         } else {
             PositionalResult::Continue
@@ -208,7 +171,7 @@ impl<T: Positional + Eq + Hash> Positional for HashSet<T> {
     fn unwrap(this: Option<Self>, info: &PositionalInfo<Self>) -> Result<Self> {
         let set = this.unwrap_or(HashSet::new());
 
-        if set.len() < info.min_count {
+        if Some(set.len()) < info.min.map(|f| f as usize) {
             return Err(Error::missing_positional_value(info.value));
         }
 
@@ -216,11 +179,12 @@ impl<T: Positional + Eq + Hash> Positional for HashSet<T> {
     }
 
     fn is_required(info: &PositionalInfo<Self>) -> bool {
-        info.min_count > 0
+        info.min.map(|f| f as usize > 0).unwrap_or(false)
     }
 
     fn multiple(info: &PositionalInfo<Self>) -> bool {
-        info.max_count != 1
+        info.max.is_none()
+            || (info.max.map(|f| f as usize) != Some(0) && info.max.map(|f| f as usize) != Some(1))
     }
 }
 
@@ -239,21 +203,11 @@ impl<T: Positional + Ord> Positional for BTreeSet<T> {
         };
 
         let mut value = None;
-        T::parse(
-            &mut value,
-            argument,
-            &PositionalInfo {
-                value: info.value,
-                min_count: 1,
-                max_count: 1,
-                default: None,
-                description: None,
-            },
-        )?;
+        T::parse(&mut value, argument, &info.drop_default())?;
 
         set.insert(value.unwrap());
 
-        if set.len() == info.max_count {
+        if Some(set.len()) == info.max.map(|f| f as usize) {
             PositionalResult::Next
         } else {
             PositionalResult::Continue
@@ -263,7 +217,7 @@ impl<T: Positional + Ord> Positional for BTreeSet<T> {
     fn unwrap(this: Option<Self>, info: &PositionalInfo<Self>) -> Result<Self> {
         let set = this.unwrap_or(BTreeSet::new());
 
-        if set.len() < info.min_count {
+        if Some(set.len()) < info.min.map(|f| f as usize) {
             return Err(Error::missing_positional_value(info.value));
         }
 
@@ -271,11 +225,12 @@ impl<T: Positional + Ord> Positional for BTreeSet<T> {
     }
 
     fn is_required(info: &PositionalInfo<Self>) -> bool {
-        info.min_count > 0
+        info.min.map(|f| f as usize > 0).unwrap_or(false)
     }
 
     fn multiple(info: &PositionalInfo<Self>) -> bool {
-        info.max_count != 1
+        info.max.is_none()
+            || (info.max.map(|f| f as usize) != Some(0) && info.max.map(|f| f as usize) != Some(1))
     }
 }
 
@@ -294,21 +249,11 @@ impl<T: Positional + Ord> Positional for BinaryHeap<T> {
         };
 
         let mut value = None;
-        T::parse(
-            &mut value,
-            argument,
-            &PositionalInfo {
-                value: info.value,
-                min_count: 1,
-                max_count: 1,
-                default: None,
-                description: None,
-            },
-        )?;
+        T::parse(&mut value, argument, &info.drop_default())?;
 
         heap.push(value.unwrap());
 
-        if heap.len() == info.max_count {
+        if Some(heap.len()) == info.max.map(|f| f as usize) {
             PositionalResult::Next
         } else {
             PositionalResult::Continue
@@ -318,7 +263,7 @@ impl<T: Positional + Ord> Positional for BinaryHeap<T> {
     fn unwrap(this: Option<Self>, info: &PositionalInfo<Self>) -> Result<Self> {
         let heap = this.unwrap_or(BinaryHeap::new());
 
-        if heap.len() < info.min_count {
+        if Some(heap.len()) < info.min.map(|f| f as usize) {
             return Err(Error::missing_positional_value(info.value));
         }
 
@@ -326,10 +271,11 @@ impl<T: Positional + Ord> Positional for BinaryHeap<T> {
     }
 
     fn is_required(info: &PositionalInfo<Self>) -> bool {
-        info.min_count > 0
+        info.min.map(|f| f as usize > 0).unwrap_or(false)
     }
 
     fn multiple(info: &PositionalInfo<Self>) -> bool {
-        info.max_count != 1
+        info.max.is_none()
+            || (info.max.map(|f| f as usize) != Some(0) && info.max.map(|f| f as usize) != Some(1))
     }
 }

@@ -9,7 +9,54 @@ macro_rules! impl_number {
                 info: &PositionalInfo<Self>,
             ) -> PositionalResult {
                 match argument.as_str()?.parse() {
-                    Ok(value) => *this = Some(value),
+                    Ok(value) => {
+                        if let Some(min) = info.min {
+                            if value < min as _ {
+                                return PositionalResult::Error(Error::invalid_positional_value(info.value, InvalidNumberError::NegOverflow));
+                            }
+                        }
+
+                        if let Some(max) = info.max {
+                            if value > max as _ {
+                                return PositionalResult::Error(Error::invalid_positional_value(info.value, InvalidNumberError::PosOverflow));
+                            }
+                        }
+
+                        *this = Some(value)
+                    },
+                    Err(error) => {
+                        return PositionalResult::Error(Error::invalid_positional_value(
+                            info.value,
+                            InvalidNumberError::from(error),
+                        ))
+                    }
+                }
+                PositionalResult::Next
+            }
+        }
+
+        impl Positional for std::num::NonZero<$t> {
+            fn parse(
+                this: &mut Option<Self>,
+                argument: Argument,
+                info: &PositionalInfo<Self>,
+            ) -> PositionalResult {
+                match argument.as_str()?.parse::<std::num::NonZero<$t>>() {
+                    Ok(value) => {
+                        if let Some(min) = info.min {
+                            if value.get() < min as _ {
+                                return PositionalResult::Error(Error::invalid_positional_value(info.value, InvalidNumberError::NegOverflow));
+                            }
+                        }
+
+                        if let Some(max) = info.max {
+                            if value.get() > max as _ {
+                                return PositionalResult::Error(Error::invalid_positional_value(info.value, InvalidNumberError::PosOverflow));
+                            }
+                        }
+
+                        *this = Some(value)
+                    },
                     Err(error) => {
                         return PositionalResult::Error(Error::invalid_positional_value(
                             info.value,
@@ -32,7 +79,21 @@ macro_rules! impl_atomic {
                 info: &PositionalInfo<Self>,
             ) -> PositionalResult {
                 match argument.as_str()?.parse() {
-                    Ok(value) => *this = Some(<$t>::new(value)),
+                    Ok(value) => {
+                        if let Some(min) = info.min {
+                            if value < min as _ {
+                                return PositionalResult::Error(Error::invalid_positional_value(info.value, InvalidNumberError::NegOverflow));
+                            }
+                        }
+
+                        if let Some(max) = info.max {
+                            if value > max as _ {
+                                return PositionalResult::Error(Error::invalid_positional_value(info.value, InvalidNumberError::PosOverflow));
+                            }
+                        }
+
+                        *this = Some(<$t>::new(value))
+                    },
                     Err(error) => {
                         return PositionalResult::Error(Error::invalid_positional_value(
                             info.value,
@@ -46,34 +107,7 @@ macro_rules! impl_atomic {
     )*};
 }
 
-impl_number!(
-    i8,
-    i16,
-    i32,
-    i64,
-    i128,
-    isize,
-    u8,
-    u16,
-    u32,
-    u64,
-    u128,
-    usize,
-    f32,
-    f64,
-    std::num::NonZeroU8,
-    std::num::NonZeroU16,
-    std::num::NonZeroU32,
-    std::num::NonZeroU64,
-    std::num::NonZeroU128,
-    std::num::NonZeroUsize,
-    std::num::NonZeroI8,
-    std::num::NonZeroI16,
-    std::num::NonZeroI32,
-    std::num::NonZeroI64,
-    std::num::NonZeroI128,
-    std::num::NonZeroIsize
-);
+impl_number!(i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize);
 
 impl_atomic!(
     std::sync::atomic::AtomicI8,

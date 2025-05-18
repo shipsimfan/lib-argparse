@@ -34,11 +34,11 @@ pub struct Flag<'a> {
     /// The name of the value for this flag
     value: Option<Literal>,
 
-    /// The minimum count of values
-    min_count: Literal,
+    /// The minimum length/quantity/value
+    min: Option<Expression<'a>>,
 
-    /// The maximum count of values
-    max_count: Literal,
+    /// The maximum length/quantity/value
+    max: Option<Expression<'a>>,
 
     /// The default value
     default: Option<Expression<'a>>,

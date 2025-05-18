@@ -1,5 +1,6 @@
 mod invalid_address;
 mod invalid_char;
+mod invalid_length;
 mod invalid_number;
 
 mod display;
@@ -7,6 +8,7 @@ mod new;
 
 pub use invalid_address::InvalidAddressError;
 pub use invalid_char::InvalidCharError;
+pub use invalid_length::InvalidLengthError;
 pub use invalid_number::InvalidNumberError;
 
 /// A result of an argparse operation

@@ -9,8 +9,8 @@ impl<'a> ToTokens for FlagInfo<'a> {
             info_long_name: long_name,
             info_short_name: short_name,
             value,
-            min_count,
-            max_count,
+            min,
+            max,
             default,
             description,
         } = self;
@@ -20,8 +20,8 @@ impl<'a> ToTokens for FlagInfo<'a> {
                 long_name: #long_name,
                 short_name: #short_name,
                 value: #value,
-                min_count: #min_count,
-                max_count: #max_count,
+                min: #min,
+                max: #max,
                 default: #default,
                 description: #description,
             };

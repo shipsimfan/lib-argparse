@@ -7,7 +7,7 @@ impl std::fmt::Display for Error {
             Error::MissingArgument(argument) => write!(f, "missing argument \"{argument}\""),
             Error::MissingPositionalValue(value) => write!(f, "missing \"{value}\""),
             Error::InvalidPositionalValue(value, error) => {
-                write!(f, "invalid \"{value}\" - \"{error}\"")
+                write!(f, "invalid \"{value}\" - {error}")
             }
             Error::MissingFlagValue(argument, value) => {
                 write!(f, "missing \"{value}\" for \"{argument}\"")

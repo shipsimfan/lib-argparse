@@ -1,7 +1,7 @@
 use super::FlagInfo;
-use crate::command::output::{DefaultValue, Description, OptionalOutput};
+use crate::command::output::{as_f64::AsF64, DefaultValue, Description, OptionalOutput};
 use proc_macro_util::{
-    ast::Type,
+    ast::{Expression, Type},
     tokens::{Identifier, Literal},
 };
 
@@ -13,8 +13,8 @@ impl<'a> FlagInfo<'a> {
         info_long_name: OptionalOutput<Literal>,
         info_short_name: OptionalOutput<Literal>,
         value: OptionalOutput<Literal>,
-        min_count: Literal,
-        max_count: Literal,
+        min: Option<Expression<'a>>,
+        max: Option<Expression<'a>>,
         default: OptionalOutput<DefaultValue<'a>>,
         description: OptionalOutput<Description<'a>>,
     ) -> Self {
@@ -24,8 +24,8 @@ impl<'a> FlagInfo<'a> {
             info_long_name,
             info_short_name,
             value,
-            min_count,
-            max_count,
+            min: min.map(AsF64::new).into(),
+            max: max.map(AsF64::new).into(),
             default,
             description,
         }

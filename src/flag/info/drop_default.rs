@@ -7,8 +7,8 @@ impl<T: Flag> FlagInfo<T> {
             long_name: self.long_name,
             short_name: self.short_name,
             value: self.value,
-            min_count: self.min_count,
-            max_count: self.max_count,
+            min: self.min,
+            max: self.max,
             default: None,
             description: self.description,
         }

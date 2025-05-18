@@ -73,8 +73,8 @@ impl<'a> Flag<'a> {
         let mut long_name = Literal::new(long_name_str.as_str());
         let mut short_name: Option<Literal> = None;
         let mut value = None;
-        let mut min_count = Literal::new(0);
-        let mut max_count = Literal::new(0);
+        let mut min = None;
+        let mut max = None;
         let mut default = None;
         let mut description = None;
         let mut parser = flag_group.parser();
@@ -101,11 +101,11 @@ impl<'a> Flag<'a> {
                 }
                 "min" => {
                     parser.parse::<Token![=]>()?;
-                    min_count = parser.parse()?;
+                    min = Some(parser.parse::<Expression>()?.into_static());
                 }
                 "max" => {
                     parser.parse::<Token![=]>()?;
-                    max_count = parser.parse()?;
+                    max = Some(parser.parse::<Expression>()?.into_static());
                 }
                 "default" => {
                     parser.parse::<Token![=]>()?;
@@ -171,8 +171,8 @@ impl<'a> Flag<'a> {
             short_name,
             info_short_name,
             value,
-            min_count,
-            max_count,
+            min,
+            max,
             default,
             description,
         }))

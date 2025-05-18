@@ -21,11 +21,11 @@ pub struct Positional<'a> {
     /// The name for the value of the positional
     value: Literal,
 
-    /// The minimum count
-    min_count: Literal,
+    /// The minimum length/quantity/value
+    min: Option<Expression<'a>>,
 
-    /// The maximum count
-    max_count: Literal,
+    /// The maximum length/quantity/value
+    max: Option<Expression<'a>>,
 
     /// The default value
     default: Option<Expression<'a>>,

@@ -50,8 +50,8 @@ impl<'a> Positional<'a> {
         }
 
         let mut value = Literal::new(name_upper.replace('_', "-").as_str());
-        let mut min_count = Literal::new(0);
-        let mut max_count = Literal::new(0);
+        let mut min = None;
+        let mut max = None;
         let mut default = None;
         let mut description = None;
         if let Some(attribute) = arg_attribute {
@@ -67,11 +67,11 @@ impl<'a> Positional<'a> {
                     }
                     "min" => {
                         parser.parse::<Token![=]>()?;
-                        min_count = parser.parse()?;
+                        min = Some(parser.parse::<Expression>()?.into_static());
                     }
                     "max" => {
                         parser.parse::<Token![=]>()?;
-                        max_count = parser.parse()?;
+                        max = Some(parser.parse::<Expression>()?.into_static());
                     }
                     "default" => {
                         parser.parse::<Token![=]>()?;
@@ -124,8 +124,8 @@ impl<'a> Positional<'a> {
             info_name,
             r#type,
             value,
-            min_count,
-            max_count,
+            min,
+            max,
             default,
             description,
         })

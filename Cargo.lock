@@ -19,7 +19,7 @@ dependencies = [
 [[package]]
 name = "proc-macro-util"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#e0a60c2c8c9fa103d3bb9aa943f3b91743d48b93"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#8b8f883f16acea3451622ce81597c93ac62ad722"
 dependencies = [
  "proc-macro-util-base",
  "proc-macro-util-macros",
@@ -28,12 +28,12 @@ dependencies = [
 [[package]]
 name = "proc-macro-util-base"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#e0a60c2c8c9fa103d3bb9aa943f3b91743d48b93"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#8b8f883f16acea3451622ce81597c93ac62ad722"
 
 [[package]]
 name = "proc-macro-util-macros"
 version = "0.1.0"
-source = "git+https://github.com/shipsimfan/lib-proc-macro-util#e0a60c2c8c9fa103d3bb9aa943f3b91743d48b93"
+source = "git+https://github.com/shipsimfan/lib-proc-macro-util#8b8f883f16acea3451622ce81597c93ac62ad722"
 dependencies = [
  "proc-macro-util-base",
 ]

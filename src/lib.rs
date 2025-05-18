@@ -22,7 +22,9 @@ pub use argument::{
 };
 pub use command::Command;
 pub use default_display::DefaultDisplay;
-pub use error::{Error, InvalidAddressError, InvalidCharError, InvalidNumberError, Result};
+pub use error::{
+    Error, InvalidAddressError, InvalidCharError, InvalidLengthError, InvalidNumberError, Result,
+};
 pub use flag::{Flag, FlagInfo};
 pub use macros::Command;
 pub use positional::{Positional, PositionalInfo, PositionalResult};

@@ -1,6 +1,6 @@
-use crate::command::output::{r#struct::DefaultValue, Description, OptionalOutput};
+use crate::command::output::{AsF64, DefaultValue, Description, OptionalOutput};
 use proc_macro_util::{
-    ast::Type,
+    ast::{Expression, Type},
     tokens::{Identifier, Literal},
 };
 
@@ -24,11 +24,11 @@ pub struct FlagInfo<'a> {
     /// The name of the value
     value: OptionalOutput<Literal>,
 
-    /// The minimum count of values
-    min_count: Literal,
+    /// The minimum length/quantity/value
+    min: OptionalOutput<AsF64<Expression<'a>>>,
 
-    /// The maximum count of values
-    max_count: Literal,
+    /// The maximum length/quantity/value
+    max: OptionalOutput<AsF64<Expression<'a>>>,
 
     /// The default value
     default: OptionalOutput<DefaultValue<'a>>,

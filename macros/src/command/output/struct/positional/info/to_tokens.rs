@@ -7,8 +7,8 @@ impl<'a> ToTokens for PositionalInfo<'a> {
             info_name,
             r#type,
             value,
-            min_count,
-            max_count,
+            min,
+            max,
             default,
             description,
         } = self;
@@ -16,8 +16,8 @@ impl<'a> ToTokens for PositionalInfo<'a> {
         to_tokens! { generator
             const #info_name: &::argparse::PositionalInfo<#r#type> = &::argparse::PositionalInfo {
                 value: #value,
-                min_count: #min_count,
-                max_count: #max_count,
+                min: #min,
+                max: #max,
                 default: #default,
                 description: #description,
             };

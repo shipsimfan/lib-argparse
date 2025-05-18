@@ -19,11 +19,11 @@ pub struct FlagInfo<T: Flag> {
     /// The name of the value for this flag
     pub value: Option<&'static str>,
 
-    /// The requested minimum number of arguments
-    pub min_count: usize,
+    /// The requested minimum length/quantity/value of arguments
+    pub min: Option<f64>,
 
-    /// The requested maximum number of arguments (0 means infinite)
-    pub max_count: usize,
+    /// The requested maximum length/quantity/value of arguments
+    pub max: Option<f64>,
 
     /// The default value if none is provided by the user
     pub default: Option<fn() -> T>,

@@ -1,6 +1,8 @@
+use as_f64::AsF64;
 use kind::OutputKind;
 use proc_macro_util::tokens::Identifier;
 
+mod as_f64;
 mod help;
 mod kind;
 mod r#struct;
