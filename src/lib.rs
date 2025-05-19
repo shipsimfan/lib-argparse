@@ -29,5 +29,5 @@ pub use error::{
 };
 pub use flag::{Flag, FlagInfo};
 pub use flag_group::FlagGroup;
-pub use macros::{Command, FlagGroup};
+pub use macros::{Command, FlagGroup, Positional};
 pub use positional::{Positional, PositionalInfo, PositionalResult};
