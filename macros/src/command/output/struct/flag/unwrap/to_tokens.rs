@@ -1,7 +1,7 @@
 use super::FlagUnwrap;
 use proc_macro_util::{to_tokens, Generator, ToTokens};
 
-impl ToTokens for FlagUnwrap {
+impl<'a> ToTokens for FlagUnwrap<'a> {
     fn to_tokens(self, generator: &mut Generator) {
         let FlagUnwrap {
             variable_name,

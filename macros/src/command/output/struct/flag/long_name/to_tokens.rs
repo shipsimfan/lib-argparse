@@ -1,7 +1,7 @@
 use super::FlagLongName;
 use proc_macro_util::{to_tokens, Generator, ToTokens};
 
-impl ToTokens for FlagLongName {
+impl<'a> ToTokens for FlagLongName<'a> {
     fn to_tokens(self, generator: &mut Generator) {
         let FlagLongName {
             long_name,

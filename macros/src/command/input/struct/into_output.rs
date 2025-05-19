@@ -68,6 +68,19 @@ impl<'a> StructInput<'a> {
             positional_help.push(help);
         }
 
+        let mut flag_group_declarations = Vec::with_capacity(self.flag_groups.len());
+        let mut flag_group_long_names = Vec::with_capacity(self.flag_groups.len());
+        let mut flag_group_short_names = Vec::with_capacity(self.flag_groups.len());
+        let mut flag_group_unwraps = Vec::with_capacity(self.flag_groups.len());
+        for flag_group in self.flag_groups {
+            let (declaration, long_name, short_name, unwrap) = flag_group.into_output();
+
+            flag_group_declarations.push(declaration);
+            flag_group_long_names.push(long_name);
+            flag_group_short_names.push(short_name);
+            flag_group_unwraps.push(unwrap);
+        }
+
         let (version, help) =
             self.info
                 .into_output(positional_usages, positional_help, flag_usages, flag_help);
@@ -84,6 +97,10 @@ impl<'a> StructInput<'a> {
             flag_long_names,
             flag_short_names,
             flag_unwraps,
+            flag_group_declarations,
+            flag_group_long_names,
+            flag_group_short_names,
+            flag_group_unwraps,
             version,
             help,
         ))

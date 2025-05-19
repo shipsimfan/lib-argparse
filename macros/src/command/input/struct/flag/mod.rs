@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use proc_macro_util::{
     ast::{Expression, Type},
     tokens::{Identifier, Literal},
@@ -11,7 +13,7 @@ mod into_output;
 /// The information extracted for a flag
 pub struct Flag<'a> {
     /// The name of the variable in the struct
-    variable_name: Identifier,
+    variable_name: Cow<'a, Identifier>,
 
     /// The name of the constant describing its info
     info_name: Identifier,

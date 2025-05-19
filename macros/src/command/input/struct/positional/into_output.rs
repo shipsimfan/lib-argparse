@@ -11,10 +11,10 @@ impl<'a> Positional<'a> {
         description_offset: usize,
     ) -> (
         PositionalInfo<'a>,
-        VariableDeclaration,
-        PositionalMatch,
-        PositionalSubCommand,
-        PositionalUnwrap,
+        VariableDeclaration<'a>,
+        PositionalMatch<'a>,
+        PositionalSubCommand<'a>,
+        PositionalUnwrap<'a>,
         PositionalHelpUsageOutput,
         PositionalHelpOutput,
     ) {

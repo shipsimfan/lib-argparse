@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use as_f64::AsF64;
 use kind::OutputKind;
 use proc_macro_util::tokens::Identifier;
@@ -16,7 +18,8 @@ pub use help::{
     HelpOutputName, HelpUsageOutput, PositionalHelpOutput, PositionalHelpUsageOutput,
 };
 pub use r#struct::{
-    DefaultValue, Description, FlagInfo, FlagLongName, FlagShortName, FlagUnwrap, OptionalOutput,
+    DefaultValue, Description, FlagGroupDeclaration, FlagGroupLongName, FlagGroupShortName,
+    FlagGroupUnwrap, FlagInfo, FlagLongName, FlagShortName, FlagUnwrap, OptionalOutput,
     PositionalInfo, PositionalMatch, PositionalSubCommand, PositionalUnwrap, StructOutput,
     VariableDeclaration,
 };
@@ -25,7 +28,7 @@ pub use version::VersionOutput;
 /// The output code from the Command derive macro
 pub struct Output<'a> {
     /// The name of the input item
-    name: Identifier,
+    name: Cow<'a, Identifier>,
 
     /// The kind of output to produce
     kind: OutputKind<'a>,

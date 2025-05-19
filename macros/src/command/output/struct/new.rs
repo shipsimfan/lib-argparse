@@ -1,24 +1,30 @@
 use super::{
-    FlagInfo, FlagLongName, FlagShortName, FlagUnwrap, PositionalInfo, PositionalMatch,
-    PositionalSubCommand, PositionalUnwrap, StructOutput, VariableDeclaration,
+    FlagGroupDeclaration, FlagGroupLongName, FlagGroupShortName, FlagGroupUnwrap, FlagInfo,
+    FlagLongName, FlagShortName, FlagUnwrap, PositionalInfo, PositionalMatch, PositionalSubCommand,
+    PositionalUnwrap, StructOutput, VariableDeclaration,
 };
 use crate::command::output::{HelpOutput, VersionOutput};
 use proc_macro_util::tokens::Identifier;
+use std::borrow::Cow;
 
 impl<'a> StructOutput<'a> {
     /// Creates a new [`StructOutput`]
     pub fn new(
-        name: Identifier,
+        name: Cow<'a, Identifier>,
         positional_info: Vec<PositionalInfo<'a>>,
-        positional_declarations: Vec<VariableDeclaration>,
-        positional_matches: Vec<PositionalMatch>,
-        positional_sub_commands: Vec<PositionalSubCommand>,
-        positional_unwraps: Vec<PositionalUnwrap>,
+        positional_declarations: Vec<VariableDeclaration<'a>>,
+        positional_matches: Vec<PositionalMatch<'a>>,
+        positional_sub_commands: Vec<PositionalSubCommand<'a>>,
+        positional_unwraps: Vec<PositionalUnwrap<'a>>,
         flag_info: Vec<FlagInfo<'a>>,
-        flag_declarations: Vec<VariableDeclaration>,
-        flag_long_names: Vec<FlagLongName>,
-        flag_short_names: Vec<FlagShortName>,
-        flag_unwraps: Vec<FlagUnwrap>,
+        flag_declarations: Vec<VariableDeclaration<'a>>,
+        flag_long_names: Vec<FlagLongName<'a>>,
+        flag_short_names: Vec<FlagShortName<'a>>,
+        flag_unwraps: Vec<FlagUnwrap<'a>>,
+        flag_group_declarations: Vec<FlagGroupDeclaration<'a>>,
+        flag_group_long_names: Vec<FlagGroupLongName<'a>>,
+        flag_group_short_names: Vec<FlagGroupShortName<'a>>,
+        flag_group_unwraps: Vec<FlagGroupUnwrap<'a>>,
         version: Option<VersionOutput<'a>>,
         help: Option<HelpOutput<'a>>,
     ) -> Self {
@@ -34,6 +40,10 @@ impl<'a> StructOutput<'a> {
             flag_long_names,
             flag_short_names,
             flag_unwraps,
+            flag_group_declarations,
+            flag_group_long_names,
+            flag_group_short_names,
+            flag_group_unwraps,
             version,
             help,
         }

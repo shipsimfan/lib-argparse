@@ -62,7 +62,7 @@ impl<'a> Flag<'a> {
             }
         };
 
-        let variable_name = field.name.into_owned();
+        let variable_name = field.name;
         let r#type = field.r#type;
 
         let variable_name_str = variable_name.to_string();

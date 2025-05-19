@@ -11,10 +11,10 @@ impl<'a> Flag<'a> {
         short_names: bool,
     ) -> (
         FlagInfo<'a>,
-        VariableDeclaration,
-        FlagLongName,
-        Option<FlagShortName>,
-        FlagUnwrap,
+        VariableDeclaration<'a>,
+        FlagLongName<'a>,
+        Option<FlagShortName<'a>>,
+        FlagUnwrap<'a>,
         FlagHelpUsageOutput,
         FlagHelpOutput,
     ) {

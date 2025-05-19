@@ -1,7 +1,7 @@
 use super::PositionalUnwrap;
 use proc_macro_util::{to_tokens, Generator, ToTokens};
 
-impl ToTokens for PositionalUnwrap {
+impl<'a> ToTokens for PositionalUnwrap<'a> {
     fn to_tokens(self, generator: &mut Generator) {
         let PositionalUnwrap {
             variable_name,

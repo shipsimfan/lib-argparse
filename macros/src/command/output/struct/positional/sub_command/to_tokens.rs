@@ -1,7 +1,7 @@
 use super::PositionalSubCommand;
 use proc_macro_util::{to_tokens, Generator, ToTokens};
 
-impl ToTokens for PositionalSubCommand {
+impl<'a> ToTokens for PositionalSubCommand<'a> {
     fn to_tokens(self, generator: &mut Generator) {
         let PositionalSubCommand {
             index,

@@ -7,7 +7,7 @@ use proc_macro_util::{
 
 impl<'a> Positional<'a> {
     pub fn extract(field: StructField<'a>) -> Result<Self, Error> {
-        let variable_name = field.name.into_owned();
+        let variable_name = field.name;
         let r#type = field.r#type;
 
         let name_upper = variable_name.to_string().to_uppercase();

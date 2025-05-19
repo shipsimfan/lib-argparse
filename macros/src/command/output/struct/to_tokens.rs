@@ -15,11 +15,18 @@ impl<'a> ToTokens for StructOutput<'a> {
             flag_long_names,
             flag_short_names,
             flag_unwraps,
+            flag_group_declarations,
+            flag_group_long_names,
+            flag_group_short_names,
+            flag_group_unwraps,
             version,
             help,
         } = self;
 
         to_tokens! { generator
+            #[allow(unused_imports)]
+            use ::argparse::FlagGroup;
+
             // Positional info
             #positional_info
 
@@ -31,6 +38,9 @@ impl<'a> ToTokens for StructOutput<'a> {
 
             // Flag variables
             #flag_declarations
+
+            // Flag group variables
+            #flag_group_declarations
 
             // Accounting variables
             let mut __current_positional = 0;
@@ -44,7 +54,11 @@ impl<'a> ToTokens for StructOutput<'a> {
                             #flag_long_names
                             #version
                             #help
-                            _ => return Err(::argparse::Error::unknown_argument(__argument.to_string())),
+                            __flag_name => {
+                                #flag_group_long_names
+
+                                return Err(::argparse::Error::unknown_argument(__argument.to_string()));
+                            }
                         }
 
                         #[allow(unreachable_code)]
@@ -55,7 +69,11 @@ impl<'a> ToTokens for StructOutput<'a> {
                         for __c in __chars {
                             match __c {
                                 #flag_short_names
-                                _ => return Err(::argparse::Error::unknown_argument(::std::format!("-{}", __c))),
+                                __flag_name => {
+                                    #flag_group_short_names
+
+                                    return Err(::argparse::Error::unknown_argument(::std::format!("-{}", __c)));
+                                }
                             }
                         }
 
@@ -88,6 +106,7 @@ impl<'a> ToTokens for StructOutput<'a> {
             Ok(Some(#name {
                 #positional_unwraps
                 #flag_unwraps
+                #flag_group_unwraps
             }))
         }
     }
