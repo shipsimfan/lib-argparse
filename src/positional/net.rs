@@ -3,11 +3,11 @@ use crate::{Argument, Error, InvalidAddressError, Positional, PositionalInfo, Po
 macro_rules! impl_net {
     ($($t: ty),*) => {$(
         impl Positional for $t {
-            fn parse(
+            fn parse<'a>(
                 this: &mut Option<Self>,
-                argument: Argument,
+                argument: Argument<'a>,
                 info: &PositionalInfo<Self>,
-            ) -> PositionalResult {
+            ) -> PositionalResult<'a> {
                 match argument.as_str()?.parse() {
                     Ok(value) => *this = Some(value),
                     Err(_) => {

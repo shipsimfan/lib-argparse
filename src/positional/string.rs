@@ -2,11 +2,11 @@ use crate::{Argument, Error, InvalidLengthError, Positional, PositionalInfo, Pos
 use std::ffi::OsString;
 
 impl Positional for String {
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'a> {
         let str = match argument {
             Argument::Str(str) => str.into_owned(),
             Argument::OsStr(os_str) => match os_str.as_str() {
@@ -39,11 +39,11 @@ impl Positional for String {
 }
 
 impl Positional for OsString {
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'a> {
         let str = match argument {
             Argument::Str(str) => OsString::from(str.as_ref()),
             Argument::OsStr(os_str) => os_str.to_os_string(),

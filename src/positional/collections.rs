@@ -7,11 +7,11 @@ use std::{
 };
 
 impl<T: Positional> Positional for Vec<T> {
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'a> {
         let vec = match this {
             Some(vec) => vec,
             None => {
@@ -66,11 +66,11 @@ impl<T: Positional> Positional for Vec<T> {
 }
 
 impl<T: Positional> Positional for VecDeque<T> {
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'a> {
         let vec = match this {
             Some(vec) => vec,
             None => {
@@ -125,11 +125,11 @@ impl<T: Positional> Positional for VecDeque<T> {
 }
 
 impl<T: Positional> Positional for LinkedList<T> {
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'a> {
         let list = match this {
             Some(vec) => vec,
             None => {
@@ -184,11 +184,11 @@ impl<T: Positional> Positional for LinkedList<T> {
 }
 
 impl<T: Positional + Eq + Hash> Positional for HashSet<T> {
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'a> {
         let set = match this {
             Some(vec) => vec,
             None => {
@@ -243,11 +243,11 @@ impl<T: Positional + Eq + Hash> Positional for HashSet<T> {
 }
 
 impl<T: Positional + Ord> Positional for BTreeSet<T> {
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'a> {
         let set = match this {
             Some(vec) => vec,
             None => {
@@ -302,11 +302,11 @@ impl<T: Positional + Ord> Positional for BTreeSet<T> {
 }
 
 impl<T: Positional + Ord> Positional for BinaryHeap<T> {
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'a> {
         let heap = match this {
             Some(vec) => vec,
             None => {

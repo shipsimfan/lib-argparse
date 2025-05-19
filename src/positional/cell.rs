@@ -2,11 +2,11 @@ use crate::{Argument, ArgumentSource, Positional, PositionalInfo, PositionalResu
 use std::cell::RefCell;
 
 impl<T: Positional> Positional for RefCell<T> {
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'a> {
         let mut inner = this.take().map(RefCell::into_inner);
         let result = T::parse(&mut inner, argument, &info.drop_default())?;
         *this = Some(RefCell::new(inner.unwrap()));
@@ -15,10 +15,11 @@ impl<T: Positional> Positional for RefCell<T> {
 
     fn sub(
         this: &mut Option<Self>,
-        parser: &mut dyn ArgumentSource,
+        command: Argument,
+        source: &mut dyn ArgumentSource,
         command_list: String,
     ) -> Result<bool> {
         let mut inner = this.take().map(RefCell::into_inner);
-        T::sub(&mut inner, parser, command_list)
+        T::sub(&mut inner, command, source, command_list)
     }
 }

@@ -3,11 +3,11 @@ use crate::{Argument, Error, InvalidNumberError, Positional, PositionalInfo, Pos
 macro_rules! impl_number {
     ($($t: ty),*) => {$(
         impl Positional for $t {
-            fn parse(
+            fn parse<'a>(
                 this: &mut Option<Self>,
-                argument: Argument,
+                argument: Argument<'a>,
                 info: &PositionalInfo<Self>,
-            ) -> PositionalResult {
+            ) -> PositionalResult<'a> {
                 match argument.as_str()?.parse() {
                     Ok(value) => {
                         if let Some(min) = info.min {
@@ -36,11 +36,11 @@ macro_rules! impl_number {
         }
 
         impl Positional for std::num::NonZero<$t> {
-            fn parse(
+            fn parse<'a>(
                 this: &mut Option<Self>,
-                argument: Argument,
+                argument: Argument<'a>,
                 info: &PositionalInfo<Self>,
-            ) -> PositionalResult {
+            ) -> PositionalResult<'a> {
                 match argument.as_str()?.parse::<std::num::NonZero<$t>>() {
                     Ok(value) => {
                         if let Some(min) = info.min {
@@ -73,11 +73,11 @@ macro_rules! impl_number {
 macro_rules! impl_atomic {
     ($($t: ty),*) => {$(
         impl Positional for $t {
-            fn parse(
+            fn parse<'a>(
                 this: &mut Option<Self>,
-                argument: Argument,
+                argument: Argument<'a>,
                 info: &PositionalInfo<Self>,
-            ) -> PositionalResult {
+            ) -> PositionalResult<'a> {
                 match argument.as_str()?.parse() {
                     Ok(value) => {
                         if let Some(min) = info.min {
@@ -121,3 +121,81 @@ impl_atomic!(
     std::sync::atomic::AtomicU64,
     std::sync::atomic::AtomicUsize
 );
+
+impl Positional for f32 {
+    fn parse<'a>(
+        this: &mut Option<Self>,
+        argument: Argument<'a>,
+        info: &PositionalInfo<Self>,
+    ) -> PositionalResult<'a> {
+        match argument.as_str()?.parse() {
+            Ok(value) => {
+                if let Some(min) = info.min {
+                    if value < min as _ {
+                        return PositionalResult::Error(Error::invalid_positional_value(
+                            info.value,
+                            InvalidNumberError::NegOverflow,
+                        ));
+                    }
+                }
+
+                if let Some(max) = info.max {
+                    if value > max as _ {
+                        return PositionalResult::Error(Error::invalid_positional_value(
+                            info.value,
+                            InvalidNumberError::PosOverflow,
+                        ));
+                    }
+                }
+
+                *this = Some(value)
+            }
+            Err(error) => {
+                return PositionalResult::Error(Error::invalid_positional_value(
+                    info.value,
+                    InvalidNumberError::from(error),
+                ))
+            }
+        }
+        PositionalResult::Next
+    }
+}
+
+impl Positional for f64 {
+    fn parse<'a>(
+        this: &mut Option<Self>,
+        argument: Argument<'a>,
+        info: &PositionalInfo<Self>,
+    ) -> PositionalResult<'a> {
+        match argument.as_str()?.parse() {
+            Ok(value) => {
+                if let Some(min) = info.min {
+                    if value < min as _ {
+                        return PositionalResult::Error(Error::invalid_positional_value(
+                            info.value,
+                            InvalidNumberError::NegOverflow,
+                        ));
+                    }
+                }
+
+                if let Some(max) = info.max {
+                    if value > max as _ {
+                        return PositionalResult::Error(Error::invalid_positional_value(
+                            info.value,
+                            InvalidNumberError::PosOverflow,
+                        ));
+                    }
+                }
+
+                *this = Some(value)
+            }
+            Err(error) => {
+                return PositionalResult::Error(Error::invalid_positional_value(
+                    info.value,
+                    InvalidNumberError::from(error),
+                ))
+            }
+        }
+        PositionalResult::Next
+    }
+}

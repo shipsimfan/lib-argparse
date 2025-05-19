@@ -89,7 +89,7 @@ impl<'a> ToTokens for StructOutput<'a> {
                     ::argparse::PositionalResult::Continue => {},
                     ::argparse::PositionalResult::Next => __current_positional += 1,
                     ::argparse::PositionalResult::Error(__error) => return Err(__error),
-                    ::argparse::PositionalResult::Sub => {
+                    ::argparse::PositionalResult::Sub(__command) => {
                         match __current_positional {
                             #positional_sub_commands
                             _ => unreachable!(),

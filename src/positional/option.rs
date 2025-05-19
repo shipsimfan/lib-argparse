@@ -1,11 +1,11 @@
 use crate::{Argument, Positional, PositionalInfo, PositionalResult, Result};
 
 impl<T: Positional> Positional for Option<T> {
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'a> {
         let mut inner = match this.take() {
             Some(inner) => inner,
             None => None,

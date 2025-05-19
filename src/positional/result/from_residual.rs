@@ -1,13 +1,13 @@
 use crate::{Error, PositionalResult};
 use std::ops::FromResidual;
 
-impl FromResidual for PositionalResult {
+impl<'a> FromResidual for PositionalResult<'a> {
     fn from_residual(residual: <Self as std::ops::Try>::Residual) -> Self {
         residual
     }
 }
 
-impl<T> FromResidual<Result<T, Error>> for PositionalResult {
+impl<'a, T> FromResidual<Result<T, Error>> for PositionalResult<'a> {
     fn from_residual(residual: Result<T, Error>) -> Self {
         match residual {
             Ok(_) => unimplemented!(),
@@ -16,8 +16,8 @@ impl<T> FromResidual<Result<T, Error>> for PositionalResult {
     }
 }
 
-impl<T> FromResidual<PositionalResult> for Result<T, Error> {
-    fn from_residual(residual: PositionalResult) -> Self {
+impl<'a, T> FromResidual<PositionalResult<'a>> for Result<T, Error> {
+    fn from_residual(residual: PositionalResult<'a>) -> Self {
         match residual {
             PositionalResult::Error(error) => Err(error),
             _ => unimplemented!(),

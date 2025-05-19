@@ -4,11 +4,11 @@ use crate::{
 use std::borrow::Cow;
 
 impl<'a, T: Positional, B: DefaultDisplay + ToOwned<Owned = T>> Positional for Cow<'a, B> {
-    fn parse(
+    fn parse<'b>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'b>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'b> {
         let mut inner = this.take().map(|inner| match inner {
             Cow::Owned(inner) => inner,
             Cow::Borrowed(_) => {
@@ -22,7 +22,8 @@ impl<'a, T: Positional, B: DefaultDisplay + ToOwned<Owned = T>> Positional for C
 
     fn sub(
         this: &mut Option<Self>,
-        parser: &mut dyn ArgumentSource,
+        command: Argument,
+        source: &mut dyn ArgumentSource,
         command_list: String,
     ) -> Result<bool> {
         let mut inner = this.take().map(|inner| match inner {
@@ -32,6 +33,6 @@ impl<'a, T: Positional, B: DefaultDisplay + ToOwned<Owned = T>> Positional for C
             }
         });
 
-        T::sub(&mut inner, parser, command_list)
+        T::sub(&mut inner, command, source, command_list)
     }
 }

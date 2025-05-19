@@ -1,7 +1,7 @@
 use crate::PositionalResult;
 use std::ops::{ControlFlow, Try};
 
-impl Try for PositionalResult {
+impl<'a> Try for PositionalResult<'a> {
     type Output = Self;
 
     type Residual = Self;

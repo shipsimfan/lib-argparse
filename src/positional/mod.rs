@@ -22,11 +22,11 @@ pub use result::PositionalResult;
 /// A type which can be a positional argument
 pub trait Positional: Sized + DefaultDisplay {
     /// Parse `argument` into this value
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult;
+    ) -> PositionalResult<'a>;
 
     /// Unwrap this positional argument
     fn unwrap(this: Option<Self>, info: &PositionalInfo<Self>) -> Result<Self> {
@@ -37,11 +37,12 @@ pub trait Positional: Sized + DefaultDisplay {
         }
     }
 
-    /// Continue parsing as a sub-command
+    /// Continue parsing as a sub-command, returning true if the parse should return [`Some`]
     #[allow(unused_variables)]
     fn sub(
         this: &mut Option<Self>,
-        parser: &mut dyn ArgumentSource,
+        command: Argument,
+        source: &mut dyn ArgumentSource,
         command_list: String,
     ) -> Result<bool> {
         unimplemented!()

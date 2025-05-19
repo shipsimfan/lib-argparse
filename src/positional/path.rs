@@ -2,11 +2,11 @@ use crate::{Argument, Error, InvalidLengthError, Positional, PositionalInfo, Pos
 use std::path::PathBuf;
 
 impl Positional for PathBuf {
-    fn parse(
+    fn parse<'a>(
         this: &mut Option<Self>,
-        argument: Argument,
+        argument: Argument<'a>,
         info: &PositionalInfo<Self>,
-    ) -> PositionalResult {
+    ) -> PositionalResult<'a> {
         let path = match argument {
             Argument::Str(str) => PathBuf::from(str.into_owned()),
             Argument::OsStr(os_str) => PathBuf::from(os_str.into_owned()),

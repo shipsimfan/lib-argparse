@@ -9,7 +9,12 @@ impl<'a> ToTokens for PositionalSubCommand<'a> {
         } = self;
 
         to_tokens! { generator
-            #index => match ::argparse::Positional::sub(&mut #variable_name, __source, ::std::format!("{}{} ", __command_list, __argument))? {
+            #index => match ::argparse::Positional::sub(
+                &mut #variable_name,
+                __command,
+                __source,
+                ::std::format!("{}{} ", __command_list, __argument)
+            )? {
                 true => break,
                 false => return Ok(None),
             },
