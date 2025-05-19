@@ -21,7 +21,17 @@ impl<T: Positional> Positional for Vec<T> {
         };
 
         let mut value = None;
-        T::parse(&mut value, argument, &info.drop_default())?;
+        T::parse(
+            &mut value,
+            argument,
+            &PositionalInfo {
+                value: info.value,
+                min: None,
+                max: None,
+                default: None,
+                description: None,
+            },
+        )?;
 
         vec.push(value.unwrap());
 
@@ -70,7 +80,17 @@ impl<T: Positional> Positional for VecDeque<T> {
         };
 
         let mut value = None;
-        T::parse(&mut value, argument, &info.drop_default())?;
+        T::parse(
+            &mut value,
+            argument,
+            &PositionalInfo {
+                value: info.value,
+                min: None,
+                max: None,
+                default: None,
+                description: None,
+            },
+        )?;
 
         vec.push_back(value.unwrap());
 
@@ -119,7 +139,17 @@ impl<T: Positional> Positional for LinkedList<T> {
         };
 
         let mut value = None;
-        T::parse(&mut value, argument, &info.drop_default())?;
+        T::parse(
+            &mut value,
+            argument,
+            &PositionalInfo {
+                value: info.value,
+                min: None,
+                max: None,
+                default: None,
+                description: None,
+            },
+        )?;
 
         list.push_back(value.unwrap());
 
@@ -168,7 +198,17 @@ impl<T: Positional + Eq + Hash> Positional for HashSet<T> {
         };
 
         let mut value = None;
-        T::parse(&mut value, argument, &info.drop_default())?;
+        T::parse(
+            &mut value,
+            argument,
+            &PositionalInfo {
+                value: info.value,
+                min: None,
+                max: None,
+                default: None,
+                description: None,
+            },
+        )?;
 
         set.insert(value.unwrap());
 
@@ -217,7 +257,17 @@ impl<T: Positional + Ord> Positional for BTreeSet<T> {
         };
 
         let mut value = None;
-        T::parse(&mut value, argument, &info.drop_default())?;
+        T::parse(
+            &mut value,
+            argument,
+            &PositionalInfo {
+                value: info.value,
+                min: None,
+                max: None,
+                default: None,
+                description: None,
+            },
+        )?;
 
         set.insert(value.unwrap());
 
@@ -266,7 +316,17 @@ impl<T: Positional + Ord> Positional for BinaryHeap<T> {
         };
 
         let mut value = None;
-        T::parse(&mut value, argument, &info.drop_default())?;
+        T::parse(
+            &mut value,
+            argument,
+            &PositionalInfo {
+                value: info.value,
+                min: None,
+                max: None,
+                default: None,
+                description: None,
+            },
+        )?;
 
         heap.push(value.unwrap());
 

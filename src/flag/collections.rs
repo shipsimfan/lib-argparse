@@ -20,7 +20,15 @@ impl<T: Flag> Flag for Vec<T> {
         };
 
         let mut value = None;
-        let info = info.drop_default();
+        let info = FlagInfo {
+            long_name: info.long_name,
+            short_name: info.short_name,
+            value: info.value,
+            min: None,
+            max: None,
+            default: None,
+            description: None,
+        };
         T::parse(&mut value, source, &info, long)?;
 
         vec.push(T::unwrap(value, &info)?);
@@ -71,7 +79,15 @@ impl<T: Flag> Flag for VecDeque<T> {
         };
 
         let mut value = None;
-        let info = info.drop_default();
+        let info = FlagInfo {
+            long_name: info.long_name,
+            short_name: info.short_name,
+            value: info.value,
+            min: None,
+            max: None,
+            default: None,
+            description: None,
+        };
         T::parse(&mut value, source, &info, long)?;
 
         vec.push_back(T::unwrap(value, &info)?);
@@ -122,7 +138,15 @@ impl<T: Flag> Flag for LinkedList<T> {
         };
 
         let mut value = None;
-        let info = info.drop_default();
+        let info = FlagInfo {
+            long_name: info.long_name,
+            short_name: info.short_name,
+            value: info.value,
+            min: None,
+            max: None,
+            default: None,
+            description: None,
+        };
         T::parse(&mut value, source, &info, long)?;
 
         list.push_back(T::unwrap(value, &info)?);
@@ -173,7 +197,15 @@ impl<T: Flag + Eq + Hash> Flag for HashSet<T> {
         };
 
         let mut value = None;
-        let info = info.drop_default();
+        let info = FlagInfo {
+            long_name: info.long_name,
+            short_name: info.short_name,
+            value: info.value,
+            min: None,
+            max: None,
+            default: None,
+            description: None,
+        };
         T::parse(&mut value, source, &info, long)?;
 
         set.insert(T::unwrap(value, &info)?);
@@ -224,7 +256,15 @@ impl<T: Flag + Ord> Flag for BTreeSet<T> {
         };
 
         let mut value = None;
-        let info = info.drop_default();
+        let info = FlagInfo {
+            long_name: info.long_name,
+            short_name: info.short_name,
+            value: info.value,
+            min: None,
+            max: None,
+            default: None,
+            description: None,
+        };
         T::parse(&mut value, source, &info, long)?;
 
         set.insert(T::unwrap(value, &info)?);
@@ -275,7 +315,15 @@ impl<T: Flag + Ord> Flag for BinaryHeap<T> {
         };
 
         let mut value = None;
-        let info = info.drop_default();
+        let info = FlagInfo {
+            long_name: info.long_name,
+            short_name: info.short_name,
+            value: info.value,
+            min: None,
+            max: None,
+            default: None,
+            description: None,
+        };
         T::parse(&mut value, source, &info, long)?;
 
         heap.push(T::unwrap(value, &info)?);
