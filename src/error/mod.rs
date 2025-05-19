@@ -1,5 +1,6 @@
 mod invalid_address;
 mod invalid_char;
+mod invalid_duration;
 mod invalid_length;
 mod invalid_number;
 mod unexpected;
@@ -9,6 +10,7 @@ mod new;
 
 pub use invalid_address::InvalidAddressError;
 pub use invalid_char::InvalidCharError;
+pub use invalid_duration::InvalidDurationError;
 pub use invalid_length::InvalidLengthError;
 pub use invalid_number::InvalidNumberError;
 pub use unexpected::UnexpectedError;

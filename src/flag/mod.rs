@@ -16,6 +16,7 @@ mod path;
 mod rc;
 mod string;
 mod sync;
+mod time;
 mod tuple;
 
 pub use info::FlagInfo;

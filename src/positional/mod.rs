@@ -15,6 +15,7 @@ mod path;
 mod rc;
 mod string;
 mod sync;
+mod time;
 
 pub use info::PositionalInfo;
 pub use result::PositionalResult;

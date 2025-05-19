@@ -24,8 +24,8 @@ pub use argument::{
 pub use command::Command;
 pub use default_display::DefaultDisplay;
 pub use error::{
-    Error, InvalidAddressError, InvalidCharError, InvalidLengthError, InvalidNumberError, Result,
-    UnexpectedError,
+    Error, InvalidAddressError, InvalidCharError, InvalidDurationError, InvalidLengthError,
+    InvalidNumberError, Result, UnexpectedError,
 };
 pub use flag::{Flag, FlagInfo};
 pub use flag_group::FlagGroup;

@@ -8,6 +8,7 @@ mod option;
 mod os_str;
 mod rc;
 mod sync;
+mod time;
 mod tuple;
 
 /// Display a default value
