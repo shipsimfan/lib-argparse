@@ -24,9 +24,6 @@ impl<'a> ToTokens for StructOutput<'a> {
         } = self;
 
         to_tokens! { generator
-            #[allow(unused_imports)]
-            use ::argparse::FlagGroup;
-
             // Positional info
             #positional_info
 
