@@ -12,6 +12,8 @@ impl<'a> ToTokens for StructOutput<'a> {
             long_names,
             short_names,
             unwraps,
+            usages,
+            helps,
         } = self;
 
         let name2 = name.clone();
@@ -58,6 +60,17 @@ impl<'a> ToTokens for StructOutput<'a> {
                         Ok(#name2 {
                             #unwraps
                         })
+                    }
+
+                    fn print_help_usage() -> bool {
+                        #[allow(unused_mut)]
+                        let mut __optional_flags = false;
+                        #usages
+                        __optional_flags
+                    }
+
+                    fn print_help() {
+                        #helps
                     }
                 }
             }

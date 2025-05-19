@@ -7,6 +7,7 @@ impl<'a> ToTokens for HelpUsageOutput<'a> {
             header,
             positionals,
             flags,
+            flag_groups,
         } = self;
 
         to_tokens! { generator
@@ -17,6 +18,7 @@ impl<'a> ToTokens for HelpUsageOutput<'a> {
             let mut __optional_flags = false;
 
             #flags
+            #flag_groups
 
             if __optional_flags {
                 ::std::print!("[OPTIONS..] ");

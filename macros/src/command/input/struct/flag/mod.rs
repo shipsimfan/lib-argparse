@@ -1,9 +1,8 @@
-use std::borrow::Cow;
-
 use proc_macro_util::{
     ast::{Expression, Type},
     tokens::{Identifier, Literal},
 };
+use std::borrow::Cow;
 
 mod extract;
 mod get;

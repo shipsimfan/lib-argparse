@@ -1,6 +1,6 @@
 use super::{
-    FlagHelpOutput, HelpHeader, HelpOutput, HelpOutputDescription, HelpOutputName, HelpUsageOutput,
-    PositionalHelpOutput,
+    flag_group::FlagGroupHelpOutput, FlagHelpOutput, HelpHeader, HelpOutput, HelpOutputDescription,
+    HelpOutputName, HelpUsageOutput, PositionalHelpOutput,
 };
 
 impl<'a> HelpOutput<'a> {
@@ -13,6 +13,7 @@ impl<'a> HelpOutput<'a> {
         positionals: Vec<PositionalHelpOutput>,
         flag_header: Option<HelpHeader<'a>>,
         flags: Vec<FlagHelpOutput>,
+        flag_groups: Vec<FlagGroupHelpOutput<'a>>,
     ) -> Self {
         HelpOutput {
             name,
@@ -22,6 +23,7 @@ impl<'a> HelpOutput<'a> {
             positionals,
             flag_header,
             flags,
+            flag_groups,
         }
     }
 }

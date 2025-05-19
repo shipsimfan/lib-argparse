@@ -11,6 +11,7 @@ impl<'a> ToTokens for HelpOutput<'a> {
             positionals,
             flag_header,
             flags,
+            flag_groups,
         } = self;
 
         to_tokens! { generator
@@ -25,6 +26,8 @@ impl<'a> ToTokens for HelpOutput<'a> {
 
                 #flag_header
                 #flags
+
+                #flag_groups
 
                 return Ok(None);
             }

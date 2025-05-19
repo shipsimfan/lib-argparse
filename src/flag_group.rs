@@ -26,4 +26,11 @@ pub trait FlagGroup: Sized {
 
     /// Unwrap the flags in this group
     fn unwrap(this: Self::InProgress) -> Result<Self>;
+
+    /// Print the required flags' help usage to stdout, returning if there are any optional flags
+    /// in the group
+    fn print_help_usage() -> bool;
+
+    /// Print the help information of the contained flags to stdout
+    fn print_help();
 }

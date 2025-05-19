@@ -1,5 +1,5 @@
 use super::{FlagLongName, FlagShortName, FlagUnwrap, InProgress, NewInProgress, StructOutput};
-use crate::command::FlagInfo;
+use crate::command::{FlagHelpOutput, FlagHelpUsageOutput, FlagInfo};
 use proc_macro_util::tokens::Identifier;
 use std::borrow::Cow;
 
@@ -13,6 +13,8 @@ impl<'a> StructOutput<'a> {
         long_names: Vec<FlagLongName>,
         short_names: Vec<FlagShortName>,
         unwraps: Vec<FlagUnwrap<'a>>,
+        usages: Vec<FlagHelpUsageOutput>,
+        helps: Vec<FlagHelpOutput>,
     ) -> Self {
         let module_name = Identifier::new(&format!("__flag_group_{}", name));
 
@@ -25,6 +27,8 @@ impl<'a> StructOutput<'a> {
             short_names,
             long_names,
             unwraps,
+            helps,
+            usages,
         }
     }
 }

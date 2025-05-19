@@ -11,8 +11,8 @@ impl<T: Positional> PositionalInfo<T> {
             }
 
             description(description_offset);
-        } else {
-            println!();
         }
+
+        println!();
     }
 }

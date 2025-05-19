@@ -72,18 +72,28 @@ impl<'a> StructInput<'a> {
         let mut flag_group_long_names = Vec::with_capacity(self.flag_groups.len());
         let mut flag_group_short_names = Vec::with_capacity(self.flag_groups.len());
         let mut flag_group_unwraps = Vec::with_capacity(self.flag_groups.len());
+        let mut flag_group_usages = Vec::with_capacity(self.flag_groups.len());
+        let mut flag_group_helps = Vec::with_capacity(self.flag_groups.len());
         for flag_group in self.flag_groups {
-            let (declaration, long_name, short_name, unwrap) = flag_group.into_output();
+            let (declaration, long_name, short_name, unwrap, usage, help) =
+                flag_group.into_output();
 
             flag_group_declarations.push(declaration);
             flag_group_long_names.push(long_name);
             flag_group_short_names.push(short_name);
             flag_group_unwraps.push(unwrap);
+            flag_group_usages.push(usage);
+            flag_group_helps.push(help);
         }
 
-        let (version, help) =
-            self.info
-                .into_output(positional_usages, positional_help, flag_usages, flag_help);
+        let (version, help) = self.info.into_output(
+            positional_usages,
+            positional_help,
+            flag_usages,
+            flag_help,
+            flag_group_usages,
+            flag_group_helps,
+        );
 
         Output::new_struct(StructOutput::new(
             self.name,

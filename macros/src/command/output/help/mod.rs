@@ -1,5 +1,6 @@
 mod description;
 mod flag;
+mod flag_group;
 mod header;
 mod name;
 mod positional;
@@ -10,10 +11,13 @@ mod to_tokens;
 
 pub use description::HelpOutputDescription;
 pub use flag::FlagHelpOutput;
+pub use flag_group::FlagGroupHelpOutput;
 pub use header::HelpHeader;
 pub use name::HelpOutputName;
 pub use positional::PositionalHelpOutput;
-pub use usage::{FlagHelpUsageOutput, HelpUsageOutput, PositionalHelpUsageOutput};
+pub use usage::{
+    FlagGroupHelpUsageOutput, FlagHelpUsageOutput, HelpUsageOutput, PositionalHelpUsageOutput,
+};
 
 /// Generates the code to display a help message
 pub struct HelpOutput<'a> {
@@ -37,4 +41,7 @@ pub struct HelpOutput<'a> {
 
     /// The flags to display help for
     flags: Vec<FlagHelpOutput>,
+
+    /// The flag groups to display help for
+    flag_groups: Vec<FlagGroupHelpOutput<'a>>,
 }

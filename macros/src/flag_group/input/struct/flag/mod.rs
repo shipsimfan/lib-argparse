@@ -5,6 +5,8 @@ use proc_macro_util::{
 use std::borrow::Cow;
 
 mod extract;
+mod get;
+mod help_length;
 mod into_output;
 
 /// The information extracted for a flag

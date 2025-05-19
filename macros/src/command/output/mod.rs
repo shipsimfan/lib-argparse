@@ -14,8 +14,9 @@ mod new;
 mod to_tokens;
 
 pub use help::{
-    FlagHelpOutput, FlagHelpUsageOutput, HelpHeader, HelpOutput, HelpOutputDescription,
-    HelpOutputName, HelpUsageOutput, PositionalHelpOutput, PositionalHelpUsageOutput,
+    FlagGroupHelpOutput, FlagGroupHelpUsageOutput, FlagHelpOutput, FlagHelpUsageOutput, HelpHeader,
+    HelpOutput, HelpOutputDescription, HelpOutputName, HelpUsageOutput, PositionalHelpOutput,
+    PositionalHelpUsageOutput,
 };
 pub use r#struct::{
     DefaultValue, Description, FlagGroupDeclaration, FlagGroupLongName, FlagGroupShortName,

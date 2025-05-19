@@ -1,8 +1,8 @@
 use super::CommandInfo;
 use crate::command::output::{
-    Description, FlagHelpOutput, FlagHelpUsageOutput, HelpHeader, HelpOutput,
-    HelpOutputDescription, HelpOutputName, HelpUsageOutput, PositionalHelpOutput,
-    PositionalHelpUsageOutput, VersionOutput,
+    Description, FlagGroupHelpOutput, FlagGroupHelpUsageOutput, FlagHelpOutput,
+    FlagHelpUsageOutput, HelpHeader, HelpOutput, HelpOutputDescription, HelpOutputName,
+    HelpUsageOutput, PositionalHelpOutput, PositionalHelpUsageOutput, VersionOutput,
 };
 
 impl<'a> CommandInfo<'a> {
@@ -13,6 +13,8 @@ impl<'a> CommandInfo<'a> {
         positional_help: Vec<PositionalHelpOutput>,
         flag_usages: Vec<FlagHelpUsageOutput>,
         flag_help: Vec<FlagHelpOutput>,
+        flag_group_usages: Vec<FlagGroupHelpUsageOutput<'a>>,
+        flag_group_helps: Vec<FlagGroupHelpOutput<'a>>,
     ) -> (Option<VersionOutput<'a>>, Option<HelpOutput<'a>>) {
         (
             self.version
@@ -40,6 +42,7 @@ impl<'a> CommandInfo<'a> {
                         },
                         positional_usages,
                         flag_usages,
+                        flag_group_usages,
                     ),
                     if positional_help.len() > 0 {
                         Some(match self.positional_header {
@@ -59,6 +62,7 @@ impl<'a> CommandInfo<'a> {
                         None
                     },
                     flag_help,
+                    flag_group_helps,
                 ))
             } else {
                 None

@@ -1,4 +1,4 @@
-use crate::command::FlagInfo;
+use crate::command::{FlagHelpOutput, FlagHelpUsageOutput, FlagInfo};
 use proc_macro_util::tokens::Identifier;
 use std::borrow::Cow;
 
@@ -42,4 +42,10 @@ pub struct StructOutput<'a> {
 
     /// Unwrapping of flags
     unwraps: Vec<FlagUnwrap<'a>>,
+
+    /// Prints the usages for the flags in the group
+    usages: Vec<FlagHelpUsageOutput>,
+
+    /// The help displays for the contained flags
+    helps: Vec<FlagHelpOutput>,
 }
