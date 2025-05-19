@@ -19,6 +19,8 @@ impl<'a> StructInput<'a> {
 
         description_offset += 2;
 
+        let num_flags = self.flags.len();
+
         let mut infos = Vec::with_capacity(self.flags.len());
         let mut types = Vec::with_capacity(self.flags.len());
         let mut long_names = Vec::with_capacity(self.flags.len());
@@ -42,6 +44,26 @@ impl<'a> StructInput<'a> {
             }
         }
 
+        let mut flag_group_in_progress = Vec::with_capacity(self.flag_groups.len());
+        let mut flag_group_declarations = Vec::with_capacity(self.flag_groups.len());
+        let mut flag_group_long_names = Vec::with_capacity(self.flag_groups.len());
+        let mut flag_group_short_names = Vec::with_capacity(self.flag_groups.len());
+        let mut flag_group_unwraps = Vec::with_capacity(self.flag_groups.len());
+        let mut flag_group_usages = Vec::with_capacity(self.flag_groups.len());
+        let mut flag_group_helps = Vec::with_capacity(self.flag_groups.len());
+        for (i, flag_group) in self.flag_groups.into_iter().enumerate() {
+            let (in_progress, declaration, long_name, short_name, unwrap, usage, help) =
+                flag_group.into_output(i + num_flags);
+
+            flag_group_in_progress.push(in_progress);
+            flag_group_declarations.push(declaration);
+            flag_group_long_names.push(long_name);
+            flag_group_short_names.push(short_name);
+            flag_group_unwraps.push(unwrap);
+            flag_group_usages.push(usage);
+            flag_group_helps.push(help);
+        }
+
         let in_progress = InProgress::new(types);
 
         Output::Struct(StructOutput::new(
@@ -54,6 +76,13 @@ impl<'a> StructInput<'a> {
             unwraps,
             usages,
             helps,
+            flag_group_in_progress,
+            flag_group_declarations,
+            flag_group_long_names,
+            flag_group_short_names,
+            flag_group_unwraps,
+            flag_group_usages,
+            flag_group_helps,
         ))
     }
 }

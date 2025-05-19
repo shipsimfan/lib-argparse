@@ -1,4 +1,4 @@
-use super::{Flag, StructInput};
+use super::{Flag, FlagGroup, StructInput};
 use proc_macro_util::{
     ast::items::{Struct, StructBody},
     Error,
@@ -21,17 +21,25 @@ impl<'a> StructInput<'a> {
         };
 
         let mut flags = Vec::new();
+        let mut flag_groups = Vec::new();
         if let Some(fields) = fields {
-            flags.push(Flag::extract(fields.first)?);
+            match FlagGroup::extract(fields.first)? {
+                Ok(flag_group) => flag_groups.push(flag_group),
+                Err(field) => flags.push(Flag::extract(field)?),
+            }
 
             for (_, field) in fields.remaining {
-                flags.push(Flag::extract(field)?);
+                match FlagGroup::extract(field)? {
+                    Ok(flag_group) => flag_groups.push(flag_group),
+                    Err(field) => flags.push(Flag::extract(field)?),
+                }
             }
         }
 
         Ok(StructInput {
             name: r#struct.name,
             flags,
+            flag_groups,
         })
     }
 }

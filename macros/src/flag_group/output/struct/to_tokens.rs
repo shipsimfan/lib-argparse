@@ -14,6 +14,13 @@ impl<'a> ToTokens for StructOutput<'a> {
             unwraps,
             usages,
             helps,
+            flag_group_in_progress,
+            flag_group_declarations,
+            flag_group_long_names,
+            flag_group_short_names,
+            flag_group_unwraps,
+            flag_group_usages,
+            flag_group_helps,
         } = self;
 
         let name2 = name.clone();
@@ -26,10 +33,10 @@ impl<'a> ToTokens for StructOutput<'a> {
                 #infos
 
                 impl ::argparse::FlagGroup for #name {
-                    type InProgress = (#in_progress);
+                    type InProgress = (#in_progress #flag_group_in_progress);
 
                     fn new_in_progress() -> Self::InProgress {
-                        (#new_in_progress)
+                        (#new_in_progress #flag_group_declarations)
                     }
 
                     fn parse_long(
@@ -39,7 +46,11 @@ impl<'a> ToTokens for StructOutput<'a> {
                     ) -> ::argparse::Result<bool> {
                         match flag {
                             #long_names
-                            _ => return Ok(false),
+                            _ => {
+                                #flag_group_long_names
+
+                                return Ok(false)
+                            },
                         }
                         #[allow(unreachable_code)]
                         Ok(true)
@@ -52,7 +63,11 @@ impl<'a> ToTokens for StructOutput<'a> {
                     ) -> ::argparse::Result<bool> {
                         match flag {
                             #short_names
-                            _ => return Ok(false),
+                            _ => {
+                                #flag_group_short_names
+
+                                return Ok(false)
+                            },
                         }
                         #[allow(unreachable_code)]
                         Ok(true)
@@ -61,6 +76,7 @@ impl<'a> ToTokens for StructOutput<'a> {
                     fn unwrap(this: Self::InProgress) -> ::argparse::Result<Self> {
                         Ok(#name2 {
                             #unwraps
+                            #flag_group_unwraps
                         })
                     }
 
@@ -68,11 +84,13 @@ impl<'a> ToTokens for StructOutput<'a> {
                         #[allow(unused_mut)]
                         let mut __optional_flags = false;
                         #usages
+                        #flag_group_usages
                         __optional_flags
                     }
 
                     fn print_help() {
                         #helps
+                        #flag_group_helps
                     }
                 }
             }

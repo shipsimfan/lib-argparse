@@ -25,7 +25,10 @@ proc_macro_util::proc_macro_derive!(
     ///
     /// Fields can have a `flag` attribute attached to give extra information about the flag. See
     /// documentation for `Command` derive for details on the `flag` attribute.
-    FlagGroup (flag) -> flag_group::generate
+    ///
+    /// Fields can have a `flag_group` attribute attached to mark it as a child flag group. This
+    /// cannot be marked at the same time as `flag`.
+    FlagGroup (flag, flag_group) -> flag_group::generate
 );
 
 proc_macro_util::proc_macro_derive!(

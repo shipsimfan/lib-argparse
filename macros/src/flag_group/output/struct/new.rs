@@ -1,5 +1,11 @@
-use super::{FlagLongName, FlagShortName, FlagUnwrap, InProgress, NewInProgress, StructOutput};
-use crate::command::{FlagHelpOutput, FlagHelpUsageOutput, FlagInfo};
+use super::{
+    FlagGroupDeclaration, FlagGroupInProgress, FlagGroupLongName, FlagGroupShortName,
+    FlagGroupUnwrap, FlagLongName, FlagShortName, FlagUnwrap, InProgress, NewInProgress,
+    StructOutput,
+};
+use crate::command::{
+    FlagGroupHelpOutput, FlagGroupHelpUsageOutput, FlagHelpOutput, FlagHelpUsageOutput, FlagInfo,
+};
 use proc_macro_util::tokens::Identifier;
 use std::borrow::Cow;
 
@@ -15,6 +21,13 @@ impl<'a> StructOutput<'a> {
         unwraps: Vec<FlagUnwrap<'a>>,
         usages: Vec<FlagHelpUsageOutput>,
         helps: Vec<FlagHelpOutput>,
+        flag_group_in_progress: Vec<FlagGroupInProgress<'a>>,
+        flag_group_declarations: Vec<FlagGroupDeclaration<'a>>,
+        flag_group_long_names: Vec<FlagGroupLongName<'a>>,
+        flag_group_short_names: Vec<FlagGroupShortName<'a>>,
+        flag_group_unwraps: Vec<FlagGroupUnwrap<'a>>,
+        flag_group_usages: Vec<FlagGroupHelpUsageOutput<'a>>,
+        flag_group_helps: Vec<FlagGroupHelpOutput<'a>>,
     ) -> Self {
         let module_name = Identifier::new(&format!("__flag_group_{}", name));
 
@@ -29,6 +42,13 @@ impl<'a> StructOutput<'a> {
             unwraps,
             helps,
             usages,
+            flag_group_in_progress,
+            flag_group_declarations,
+            flag_group_long_names,
+            flag_group_short_names,
+            flag_group_unwraps,
+            flag_group_usages,
+            flag_group_helps,
         }
     }
 }
