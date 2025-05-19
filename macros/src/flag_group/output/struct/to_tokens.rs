@@ -41,6 +41,7 @@ impl<'a> ToTokens for StructOutput<'a> {
                             #long_names
                             _ => return Ok(false),
                         }
+                        #[allow(unreachable_code)]
                         Ok(true)
                     }
 
@@ -53,6 +54,7 @@ impl<'a> ToTokens for StructOutput<'a> {
                             #short_names
                             _ => return Ok(false),
                         }
+                        #[allow(unreachable_code)]
                         Ok(true)
                     }
 
