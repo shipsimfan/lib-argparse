@@ -1,15 +1,15 @@
 use super::{Input, StructInput};
 use proc_macro_util::{
     ast::{DeriveItem, DeriveItemKind},
-    Error,
+    Result, Span,
 };
 
 impl<'a> Input<'a> {
     /// Extract the required details from `item`
-    pub fn extract(item: DeriveItem<'a>) -> Result<Self, Error> {
+    pub fn extract(item: DeriveItem<'a>) -> Result<Self> {
         match item.kind {
             DeriveItemKind::Struct(r#struct) => Ok(Input::Struct(StructInput::extract(r#struct)?)),
-            _ => Err(Error::new("`FlagGroup` derive only supports structs")),
+            _ => Err(Span::call_site().error("`FlagGroup` derive only supports structs")),
         }
     }
 }

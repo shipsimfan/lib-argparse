@@ -1,22 +1,22 @@
 use super::{Flag, FlagGroup, StructInput};
 use proc_macro_util::{
     ast::items::{Struct, StructBody},
-    Error,
+    Result,
 };
 
 impl<'a> StructInput<'a> {
     /// Extract the required details from `r#struct`
-    pub fn extract(r#struct: Struct<'a>) -> Result<Self, Error> {
+    pub fn extract(r#struct: Struct<'a>) -> Result<Self> {
         let fields = match r#struct.body {
             StructBody::Normal {
                 where_clause: _,
                 fields,
             } => fields,
             _ => {
-                return Err(Error::new_at(
-                    "`FlagGroup` only supports structs with named fields",
-                    r#struct.name.span(),
-                ))
+                return Err(r#struct
+                    .name
+                    .span()
+                    .error("`FlagGroup` only supports structs with named fields"))
             }
         };
 

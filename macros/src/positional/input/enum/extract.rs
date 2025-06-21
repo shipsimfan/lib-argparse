@@ -1,9 +1,9 @@
 use super::{EnumInput, EnumInputVariant};
-use proc_macro_util::{ast::items::Enumeration, Error};
+use proc_macro_util::{ast::items::Enumeration, Result};
 
 impl<'a> EnumInput<'a> {
     /// Extract the required details from `r#enum`
-    pub fn extract(r#enum: Enumeration<'a>) -> Result<Self, Error> {
+    pub fn extract(r#enum: Enumeration<'a>) -> Result<Self> {
         let mut variants = Vec::new();
         if let Some(items) = r#enum.enum_items {
             variants.push(EnumInputVariant::extract(items.first)?);

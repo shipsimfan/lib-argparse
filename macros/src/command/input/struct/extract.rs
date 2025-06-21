@@ -2,12 +2,12 @@ use super::{flag_group::FlagGroup, Flag, Positional, StructInput};
 use crate::command::input::CommandInfo;
 use proc_macro_util::{
     ast::items::{Struct, StructBody},
-    Error,
+    Result,
 };
 
 impl<'a> StructInput<'a> {
     /// Extract the required details from `r#struct`
-    pub fn extract(r#struct: Struct<'a>, info: CommandInfo<'a>) -> Result<Self, Error> {
+    pub fn extract(r#struct: Struct<'a>, info: CommandInfo<'a>) -> Result<Self> {
         let name = r#struct.name;
 
         let fields = match r#struct.body {

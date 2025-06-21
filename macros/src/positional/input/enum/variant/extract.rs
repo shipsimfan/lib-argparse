@@ -1,18 +1,17 @@
 use super::EnumInputVariant;
 use proc_macro_util::{
     ast::items::{EnumItem, EnumItemKind},
-    Error,
+    Result,
 };
 
 impl<'a> EnumInputVariant<'a> {
     /// Extract the required details from `item`
-    pub fn extract(item: EnumItem<'a>) -> Result<Self, Error> {
+    pub fn extract(item: EnumItem<'a>) -> Result<Self> {
         let r#type = match item.kind {
             Some(EnumItemKind::Tuple(Some(tuple))) => {
                 if tuple.remaining.len() > 0 {
-                    return Err(Error::new_at(
+                    return Err(item.name.span().error(
                         "`Positional` derive only supports tuple-style enum variants with one field",
-                        item.name.span(),
                     ));
                 } else {
                     Some(tuple.first.r#type)
@@ -20,10 +19,10 @@ impl<'a> EnumInputVariant<'a> {
             }
             Some(EnumItemKind::Tuple(None)) => None,
             Some(_) => {
-                return Err(Error::new_at(
-                    "`Positional` derive does not support struct-style enum variants",
-                    item.name.span(),
-                ))
+                return Err(item
+                    .name
+                    .span()
+                    .error("`Positional` derive does not support struct-style enum variants"))
             }
             None => None,
         };

@@ -2,24 +2,18 @@ use super::CommandInfo;
 use proc_macro_util::{
     ast::{AttrInput, Expression, OuterAttribute},
     tokens::{Group, Identifier, Literal},
-    Error, Token,
+    Result, Token,
 };
 use std::borrow::Cow;
 
 impl<'a> CommandInfo<'a> {
     /// Extracts the [`CommandInfo`] from `attribute`
-    pub fn extract(
-        attribute: OuterAttribute<'a>,
-        docs: Vec<Expression<'a>>,
-    ) -> Result<Self, Error> {
+    pub fn extract(attribute: OuterAttribute<'a>, docs: Vec<Expression<'a>>) -> Result<Self> {
         let group = match attribute.attr.input {
             Some(AttrInput::Group(group)) => group,
             None => Cow::Owned(Group::new_parenthesis()),
             Some(AttrInput::Expression(eq, _)) => {
-                return Err(Error::new_at(
-                    "expected a group, not an expression",
-                    eq.spans[0],
-                ))
+                return Err(eq.spans[0].error("expected a group, not an expression"))
             }
         };
 
@@ -85,10 +79,9 @@ impl<'a> CommandInfo<'a> {
                     flag_header = Some(parser.parse::<Expression>()?.into_static());
                 }
                 _ => {
-                    return Err(Error::new_at(
-                        format!("unknown command tag \"{tag_str}\""),
-                        tag.span(),
-                    ))
+                    return Err(tag
+                        .span()
+                        .error(format!("unknown command tag \"{tag_str}\"")))
                 }
             }
 

@@ -1,12 +1,12 @@
 use super::{CommandInfo, Input, StructInput};
 use proc_macro_util::{
     ast::{AttrInput, DeriveItem, DeriveItemKind},
-    Error,
+    Result,
 };
 
 impl<'a> Input<'a> {
     /// Extract the required details from `item`
-    pub fn extract(item: DeriveItem<'a>) -> Result<Self, Error> {
+    pub fn extract(item: DeriveItem<'a>) -> Result<Self> {
         let mut command_attribute = None;
         let mut docs = Vec::new();
         for attribute in item.attributes {

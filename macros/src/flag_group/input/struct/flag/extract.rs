@@ -2,14 +2,14 @@ use super::Flag;
 use proc_macro_util::{
     ast::{items::StructField, AttrInput, Expression},
     tokens::{Group, Identifier, Literal},
-    Error, Token,
+    Result, Token,
 };
 use std::borrow::Cow;
 
 impl<'a> Flag<'a> {
     /// Tries to extract a [`Flag`] from `field`, return the field in [`Err`] if the field is not a
     /// flag
-    pub fn extract(mut field: StructField<'a>) -> Result<Self, Error> {
+    pub fn extract(mut field: StructField<'a>) -> Result<Self> {
         let mut flag_attribute = None;
         let mut docs = Vec::new();
         for (i, attribute) in field.attributes.iter().enumerate() {
@@ -50,10 +50,7 @@ impl<'a> Flag<'a> {
                 Some(AttrInput::Group(group)) => group,
                 None => Cow::Owned(Group::new_parenthesis()),
                 Some(AttrInput::Expression(eq, _)) => {
-                    return Err(Error::new_at(
-                        "expected a group, not an expression",
-                        eq.spans[0],
-                    ))
+                    return Err(eq.spans[0].error("expected a group, not an expression"))
                 }
             };
 
@@ -110,12 +107,7 @@ impl<'a> Flag<'a> {
                             vec![parser.parse::<Expression>()?.into_static()]
                         })
                     }
-                    _ => {
-                        return Err(Error::new_at(
-                            format!("unknown flag tag \"{tag}\""),
-                            tag.span(),
-                        ))
-                    }
+                    _ => return Err(tag.span().error(format!("unknown flag tag \"{tag}\""))),
                 }
 
                 match parser.step_parse::<Token![,]>() {
