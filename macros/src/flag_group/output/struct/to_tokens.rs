@@ -1,5 +1,5 @@
 use super::StructOutput;
-use proc_macro_util::{to_tokens, Generator, ToTokens};
+use proc_macro_util::{to_tokens, Generator, ToTokens, Token};
 
 impl<'a> ToTokens for StructOutput<'a> {
     fn to_tokens(self, generator: &mut Generator) {
@@ -25,6 +25,13 @@ impl<'a> ToTokens for StructOutput<'a> {
 
         let name2 = name.clone();
 
+        let comma1 = if flag_group_in_progress.len() + in_progress.len() == 1 {
+            Some(Token![,]())
+        } else {
+            None
+        };
+        let comma2 = comma1.clone();
+
         to_tokens! { generator
             #[allow(non_snake_case)]
             mod #module_name {
@@ -33,10 +40,10 @@ impl<'a> ToTokens for StructOutput<'a> {
                 #infos
 
                 impl ::argparse::FlagGroup for #name {
-                    type InProgress = (#in_progress #flag_group_in_progress);
+                    type InProgress = (#in_progress #flag_group_in_progress #comma1);
 
                     fn new_in_progress() -> Self::InProgress {
-                        (#new_in_progress #flag_group_declarations)
+                        (#new_in_progress #flag_group_declarations #comma2)
                     }
 
                     fn parse_long(
