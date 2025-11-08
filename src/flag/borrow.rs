@@ -1,7 +1,7 @@
 use crate::{ArgumentSource, DefaultDisplay, Error, Flag, FlagInfo, Result};
 use std::borrow::Cow;
 
-impl<'a, T: Flag, B: DefaultDisplay + ToOwned<Owned = T>> Flag for Cow<'a, B> {
+impl<'a, T: Flag, B: DefaultDisplay + ToOwned<Owned = T> + ?Sized> Flag for Cow<'a, B> {
     fn parse(
         this: &mut Option<Self>,
         source: &mut dyn ArgumentSource,
