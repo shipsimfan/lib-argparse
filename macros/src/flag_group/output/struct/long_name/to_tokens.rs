@@ -10,7 +10,7 @@ impl ToTokens for FlagLongName {
         } = self;
 
         to_tokens! { generator
-            #long_name => ::argparse::Flag::parse(&mut this.#index, source, #info_name, true)?,
+            #long_name => ::argparse::Flag::parse(&mut this.#index, source, Self::#info_name, true)?,
         }
     }
 }

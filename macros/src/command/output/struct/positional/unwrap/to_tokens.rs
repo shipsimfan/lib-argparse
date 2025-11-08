@@ -10,7 +10,7 @@ impl<'a> ToTokens for PositionalUnwrap<'a> {
         let variable_name2 = variable_name.clone();
 
         to_tokens! { generator
-            #variable_name: ::argparse::Positional::unwrap(#variable_name2, #info_name)?,
+            #variable_name: ::argparse::Positional::unwrap(#variable_name2, Self::#info_name)?,
         }
     }
 }

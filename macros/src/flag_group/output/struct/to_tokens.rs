@@ -5,6 +5,8 @@ impl<'a> ToTokens for StructOutput<'a> {
     fn to_tokens(self, generator: &mut Generator) {
         let StructOutput {
             name,
+            generic_params,
+            generic_args,
             module_name,
             infos,
             in_progress,
@@ -24,6 +26,7 @@ impl<'a> ToTokens for StructOutput<'a> {
         } = self;
 
         let name2 = name.clone();
+        let name3 = name.clone();
 
         let comma1 = if flag_group_in_progress.len() + in_progress.len() == 1 {
             Some(Token![,]())
@@ -32,14 +35,19 @@ impl<'a> ToTokens for StructOutput<'a> {
         };
         let comma2 = comma1.clone();
 
+        let generic_params2 = generic_params.clone();
+        let generic_args2 = generic_args.clone();
+
         to_tokens! { generator
             #[allow(non_snake_case)]
             mod #module_name {
                 use super::*;
 
-                #infos
+                impl #generic_params #name #generic_args {
+                    #infos
+                }
 
-                impl ::argparse::FlagGroup for #name {
+                impl #generic_params2 ::argparse::FlagGroup for #name2 #generic_args2 {
                     type InProgress = (#in_progress #flag_group_in_progress #comma1);
 
                     fn new_in_progress() -> Self::InProgress {
@@ -81,7 +89,7 @@ impl<'a> ToTokens for StructOutput<'a> {
                     }
 
                     fn unwrap(this: Self::InProgress) -> ::argparse::Result<Self> {
-                        Ok(#name2 {
+                        Ok(#name3 {
                             #unwraps
                             #flag_group_unwraps
                         })

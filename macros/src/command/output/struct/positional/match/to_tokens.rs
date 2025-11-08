@@ -10,7 +10,7 @@ impl<'a> ToTokens for PositionalMatch<'a> {
         } = self;
 
         to_tokens! { generator
-            #index => ::argparse::Positional::parse(&mut #variable_name, __argument.clone(), #info_name),
+            #index => ::argparse::Positional::parse(&mut #variable_name, __argument.clone(), Self::#info_name),
         }
     }
 }

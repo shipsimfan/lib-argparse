@@ -1,3 +1,5 @@
+use proc_macro_util::ast::GenericParams;
+
 use super::StructInput;
 use crate::flag_group::output::{InProgress, NewInProgress, Output, StructOutput};
 
@@ -66,8 +68,15 @@ impl<'a> StructInput<'a> {
 
         let in_progress = InProgress::new(types);
 
+        let generic_args = self
+            .generic_params
+            .as_ref()
+            .map(GenericParams::to_generic_args);
+
         Output::Struct(StructOutput::new(
             self.name,
+            self.generic_params,
+            generic_args,
             infos,
             in_progress,
             new_in_progress,

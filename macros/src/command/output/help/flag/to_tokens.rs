@@ -10,7 +10,7 @@ impl ToTokens for FlagHelpOutput {
         } = self;
 
         to_tokens! { generator
-            #info_name.display_help(#short_names, #description_offset);
+            Self::#info_name.display_help(#short_names, #description_offset);
         }
     }
 }

@@ -6,13 +6,18 @@ use super::{
 use crate::command::{
     FlagGroupHelpOutput, FlagGroupHelpUsageOutput, FlagHelpOutput, FlagHelpUsageOutput, FlagInfo,
 };
-use proc_macro_util::tokens::Identifier;
+use proc_macro_util::{
+    ast::{GenericArgs, GenericParams},
+    tokens::Identifier,
+};
 use std::borrow::Cow;
 
 impl<'a> StructOutput<'a> {
     /// Creates a new [`StructOutput`]
     pub fn new(
         name: Cow<'a, Identifier>,
+        generic_params: Option<GenericParams<'a>>,
+        generic_args: Option<GenericArgs<'a>>,
         infos: Vec<FlagInfo<'a>>,
         in_progress: InProgress<'a>,
         new_in_progress: NewInProgress,
@@ -33,6 +38,8 @@ impl<'a> StructOutput<'a> {
 
         StructOutput {
             name,
+            generic_params,
+            generic_args,
             module_name,
             infos,
             in_progress,

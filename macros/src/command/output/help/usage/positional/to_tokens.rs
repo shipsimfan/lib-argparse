@@ -6,7 +6,7 @@ impl ToTokens for PositionalHelpUsageOutput {
         let PositionalHelpUsageOutput { info_name } = self;
 
         to_tokens! { generator
-            #info_name.display_usage();
+            Self::#info_name.display_usage();
         }
     }
 }

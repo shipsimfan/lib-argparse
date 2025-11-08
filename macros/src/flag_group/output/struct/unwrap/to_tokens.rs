@@ -10,7 +10,7 @@ impl<'a> ToTokens for FlagUnwrap<'a> {
         } = self;
 
         to_tokens! { generator
-            #variable_name: ::argparse::Flag::unwrap(this.#index, #info_name)?,
+            #variable_name: ::argparse::Flag::unwrap(this.#index, Self::#info_name)?,
         }
     }
 }

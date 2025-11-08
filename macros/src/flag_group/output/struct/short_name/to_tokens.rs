@@ -10,7 +10,7 @@ impl ToTokens for FlagShortName {
         } = self;
 
         to_tokens! { generator
-            #short_name => ::argparse::Flag::parse(&mut this.#index, source, #info_name, false)?,
+            #short_name => ::argparse::Flag::parse(&mut this.#index, source, Self::#info_name, false)?,
         }
     }
 }

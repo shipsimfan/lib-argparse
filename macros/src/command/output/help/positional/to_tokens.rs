@@ -9,7 +9,7 @@ impl ToTokens for PositionalHelpOutput {
         } = self;
 
         to_tokens! { generator
-            #info_name.display_help(#description_offset);
+            Self::#info_name.display_help(#description_offset);
         }
     }
 }

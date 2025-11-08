@@ -38,6 +38,7 @@ impl<'a> StructInput<'a> {
 
         Ok(StructInput {
             name: r#struct.name,
+            generic_params: r#struct.generic_params,
             flags,
             flag_groups,
         })

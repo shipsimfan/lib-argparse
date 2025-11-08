@@ -6,7 +6,7 @@ impl ToTokens for FlagHelpUsageOutput {
         let FlagHelpUsageOutput { info_name } = self;
 
         to_tokens! { generator
-            __optional_flags |= #info_name.display_usage();
+            __optional_flags |= Self::#info_name.display_usage();
         }
     }
 }
