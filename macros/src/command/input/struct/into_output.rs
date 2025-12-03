@@ -2,6 +2,7 @@ use crate::command::{
     input::StructInput,
     output::{Output, StructOutput},
 };
+use proc_macro_util::ast::GenericParams;
 
 impl<'a> StructInput<'a> {
     /// Converts this input into an [`Output`]
@@ -95,8 +96,15 @@ impl<'a> StructInput<'a> {
             flag_group_helps,
         );
 
+        let generic_args = self
+            .generic_params
+            .as_ref()
+            .map(GenericParams::to_generic_args);
+
         Output::new_struct(StructOutput::new(
             self.name,
+            self.generic_params,
+            generic_args,
             positional_info,
             positional_declarations,
             positional_matches,

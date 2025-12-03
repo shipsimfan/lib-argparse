@@ -1,5 +1,8 @@
 use super::{HelpOutput, VersionOutput};
-use proc_macro_util::tokens::Identifier;
+use proc_macro_util::{
+    ast::{GenericArgs, GenericParams},
+    tokens::Identifier,
+};
 use std::borrow::Cow;
 
 mod default_value;
@@ -26,7 +29,16 @@ pub use variable_declaration::VariableDeclaration;
 /// The output code for a struct
 pub struct StructOutput<'a> {
     /// The name of the struct
-    pub(super) name: Cow<'a, Identifier>,
+    name: Cow<'a, Identifier>,
+
+    /// The generic params attached to the struct
+    generic_params: Option<GenericParams<'a>>,
+
+    /// The generic arguments attached to the struct
+    generic_args: Option<GenericArgs<'a>>,
+
+    /// The name of the module to produce the implementation in
+    module_name: Identifier,
 
     /// The info describing the positionals
     positional_info: Vec<PositionalInfo<'a>>,

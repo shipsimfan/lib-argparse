@@ -4,13 +4,18 @@ use super::{
     PositionalUnwrap, StructOutput, VariableDeclaration,
 };
 use crate::command::output::{HelpOutput, VersionOutput};
-use proc_macro_util::tokens::Identifier;
+use proc_macro_util::{
+    ast::{GenericArgs, GenericParams},
+    tokens::Identifier,
+};
 use std::borrow::Cow;
 
 impl<'a> StructOutput<'a> {
     /// Creates a new [`StructOutput`]
     pub fn new(
         name: Cow<'a, Identifier>,
+        generic_params: Option<GenericParams<'a>>,
+        generic_args: Option<GenericArgs<'a>>,
         positional_info: Vec<PositionalInfo<'a>>,
         positional_declarations: Vec<VariableDeclaration<'a>>,
         positional_matches: Vec<PositionalMatch<'a>>,
@@ -28,8 +33,13 @@ impl<'a> StructOutput<'a> {
         version: Option<VersionOutput<'a>>,
         help: Option<HelpOutput<'a>>,
     ) -> Self {
+        let module_name = Identifier::new(&format!("__command_{}", name));
+
         StructOutput {
             name,
+            generic_params,
+            generic_args,
+            module_name,
             positional_info,
             positional_declarations,
             positional_matches,
