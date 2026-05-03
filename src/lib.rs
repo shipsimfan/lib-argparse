@@ -6,6 +6,7 @@
 #![deny(rustdoc::redundant_explicit_links)]
 #![warn(rustdoc::broken_intra_doc_links)]
 #![feature(try_trait_v2)]
+#![feature(try_trait_v2_residual)]
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(box_into_inner)]
 #![feature(maybe_uninit_uninit_array_transpose)]
